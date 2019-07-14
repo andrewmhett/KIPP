@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<style>
+	#cblock{
+		border-radius:5px;
+		background: #2a2a2b;
+		padding: 20px;
+		width: 450px;
+	}
+	#flot-placeholder{
+            width:450px;
+            height:450px;
+        }
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
+</head>
+<body bgcolor="000000#">
+	<div style="text-align:center;">
+		<img src="/static/KIPP_1.png" alt="KIPP" width=640,height=360></img><br>
+		<h2>
+			<span id="time_text" style="font-family:arial;color:white"></span>
+		</h2>
+		<!--<audio src="/static/music.mp3" autoplay loop></audio>-->
+		<h2>
+			<span id="cpu_text" style="font-family:arial;color:white"></span><font color="white" style="font-family:arial">° C</font>
+		</h2>
+		<center>
+                    <div id="flot-placeholder"></div>
+                </center>
+	</div>
+	<script>
+                var options={
+                    series:{
+                        lines: {show: true,fill:true},
+                        points: {show: true}
+                    },
+                    xaxis:
+                    {
+                        show:false,
+                        min: 1,
+                        max: 20
+                    },
+                    yaxis:
+                    {
+                        min:30,
+                        max:45
+                    }
+                };
+                var data=[];
+                var x;
+                x=0;
+		$( document ).ready(function(){
+                        $.plot($("#flot-placeholder"),[],options);
+
+			document.getElementById("time_text").innerHTML="{{time}}";
+			document.getElementById("cpu_text").innerHTML="{{cpu}}";
+			var eventSource = new EventSource("/stream")
+                	eventSource.addEventListener("time_event",function(e){
+				document.getElementById("time_text").innerHTML=e.data;
+              		})
+			eventSource.addEventListener("cpu_event",function(e){
+				document.getElementById("cpu_text").innerHTML=e.data;
+                                x++;
+                                if (data.length==20){
+                                    var i;
+                                    for(i=0;i<20;i++){
+                                        if (i!=0){
+                                            data[i-1]=[data[i][0]-1,data[i][1]];
+                                        }
+                                    }
+                                    data[19]=[20,parseFloat(e.data)];
+                                }else{
+                                    data.push([x,parseFloat(e.data)]);
+                                }
+                                var dataset=[
+                                    {
+                                        label: "Temperature",
+                                        data:data
+                                    }
+                                ];
+                                $.plot($("#flot-placeholder"),dataset,options);
+              		})
+		})
+	</script>
+</body>
+</html>

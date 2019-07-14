@@ -1,0 +1,5 @@
+discord==0.16.12
+asyncio
+aiohttp
+aiodns
+lxml

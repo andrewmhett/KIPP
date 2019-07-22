@@ -265,13 +265,16 @@ async def ping_check():
 async def VerifyOwnerMeema(message):
     if str(message.server.id) == "451227721545285649":
         role = discord.utils.get(message.server.roles, name="meema")
-        for member in message.server.members:
-            if role in member.roles:
-                return True
-    if message.author == server.owner or str(message.author.id) == CREATOR_ID:
+        if role in message.author.roles:
+            return True
+    if message.author == message.server.owner or str(message.author.id) == CREATOR_ID:
         return True
-    await client.send_message(message.channel,"**{0}** is an Owner Only command".format(message.content.upper().split("|")[0]))
-    return False
+    if str(message.server.id) == "451227721545285649":
+        await client.send_message(message.channel, "{0} is a Meema-Only command".format(str(message.content).split('|')[0].upper()))
+        return False
+    elif str(message.server.id) != "451227721545285649":
+        await client.send_message(message.channel, "{0} is a Creator-Only command".format(str(message.content).split('|')[0].upper()))
+        return False
 async def VerifyMusicUser(message):
     player = serverinfo[message.server].player
     try:
@@ -509,12 +512,12 @@ async def ELECTION(message,message2):
                 serverinfo[message.server].can1=cand1
                 serverinfo[message.server].can2=cand2
                 serverinfo[message.server].election = True
-                serverinfo[server].oldtime=0
+                serverinfo[message.server].oldtime=0
                 for member in message.server.members:
                     if member.bot==False:
                         if message.server.role_hierarchy.index(member.top_role)>2 and member != cand1 and member != cand2 and (str(member.status).upper() == "ONLINE" or str(member.status) == "idle") :
                             try:
-                                await client.send_message(member, "An election has started in The New Society. Please respond to this message by typing **1** or **2**. Candidate 1 is {0}, and candidate 2 is {1}.".format(str(cand1),str(cand2)))
+                                await client.send_message(member, "An election has started in The Hierarchical Society. Please respond to this message by typing **1** or **2**. Candidate 1 is {0}, and candidate 2 is {1}.".format(str(cand1),str(cand2)))
                                 serverinfo[message.server].voters.append(member)
                                 serverinfo[message.server].messagesent.append(member)
                             except discord.DiscordException:
@@ -1558,11 +1561,13 @@ async def election_timer():
                             channel = serverinfo[server].electionmessage.channel
                             await client.delete_message(serverinfo[server].electionmessage)
                             serverinfo[server].electionmessage = await client.send_message(channel, embed=emb)
+                            cand1=serverinfo[server].can1
+                            cand2=serverinfo[server].can2
                             for member in server.members:
-                                if member not in serverinfo[server].messagesent and message.server.role_hierarchy.index(member.top_role)>2 and member != cand1 and member != cand2 and (str(member.status).upper() == "ONLINE" or str(member.status) == "idle"):
+                                if member not in serverinfo[server].messagesent and server.role_hierarchy.index(member.top_role)>2 and member != cand1 and member != cand2 and (str(member.status).upper() == "ONLINE" or str(member.status) == "idle"):
                                     await client.send_message(member, "An election has started in The New Society. Please respond to this message by typing **1** or **2**. Candidate 1 is {0}, and candidate 2 is {1}.".format(str(cand1),str(cand2)))
-                                    serverinfo[message.server].voters.append(member)
-                                    serverinfo[message.server].messagesent.append(member)
+                                    serverinfo[server].voters.append(member)
+                                    serverinfo[server].messagesent.append(member)
                     if i >= 15 or len(serverinfo[server].voters) == 0:
                         if serverinfo[server].can1votes >0 or serverinfo[server].can2votes>0:
                             emb = discord.Embed(title="Election", description="Election Ended",colour=EMBEDCOLOR)
@@ -1759,8 +1764,9 @@ while True:
                print("Welcome channel was deleted, couldn't send message to welcome channel")
     @client.event
     async def on_message(message):
-        if message.author.bot or message.author.id in serverinfo[message.server].blocked:
-            return
+        if message.server != None or str(message.channel).upper=="DIRECT MESSAGE":
+            if message.author.id in serverinfo[message.server].blocked:
+                await client.delete_message(message)
         if str(message.content).upper().startswith("!SEARCHLOG|")==False and str(message.author) != "KIPP#4780":
             add_chat_log(message)
         try:
@@ -1790,6 +1796,8 @@ while True:
         if str(message.server) != "None":
             user = message.server.get_member(KIPP_ID)
             playerinfo[message.author].game = str(message.author.game)
+        else:
+            return
         kippservers = 0
         roles = []
         for server in client.servers:
@@ -1872,73 +1880,67 @@ while True:
             profooter = ("KIPP | "+weekday+" "+strmonth+" "+str(day)+ending+", "+str(year)+" at "+hour+":"+minute+" AM")
         if timeBinary == 1:
             profooter = ("KIPP | "+weekday+" "+strmonth+" "+str(day)+ending+", "+str(year)+" at "+hour+":"+minute+" PM")
-        if str(message.server) != "None":
-            if message.author.id in serverinfo[message.server].blocked:
-                try:
-                    await client.delete_message(message)
-                except discord.DiscordException:
-                    await client.send_message(message.channel, "Even though this user is blocked, KIPP does not have permissions to delete their messages. This user is still blocked from using KIPP commands, however.")
-            message2 = str(message.content).upper()
-            if message.author == client.user:
-                return
-            if message.server.get_member(KIPP_ID).mention in message2:
-                await client.send_message(message.channel,"What do you want? Use **!help** for the commands.")
-            if message2.startswith("!HELP|"):
-                found=False
-                for command in commands:
-                    if "!" in message2.split("|")[1]:
-                        if command.Name==message2.split("|")[1]:
-                            emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
-                            emb.set_footer(text=profooter)
-                            await client.send_message(message.channel, embed=emb)
-                            found=True
-                    else:
-                        if command.Name=="!"+message2.split("|")[1]:
-                            emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
-                            emb.set_footer(text=profooter)
-                            await client.send_message(message.channel, embed=emb)
-                            found=True
-                if found==False:
-                    await client.send_message(message.channel,"Sorry, but I couldn't find a registered command with that name.")
+        message2 = str(message.content).upper()
+        if message.author == client.user:
+            return
+        if message.server.get_member(KIPP_ID).mention in message2:
+            await client.send_message(message.channel,"What do you want? Use **!help** for the commands.")
+        if message2.startswith("!HELP|"):
+            found=False
+            for command in commands:
+                if "!" in message2.split("|")[1]:
+                    if command.Name==message2.split("|")[1]:
+                        emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
+                        emb.set_footer(text=profooter)
+                        await client.send_message(message.channel, embed=emb)
+                        found=True
+                else:
+                    if command.Name=="!"+message2.split("|")[1]:
+                        emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
+                        emb.set_footer(text=profooter)
+                        await client.send_message(message.channel, embed=emb)
+                        found=True
+            if found==False:
+                await client.send_message(message.channel,"Sorry, but I couldn't find a registered command with that name.")
+        else:
+            if "|" in message2:
+                c=message2.split("|")[0]
             else:
-                if "|" in message2:
-                    c=message2.split("|")[0]
-                else:
-                    c=message2
-                for command in commands:
-                    if command.Name == c:
-                        await command.Execute[0](message,message2)
-            if message2 == ('!HELP'):
-                misc=[]
-                musc=[]
-                hierarchical=[]
-                sc=[]
-                kc=[]
-                oo=[]
-                for c in commands:
-                    if isinstance(c,MISC):
-                        misc.append(c.Name)
-                    elif isinstance(c,HISO):
-                        hierarchical.append(c.Name)
-                    elif isinstance(c,MUSC):
-                        musc.append(c.Name)
-                    elif isinstance(c,SCIN):
-                        sc.append(c.Name)
-                    elif isinstance(c,KIPC):
-                        kc.append(c.Name)
-                    elif isinstance(c,OWON):
-                        oo.append(c.Name)
-                em = discord.Embed(title='Help',description="**Use !Help|command for command-specific information**",colour=EMBEDCOLOR)
-                em.add_field(name="Miscellaneous",value="```"+"\n".join(misc)+"```")#,inline=True)
-                em.add_field(name="Music",value="```"+"\n".join(musc)+"```")#,inline=True)
-                em.add_field(name="Scientific",value="```"+"\n".join(sc)+"```")#,inline=True)
-                if str(message.server.id) == '451227721545285649':
-                    em.add_field(name="Meema Only",value="```"+"\n".join(oo)+"```")#,inline=True)
-                else:
-                    em.add_field(name="Owner Only",value="```"+"\n".join(oo)+"```")#,inline=True)
-                em.add_field(name="KIPPCOINS",value="```"+"\n".join(kc)+"```")#,inline=True)
-                if str(message.server.id) == '451227721545285649':
-                    em.add_field(name="H. Society",value="```"+"\n".join(hierarchical)+"```")#,inline=True)
-                em.set_footer(text=profooter)
-                await client.send_message(message.channel, embed=em)
+                c=message2
+            for command in commands:
+                if command.Name == c:
+                    await command.Execute[0](message,message2)
+        if message2 == ('!HELP'):
+            misc=[]
+            musc=[]
+            hierarchical=[]
+            sc=[]
+            kc=[]
+            oo=[]
+            for c in commands:
+                if isinstance(c,MISC):
+                    misc.append(c.Name)
+                elif isinstance(c,HISO):
+                    hierarchical.append(c.Name)
+                elif isinstance(c,MUSC):
+                    musc.append(c.Name)
+                elif isinstance(c,SCIN):
+                    sc.append(c.Name)
+                elif isinstance(c,KIPC):
+                    kc.append(c.Name)
+                elif isinstance(c,OWON):
+                    oo.append(c.Name)
+            em = discord.Embed(title='Help',description="**Use !Help|command for command-specific information**",colour=EMBEDCOLOR)
+            em.add_field(name="Miscellaneous",value="```"+"\n".join(misc)+"```")#,inline=True)
+            em.add_field(name="Music",value="```"+"\n".join(musc)+"```")#,inline=True)
+            em.add_field(name="Scientific",value="```"+"\n".join(sc)+"```")#,inline=True)
+            if str(message.server.id) == '451227721545285649':
+                em.add_field(name="Meema Only",value="```"+"\n".join(oo)+"```")#,inline=True)
+            else:
+                em.add_field(name="Owner Only",value="```"+"\n".join(oo)+"```")#,inline=True)
+            em.add_field(name="KIPPCOINS",value="```"+"\n".join(kc)+"```")#,inline=True)
+            if str(message.server.id) == '451227721545285649':
+                em.add_field(name="H. Society",value="```"+"\n".join(hierarchical)+"```")#,inline=True)
+            em.set_footer(text=profooter)
+            await client.send_message(message.channel, embed=em)
     client.loop.run_until_complete(client.start(TOKEN))

@@ -4,4 +4,4 @@ python:
 install:
 - pip install -r ./KIPPSTUFF/requirements.txt
 script:
-- KIPP.py
+- ./KIPP.py

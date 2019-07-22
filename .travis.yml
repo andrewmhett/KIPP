@@ -3,3 +3,5 @@ python:
 - "3.6"
 install:
 - pip install -r ./KIPPSTUFF/requirements.txt
+script:
+- KIPP.py

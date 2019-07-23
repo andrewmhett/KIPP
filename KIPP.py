@@ -10,11 +10,7 @@
 import sys
 import logging
 import os
-#print(sys.path)
-#try:
-#        sys.path.append('./KIPPSTUFF')
-#except:
-#	pass
+sys.path.append('./KIPPSTUFF')
 from ESSENTIAL_PACKAGES import *
 CREATOR_ID="289920025077219328"
 KIPP_ID="386352783550447628"

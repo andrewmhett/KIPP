@@ -10,8 +10,9 @@
 import sys
 import logging
 import os
+print(sys.path)
 try:
-	sys.path.append('./KIPPSTUFF')
+        sys.path.append('./KIPPSTUFF')
 except:
 	pass
 from ESSENTIAL_PACKAGES import *

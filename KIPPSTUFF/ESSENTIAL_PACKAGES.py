@@ -22,3 +22,7 @@ try:
 	from Token import TOKEN
 except:
 	print("TOKEN FILE NOT FOUND")
+	try:
+		TOKEN=os.environ['TOKEN']
+	except:
+		print("TOKEN NOT FOUND IN ENVIRONMENT")

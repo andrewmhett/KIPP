@@ -15,7 +15,10 @@ from PIL import Image
 import requests
 import urllib
 from math import *
-from Token import TOKEN
 import aiohttp
 import socket
 from lxml import etree
+try:
+	from Token import TOKEN
+except:
+	print("TOKEN FILE NOT FOUND")

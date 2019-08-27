@@ -368,14 +368,14 @@ async def EVENT(message,message2):
         date=await client.wait_for_message(timeout=60,author=message.author,check=check)
         if date != None:
             date=str(date.content)
-            await client.send_message(message.author,"What is the time of the event? (HHf:MM AM/PM)")
+            await client.send_message(message.author,"What is the time of the event? (HH:MM AM/PM)")
             time=await client.wait_for_message(timeout=60,author=message.author,check=check)
             if time != None:
                 time=str(time.content)
                 if "PM" in time.upper():
-                    time=str(int(time.upper().replace("PM"))+12)
+                    time=str(int(time.upper().replace("PM",'').split(":")[0])+12)+":"+time.upper().replace("PM",'').split(":")[1]
                 else:
-                    time=str(int(time.upper().replace("AM")))
+                    time=str(int(time.upper().replace("AM",'')))
                     if "12:" in time.upper():
                         time="00:"+time.split(":")[1]
                 e=Event(time,date,name,message)
@@ -389,7 +389,7 @@ async def EVENT(message,message2):
                                 if int(event.time.split(":")[0])==0:
                                     t1="12:"+event.time.split(":")[1]+" AM"
                             else:
-                                t1=str(int(event.time.split(":")[0])-12)+" PM"
+                                t1=str(int(event.time.split(":")[0])-12)+":"+event.time.split(":")[1]+" PM"
                             em = discord.Embed(title=event.name,description="**Date: {0}**\n**Time: {1}**\nReact with :thumbsup: in order to sign up.".format("`"+event.date+"`","`"+t1+"`"),colour=EMBEDCOLOR)
                             em.add_field(name="Signed Up",value="No one is currently signed up for this event.")
                             m1 = await client.send_message(message.channel, embed=em)
@@ -1458,6 +1458,7 @@ async def background_loop():
                     e=Event(row[3],row[2],row[1],None)
                     if int(e.date.split("/")[0])==datetime.date.today().month and int(e.date.split("/")[1])==datetime.date.today().day and int(e.date.split("/")[2])==datetime.date.today().year:
                         if int(e.time.split(":")[0])==int(str(datetime.datetime.now()).split(":")[0].split(" ")[1]) and int(e.time.split(":")[1])==int(str(datetime.datetime.now()).split(":")[1]):
+                            I=row[0]
                             for ID in row[4].replace('[','').replace(']','').split("'"):
                                 if len(ID)>0:
                                     await client.send_message(await client.get_user_info(ID),"{0} is starting now!".format(row[1]))
@@ -1467,6 +1468,11 @@ async def background_loop():
                                 for row in readarray:
                                     writer.writerow(row)
                                 f.close()
+                            for server in client.servers:
+                                for event in serverinfo[server].events:
+                                    if event.id == I:
+                                        em = discord.Embed(title=event.name,description="This event is no longer open to subscription",colour=EMBEDCOLOR)
+                                        await client.edit_message(event.message,embed=em)
             global last_ping
             last_ping=t.time()
             for server in client.servers:

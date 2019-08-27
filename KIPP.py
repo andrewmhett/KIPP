@@ -1458,10 +1458,15 @@ async def background_loop():
                     e=Event(row[3],row[2],row[1],None)
                     if int(e.date.split("/")[0])==datetime.date.today().month and int(e.date.split("/")[1])==datetime.date.today().day and int(e.date.split("/")[2])==datetime.date.today().year:
                         if int(e.time.split(":")[0])==int(str(datetime.datetime.now()).split(":")[0].split(" ")[1]) and int(e.time.split(":")[1])==int(str(datetime.datetime.now()).split(":")[1]):
-                            I=row[0]
+                            if int(row[3].split(":")[0])<=12:
+                                t1=time+" AM"
+                                if int(row[3].split(":")[0])==0:
+                                    t1=("12:"+row[3].split(":")[1]+" AM").replace("  "," ")
+                            else:
+                                t1=(str(int(row[3].split(":")[0])-12)+":"+row[3].split(":")[1]+" PM").replace("  "," ")
                             for ID in row[4:]:
                                 if len(ID)>0:
-                                    await client.send_message(await client.get_user_info(ID),"`{0}`, scheduled for `{1}`, is starting now!".format(row[1],row[3]))
+                                    await client.send_message(await client.get_user_info(ID),"`{0}`, scheduled for `{1}`, is starting now!".format(row[1],t1))
                             readarray.remove(row)
                             with open('/home/pi/Desktop/KIPPSTUFF/EVENTS','w') as f:
                                 writer=csv.writer(f)
@@ -1470,9 +1475,10 @@ async def background_loop():
                                 f.close()
                             for server in client.servers:
                                 for event in serverinfo[server].events:
-                                    if event.id == int(I):
+                                    if int(event.id) == int(row[0]):
                                         em = discord.Embed(title=event.name,description="This event is no longer open to subscription.",colour=EMBEDCOLOR)
                                         await client.edit_message(event.message,embed=em)
+                                        serverinfo[server].events.remove(event)
             global last_ping
             last_ping=t.time()
             for server in client.servers:

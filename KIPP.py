@@ -1461,7 +1461,7 @@ async def background_loop():
                             I=row[0]
                             for ID in row[4:]:
                                 if len(ID)>0:
-                                    await client.send_message(await client.get_user_info(ID),"{0} is starting now!".format(row[1]))
+                                    await client.send_message(await client.get_user_info(ID),"`{0}` is starting now!".format(row[1]))
                             readarray.remove(row)
                             with open('/home/pi/Desktop/KIPPSTUFF/EVENTS','w') as f:
                                 writer=csv.writer(f)

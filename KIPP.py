@@ -1461,7 +1461,7 @@ async def background_loop():
                             I=row[0]
                             for ID in row[4:]:
                                 if len(ID)>0:
-                                    await client.send_message(await client.get_user_info(ID),"`{0}` is starting now!".format(row[1]))
+                                    await client.send_message(await client.get_user_info(ID),"`{0}`, scheduled for `{1}`, is starting now!".format(row[1],row[3]))
                             readarray.remove(row)
                             with open('/home/pi/Desktop/KIPPSTUFF/EVENTS','w') as f:
                                 writer=csv.writer(f)
@@ -1470,8 +1470,8 @@ async def background_loop():
                                 f.close()
                             for server in client.servers:
                                 for event in serverinfo[server].events:
-                                    if event.id == I:
-                                        em = discord.Embed(title=event.name,description="This event is no longer open to subscription",colour=EMBEDCOLOR)
+                                    if event.id == int(I):
+                                        em = discord.Embed(title=event.name,description="This event is no longer open to subscription.",colour=EMBEDCOLOR)
                                         await client.edit_message(event.message,embed=em)
             global last_ping
             last_ping=t.time()

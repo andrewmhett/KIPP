@@ -1459,7 +1459,7 @@ async def background_loop():
                     if int(e.date.split("/")[0])==datetime.date.today().month and int(e.date.split("/")[1])==datetime.date.today().day and int(e.date.split("/")[2])==datetime.date.today().year:
                         if int(e.time.split(":")[0])==int(str(datetime.datetime.now()).split(":")[0].split(" ")[1]) and int(e.time.split(":")[1])==int(str(datetime.datetime.now()).split(":")[1]):
                             I=row[0]
-                            for ID in row[4].replace('[','').replace(']','').split("'"):
+                            for ID in row[4:]:
                                 if len(ID)>0:
                                     await client.send_message(await client.get_user_info(ID),"{0} is starting now!".format(row[1]))
                             readarray.remove(row)
@@ -1647,7 +1647,7 @@ async def background_loop():
                             if int(event.time.split(":")[0])==0:
                                 t1="12:"+event.time.split(":")[1]+" AM"
                         else:
-                            t1=str(int(event.time.split(":")[0])-12)+" PM"
+                            t1=str(int(event.time.split(":")[0])-12)+":"+event.time.split(":")[1]+" PM"
                         em = discord.Embed(title=event.name,description="**Date: {0}**\n**Time: {1}**\nReact with :thumbsup: in order to sign up.".format("`"+event.date+"`","`"+t1+"`"),colour=EMBEDCOLOR)
                         if len(event.members)>0:
                             em.add_field(name="Signed Up",value="`"+"\n".join(event.members)+"`")#,inline=True)
@@ -1667,7 +1667,7 @@ async def background_loop():
                                 readarray.append(row)
                             for row in readarray:
                                 if row[0]==str(event.id) and len(row)>1:
-                                    row[4]=event.ids 
+                                    row[4:]=event.ids 
                             with open('/home/pi/Desktop/KIPPSTUFF/EVENTS','w') as f:
                                 writer=csv.writer(f)
                                 for row in readarray:
@@ -1824,7 +1824,7 @@ while True:
                         readarray.append(row)
                     for row in readarray:
                         if row[0]==str(event.id) and len(row)>1:
-                            row[4]=event.ids
+                            row[4:]=event.ids
                     with open('/home/pi/Desktop/KIPPSTUFF/EVENTS','w') as f:
                         writer=csv.writer(f)
                         for row in readarray:

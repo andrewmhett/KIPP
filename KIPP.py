@@ -10,6 +10,7 @@
 import sys
 import logging
 import os
+import threading
 sys.path.append('./KIPPSTUFF')
 from ESSENTIAL_PACKAGES import *
 CREATOR_ID="289920025077219328"
@@ -351,6 +352,7 @@ class Event:
         self.name=name
         self.members=[]
         self.message=message
+        self.ten=False
         try:
             self.channel=message.channel
         except Exception:
@@ -375,42 +377,51 @@ async def EVENT(message,message2):
                 if "PM" in time.upper():
                     time=str(int(time.upper().replace("PM",'').split(":")[0])+12)+":"+time.upper().replace("PM",'').split(":")[1]
                 else:
-                    time=str(int(time.upper().replace("AM",'')))
+                    time=str(int(time.upper().replace("AM",'').split(":")[0]))+":"+time.upper().replace("AM",'').split(":")[1]
                     if "12:" in time.upper():
                         time="00:"+time.split(":")[1]
                 e=Event(time,date,name,message)
                 import datetime
                 try:
-                    if int(e.date.split("/")[0])>=datetime.date.today().month and int(e.date.split("/")[1])>=datetime.date.today().day and int(e.date.split("/")[2])>=datetime.date.today().year:
-                        if int(e.time.split(":")[0])>=int(str(datetime.datetime.now()).split(":")[0].split(" ")[1]) or (int(e.time.split(":")[0])>=int(str(datetime.datetime.now()).split(":")[0].split(" ")[1]) and int(e.time.split(":")[1])>=int(str(datetime.datetime.now()).split(":")[1])):
-                            event=e
-                            if int(event.time.split(":")[0])<=12:
-                                t1=time+" AM"
-                                if int(event.time.split(":")[0])==0:
-                                    t1="12:"+event.time.split(":")[1]+" AM"
-                            else:
-                                t1=str(int(event.time.split(":")[0])-12)+":"+event.time.split(":")[1]+" PM"
-                            em = discord.Embed(title=event.name,description="**Date: {0}**\n**Time: {1}**\nReact with :thumbsup: in order to sign up.".format("`"+event.date+"`","`"+t1+"`"),colour=EMBEDCOLOR)
-                            em.add_field(name="Signed Up",value="No one is currently signed up for this event.")
-                            m1 = await client.send_message(message.channel, embed=em)
-                            await client.add_reaction(m1,"\U0001F44D")
-                            e=Event(time,date,name,m1)
-                            serverinfo[message.server].events.append(e)
-                            readarray=[]
-                            reader = csv.reader(open("/home/pi/Desktop/KIPPSTUFF/EVENTS"))
-                            for row in reader:
-                                readarray.append(row)
-                            e.id=int(readarray[0][0])+1
-                            readarray[0]=[e.id]
-                            readarray.append([e.id,e.name,e.date,e.time,e.members])
-                            with open('/home/pi/Desktop/KIPPSTUFF/EVENTS','w') as f:
-                                writer=csv.writer(f)
-                                for row in readarray:
-                                    writer.writerow(row)
-                                f.close()
+                    emonth=int(e.date.split("/")[0])
+                    eday=int(e.date.split("/")[1])
+                    eyear=int(e.date.split("/")[2])
+                    month_=int(datetime.date.today().month)
+                    day_=int(datetime.date.today().day)
+                    year_=int(datetime.date.today().year)
+                    etime=(int(e.time.split(":")[0])*60)+int(e.time.split(":")[1])
+                    time_=(int(str(datetime.datetime.now()).split(":")[0].split(" ")[1])*60)+int(str(datetime.datetime.now()).split(":")[1])
+                    if (emonth>month_ or eday>day_ or eyear>year_) or (eday==day_ and emonth==month_ and eyear==year_ and etime>time_):
+                    #if int(e.date.split("/")[0])>=datetime.date.today().month and int(e.date.split("/")[1])>=datetime.date.today().day and int(e.date.split("/")[2])>=datetime.date.today().year:
+                        #if int(e.date.split("/")[1])>=datetime.date.today().day or int(e.time.split(":")[0])>=int(str(datetime.datetime.now()).split(":")[0].split(" ")[1]) or (int(e.time.split(":")[0])>=int(str(datetime.datetime.now()).split(":")[0].split(" ")[1]) and int(e.time.split(":")[1])>=int(str(datetime.datetime.now()).split(":")[1])):
+                        event=e
+                        if int(event.time.split(":")[0])<=12:
+                            t1=time+" AM"
+                            if int(event.time.split(":")[0])==0:
+                                t1="12:"+event.time.split(":")[1]+" AM"
                         else:
-                            print("1")
-                            await client.send_message(message.author,"Some of your inputs were invalid.")
+                            t1=str(int(event.time.split(":")[0])-12)+":"+event.time.split(":")[1]+" PM"
+                        em = discord.Embed(title=event.name,description="**Date: {0}**\n**Time: {1}**\nReact with :thumbsup: in order to sign up.".format("`"+event.date+"`","`"+t1+"`"),colour=EMBEDCOLOR)
+                        em.add_field(name="Signed Up",value="No one is currently signed up for this event.")
+                        m1 = await client.send_message(message.channel, embed=em)
+                        await client.add_reaction(m1,"\U0001F44D")
+                        e=Event(time,date,name,m1)
+                        serverinfo[message.server].events.append(e)
+                        readarray=[]
+                        reader = csv.reader(open("/home/pi/Desktop/KIPPSTUFF/EVENTS"))
+                        for row in reader:
+                            readarray.append(row)
+                        e.id=int(readarray[0][0])+1
+                        readarray[0]=[e.id]
+                        readarray.append([e.id,e.name,e.date,e.time,e.members])
+                        with open('/home/pi/Desktop/KIPPSTUFF/EVENTS','w') as f:
+                            writer=csv.writer(f)
+                            for row in readarray:
+                                writer.writerow(row)
+                            f.close()
+                        #else:
+                            #print("1")
+                            #await client.send_message(message.author,"Some of your inputs were invalid.")
                     else:
                         print("2")
                         await client.send_message(message.author,"Some of your inputs were invalid.")
@@ -1449,71 +1460,41 @@ async def background_loop():
     import datetime
     try:
         while True:
-            readarray=[]
-            reader = csv.reader(open("/home/pi/Desktop/KIPPSTUFF/EVENTS"))
-            for row in reader:
-                readarray.append(row)
-            for row in readarray:
-                if len(row)>1:
-                    e=Event(row[3],row[2],row[1],None)
-                    if int(e.date.split("/")[0])==datetime.date.today().month and int(e.date.split("/")[1])==datetime.date.today().day and int(e.date.split("/")[2])==datetime.date.today().year:
-                        if int(e.time.split(":")[0])==int(str(datetime.datetime.now()).split(":")[0].split(" ")[1]) and int(e.time.split(":")[1])==int(str(datetime.datetime.now()).split(":")[1]):
-                            if int(row[3].split(":")[0])<=12:
-                                t1=time+" AM"
-                                if int(row[3].split(":")[0])==0:
-                                    t1=("12:"+row[3].split(":")[1]+" AM").replace("  "," ")
-                            else:
-                                t1=(str(int(row[3].split(":")[0])-12)+":"+row[3].split(":")[1]+" PM").replace("  "," ")
-                            for ID in row[4:]:
-                                if len(ID)>0:
-                                    await client.send_message(await client.get_user_info(ID),"`{0}`, scheduled for `{1}`, is starting now!".format(row[1],t1))
-                            readarray.remove(row)
-                            with open('/home/pi/Desktop/KIPPSTUFF/EVENTS','w') as f:
-                                writer=csv.writer(f)
-                                for row in readarray:
-                                    writer.writerow(row)
-                                f.close()
-                            for server in client.servers:
-                                for event in serverinfo[server].events:
-                                    if int(event.id) == int(row[0]):
-                                        em = discord.Embed(title=event.name,description="This event is no longer open to subscription.",colour=EMBEDCOLOR)
-                                        await client.edit_message(event.message,embed=em)
-                                        serverinfo[server].events.remove(event)
             global last_ping
             last_ping=t.time()
             for server in client.servers:
-                for member in server.members:
-                    if member.bot == False:
-                        if member.game != None:
-                            if member.game.type == 1:
-                                if playerinfo[member].streaming == False:
-                                    if serverinfo[server].search_server_configs("TWITCH_CHANNEL") != None:
-                                        try:
-                                            await client.send_message(client.get_channel(serverinfo[server].search_server_configs("TWITCH_CHANNEL")[1]), '@everyone, '+str(member)+' just started streaming on Twitch! Check it out here: '+str(member.game.url))
-                                        except discord.DiscordException:
-                                            print("Twitch announcement channel was deleted, could not announce streamer")
-                                playerinfo[member].streaming = True
-                            else:
-                                playerinfo[member].streaming=False
-                    if str(server.id) == "451227721545285649":
-                        if "RAINBOW SIX SIEGE" in str(member.game).upper():
-                            if serverinfo[server].r6role not in member.roles:
-                                await client.add_roles(member, serverinfo[server].r6role)
-                        else:
-                            if serverinfo[server].r6role in member.roles:
-                                await client.remove_roles(member, serverinfo[server].r6role)
-                        if "MINECRAFT" in str(member.game).upper():
-                            if serverinfo[server].mcrole not in member.roles:
-                                await client.add_roles(member, serverinfo[server].mcrole)
-                        else:
-                            if serverinfo[server].mcrole in member.roles:
-                                await client.remove_roles(member, serverinfo[server].mcrole)
-                        if "DESTINY 2" in str(member.game).upper():
-                            if serverinfo[server].d2role not in member.roles:
-                                await client.add_roles(member, serverinfo[server].d2role)
-                        else:
-                            if serverinfo[server].d2role in member.roles:
-                                await client.remove_roles(member, serverinfo[server].d2role)
+##                for member in server.members:
+##                    if member.bot == False:
+##                        if member.game != None:
+##                            if member.game.type == 1:
+##                                if playerinfo[member].streaming == False:
+##                                    if serverinfo[server].search_server_configs("TWITCH_CHANNEL") != None:
+##                                        try:
+##                                            await client.send_message(client.get_channel(serverinfo[server].search_server_configs("TWITCH_CHANNEL")[1]), '@everyone, '+str(member)+' just started streaming on Twitch! Check it out here: '+str(member.game.url))
+##                                        except discord.DiscordException:
+##                                            print("Twitch announcement channel was deleted, could not announce streamer")
+##                                playerinfo[member].streaming = True
+##                            else:
+##                                playerinfo[member].streaming=False
+##                    if str(server.id) == "451227721545285649":
+##                        if "RAINBOW SIX SIEGE" in str(member.game).upper():
+##                            if serverinfo[server].r6role not in member.roles:
+##                                await client.add_roles(member, serverinfo[server].r6role)
+##                        else:
+##                            if serverinfo[server].r6role in member.roles:
+##                                await client.remove_roles(member, serverinfo[server].r6role)
+##                        if "MINECRAFT" in str(member.game).upper():
+##                            if serverinfo[server].mcrole not in member.roles:
+##                                await client.add_roles(member, serverinfo[server].mcrole)
+##                        else:
+##                            if serverinfo[server].mcrole in member.roles:
+##                                await client.remove_roles(member, serverinfo[server].mcrole)
+##                        if "DESTINY 2" in str(member.game).upper():
+##                            if serverinfo[server].d2role not in member.roles:
+##                                await client.add_roles(member, serverinfo[server].d2role)
+##                        else:
+##                            if serverinfo[server].d2role in member.roles:
+##                                await client.remove_roles(member, serverinfo[server].d2role)
                 queuelist="\nNo songs in queue"
                 if len(serverinfo[server].queue)>1:
                     queuelist=""
@@ -1644,12 +1625,68 @@ async def background_loop():
                                 serverinfo[server].musicmessage=await client.send_message(serverinfo[server].musictextchannel,embed=em)
                             serverinfo[server].count1=1
                 except TypeError as err:
+                    print("MUSIC ERROR")
                     print(err)
                     raise
+            await asyncio.sleep(1)
+    except Exception as err:
+        print(err)
+async def schedule_handler():
+    import datetime
+    while True:
+        readarray=[]
+        reader = csv.reader(open("/home/pi/Desktop/KIPPSTUFF/EVENTS"))
+        for row in reader:
+            readarray.append(row)
+        for row in readarray:
+            if len(row)>1:
+                e=Event(row[3],row[2],row[1],None)
+                if int(e.date.split("/")[0])==datetime.date.today().month and int(e.date.split("/")[1])==datetime.date.today().day and int(e.date.split("/")[2])==datetime.date.today().year:
+                    if int(e.time.split(":")[0])==int(str(datetime.datetime.now()).split(":")[0].split(" ")[1]) and int(e.time.split(":")[1])==int(str(datetime.datetime.now()).split(":")[1]):
+                        if int(row[3].split(":")[0])<=12:
+                            t1=(str(row[3].split(":")[0])+":"+row[3].split(":")[1]+" AM").replace("  "," ")
+                            if int(row[3].split(":")[0])==0:
+                                t1=("12:"+row[3].split(":")[1]+" AM").replace("  "," ")
+                        else:
+                            t1=(str(int(row[3].split(":")[0])-12)+":"+row[3].split(":")[1]+" PM").replace("  "," ")
+                        for ID in row[4:]:
+                            if len(ID)>0:
+                                await client.send_message(await client.get_user_info(ID),"`{0}`, scheduled for `{1}`, is starting now!".format(row[1],t1))
+                        I=row[0]
+                        readarray.remove(row)
+                        with open('/home/pi/Desktop/KIPPSTUFF/EVENTS','w') as f:
+                            writer=csv.writer(f)
+                            for row in readarray:
+                                writer.writerow(row)
+                            f.close()
+                        for server in client.servers:
+                            for event in serverinfo[server].events:
+                                if int(event.id) == int(I):
+                                    em = discord.Embed(title=event.name,description="This event is no longer open to subscription.",colour=EMBEDCOLOR)
+                                    await client.edit_message(event.message,embed=em)
+                                    serverinfo[server].events.remove(event)
+                    for server in client.servers:
+                        for P in serverinfo[server].events:
+                            if int(P.id)==int(row[0]):
+                                etime=(int(e.time.split(":")[0])*60)+int(e.time.split(":")[1])
+                                time_=(int(str(datetime.datetime.now()).split(":")[0].split(" ")[1])*60)+int(str(datetime.datetime.now()).split(":")[1])
+                                if time_==etime-10:
+                                    if P.ten==False:
+                                        P.ten=True
+                                        if int(row[3].split(":")[0])<=12:
+                                            t1=(str(row[3].split(":")[0])+":"+row[3].split(":")[1]+" AM").replace("  "," ")
+                                            if int(row[3].split(":")[0])==0:
+                                                t1=("12:"+row[3].split(":")[1]+" AM").replace("  "," ")
+                                        else:
+                                            t1=(str(int(row[3].split(":")[0])-12)+":"+row[3].split(":")[1]+" PM").replace("  "," ")
+                                        for ID in row[4:]:
+                                            if len(ID)>0:
+                                                await client.send_message(await client.get_user_info(ID),"`{0}`, scheduled for `{1}`, will start in `10` minutes.".format(row[1],t1))
+            for server in client.servers:
                 if len(serverinfo[server].events)>0:
                     for event in serverinfo[server].events:
                         if int(event.time.split(":")[0])<=12:
-                            t1=time+" AM"
+                            t1=(str(event.time.split(":")[0])+":"+event.time.split(":")[1]+" AM").replace("  "," ")
                             if int(event.time.split(":")[0])==0:
                                 t1="12:"+event.time.split(":")[1]+" AM"
                         else:
@@ -1663,26 +1700,8 @@ async def background_loop():
                             await client.edit_message(event.message,embed=em)
                         except discord.DiscordException:
                             event.message=await client.send_message(event.channel,embed=em)
-                        reaction=await client.wait_for_reaction(emoji="\U0001F44D",message=event.message)
-                        if str(reaction.user) not in event.members:
-                            event.members.append(str(reaction.user))
-                            event.ids.append(reaction.user.id)
-                            readarray=[]
-                            reader = csv.reader(open("/home/pi/Desktop/KIPPSTUFF/EVENTS"))
-                            for row in reader:
-                                readarray.append(row)
-                            for row in readarray:
-                                if row[0]==str(event.id) and len(row)>1:
-                                    row[4:]=event.ids 
-                            with open('/home/pi/Desktop/KIPPSTUFF/EVENTS','w') as f:
-                                writer=csv.writer(f)
-                                for row in readarray:
-                                    writer.writerow(row)
-                                f.close()
                         await client.edit_message(event.message,embed=em)
-            await asyncio.sleep(1)
-    except Exception as err:
-        print(err)
+        await asyncio.sleep(1)
 async def election_timer():
     import datetime
     while True:
@@ -1818,6 +1837,27 @@ serverinfo = {}
 print("KIPP starting up...")
 while True:
     @client.event
+    async def on_reaction_add(reaction,user):
+        server=reaction.message.server
+        for event in serverinfo[server].events:
+            if reaction.message.id==event.message.id:
+                if reaction.emoji=="\U0001F44D":
+                    if str(user.id) != KIPP_ID:
+                        event.members.append(str(user))
+                        event.ids.append(str(user.id))
+                        readarray=[]
+                        reader = csv.reader(open("/home/pi/Desktop/KIPPSTUFF/EVENTS"))
+                        for row in reader:
+                            readarray.append(row)
+                        for row in readarray:
+                            if row[0]==str(event.id) and len(row)>1:
+                                row[4:]=event.ids 
+                        with open('/home/pi/Desktop/KIPPSTUFF/EVENTS','w') as f:
+                            writer=csv.writer(f)
+                            for row in readarray:
+                                writer.writerow(row)
+                            f.close()
+    @client.event
     async def on_reaction_remove(reaction,user):
         for event in serverinfo[reaction.message.server].events:
             if str(user) in event.members:
@@ -1901,6 +1941,7 @@ while True:
         loop.create_task(election_timer())
         loop.create_task(ping_check())
         loop.create_task(background_loop())
+        loop.create_task(schedule_handler())
         logging.log(5,"KIPP started.")
         for server in client.servers:
             serverinfo[server] = Server(server)

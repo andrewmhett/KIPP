@@ -18,7 +18,7 @@ KIPP_RESET_ERRORS = [ConnectionResetError,
                      websockets.exceptions.InvalidStatusCode]
 try:
     logging.log(50,"Backing KIPP up to GitHub...")
-    p=Popen(os.system('sudo /home/pi/Desktop/KIPPSTUFF/BackupKIPP.sh'),stdout=PIPE,stderr=PIPE)
+    p=Popen(os.system('sudo /home/pi/Desktop/KIPPSTUFF/BackupKIPP.sh'))#,stdout=PIPE,stderr=PIPE)
     p.communicate()[0]
     p.kill()
 except FileNotFoundError:

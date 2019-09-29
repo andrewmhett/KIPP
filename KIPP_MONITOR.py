@@ -14,17 +14,18 @@ KIPP_RESET_ERRORS = [ConnectionResetError,
                      discord.errors.ConnectionClosed,
                      websockets.exceptions.ConnectionClosed,
                      concurrent.futures._base.TimeoutError,
-                     aiohttp_errors.ClientOSError]
+                     aiohttp_errors.ClientOSError,
+                     websockets.exceptions.InvalidStatusCode]
 try:
     logging.log(50,"Backing KIPP up to GitHub...")
-    p=Popen('sudo /home/pi/Desktop/KIPPSTUFF/BackupKIPP.sh',stdout=PIPE,stderr=PIPE)
+    p=Popen(os.system('sudo /home/pi/Desktop/KIPPSTUFF/BackupKIPP.sh'),stdout=PIPE,stderr=PIPE)
     p.communicate()
     p.kill()
 except FileNotFoundError:
     logging.log(50,"KIPP backup file not found.")
 try:
     logging.log(50,"Checking for package updates")
-    p=Popen('sudo /home/pi/Desktop/KIPPSTUFF/REQUIREMENTUPDATES.sh',stdout=PIPE,stderr=PIPE)
+    p=Popen(os.system('sudo /home/pi/Desktop/KIPPSTUFF/REQUIREMENTUPDATES.sh'),stdout=PIPE,stderr=PIPE)
     p.communicate()
     p.kill()
 except FileNotFoundError:

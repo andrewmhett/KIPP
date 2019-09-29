@@ -19,7 +19,7 @@ KIPP_RESET_ERRORS = [ConnectionResetError,
 try:
     logging.log(50,"Backing KIPP up to GitHub...")
     p=Popen(os.system('sudo /home/pi/Desktop/KIPPSTUFF/BackupKIPP.sh'),stdout=PIPE,stderr=PIPE)
-    p.communicate()
+    #p.communicate()
     p.kill()
 except FileNotFoundError:
     logging.log(50,"KIPP backup file not found.")

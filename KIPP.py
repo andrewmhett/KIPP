@@ -1008,6 +1008,7 @@ async def MUSIC(message,message2):
                             if ((music3[0]).upper() == "!MUSIC"):
                                 if (music4.startswith("https://www.youtube.com") or music4.startswith("https://youtu.be") or music4.startswith("http://www.youtube.com")):
                                     if "user" not in music4:
+                                        print(discord.__file__)
                                         serverinfo[message.server].musiccolor=playerinfo[message.author].hrolecolor
                                         users = []
                                         for user in message.author.voice.voice_channel.voice_members:
@@ -1029,6 +1030,7 @@ async def MUSIC(message,message2):
                                             pass
                                         if len(serverinfo[message.server].queue) == 1:
                                             message.server.voice_client.encoder_options(sample_rate=48000,channels=2)
+                                            print("creating ytdl player...")
                                             player = await message.server.voice_client.create_ytdl_player(music4,before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
                                             player.start()
                                             serverinfo[message.server].count=1
@@ -1941,7 +1943,7 @@ while True:
         loop.create_task(election_timer())
         loop.create_task(ping_check())
         loop.create_task(background_loop())
-        loop.create_task(schedule_handler())
+        #loop.create_task(schedule_handler())
         logging.log(5,"KIPP started.")
         for server in client.servers:
             serverinfo[server] = Server(server)

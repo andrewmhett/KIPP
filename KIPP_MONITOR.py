@@ -3,7 +3,8 @@ from subprocess import Popen, PIPE
 import discord.errors
 import websockets.exceptions
 import concurrent.futures._base
-from aiohttp import errors as aiohttp_errors
+#from aiohttp import errors as aiohttp_errors
+import aiohttp
 import logging
 import threading
 def WebMonitor():
@@ -14,7 +15,7 @@ KIPP_RESET_ERRORS = [ConnectionResetError,
                      discord.errors.ConnectionClosed,
                      websockets.exceptions.ConnectionClosed,
                      concurrent.futures._base.TimeoutError,
-                     aiohttp_errors.ClientOSError,
+                     aiohttp.ClientOSError,
                      websockets.exceptions.InvalidStatusCode]
 try:
     logging.log(50,"Backing KIPP up to GitHub...")

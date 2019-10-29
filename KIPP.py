@@ -963,7 +963,6 @@ async def ADDKIPP(message,message2):
     msg = 'https://discordapp.com/oauth2/authorize?client_id=386352783550447628&permissions=2146958583&scope=bot'
     await client.send_message(message.channel, msg)
 async def MUSIC(message,message2):
-    print(message2)
     server=message.server
     notsearched = False
     serverinfo[message.server].musictextchannel = message.channel
@@ -1009,7 +1008,6 @@ async def MUSIC(message,message2):
                             if ((music3[0]).upper() == "!MUSIC"):
                                 if (music4.startswith("https://www.youtube.com") or music4.startswith("https://youtu.be") or music4.startswith("http://www.youtube.com")):
                                     if "user" not in music4:
-                                        print(discord.__file__)
                                         serverinfo[message.server].musiccolor=playerinfo[message.author].hrolecolor
                                         users = []
                                         for user in message.author.voice.voice_channel.voice_members:

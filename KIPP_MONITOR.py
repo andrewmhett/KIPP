@@ -1,6 +1,5 @@
 import os
 from subprocess import Popen, PIPE
-import discord.errors
 import websockets.exceptions
 import concurrent.futures._base
 #from aiohttp import errors as aiohttp_errors
@@ -12,7 +11,6 @@ def WebMonitor():
 t1=threading.Thread(target=WebMonitor)
 t1.start()
 KIPP_RESET_ERRORS = [ConnectionResetError,
-                     discord.errors.ConnectionClosed,
                      websockets.exceptions.ConnectionClosed,
                      concurrent.futures._base.TimeoutError,
                      aiohttp.ClientOSError,

@@ -1,4 +1,4 @@
-discord<1.0.0
+git+https://www.github.com/LockdownDoom/async_discord.py
 asyncio
 aiohttp
 aiodns

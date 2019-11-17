@@ -99,7 +99,7 @@ class Server:
         self.r6role=None
         self.d2role=None
         self.events=[]
-        self.music_timeout_timer=datetime.datetime.now()
+        self.music_end_timer=datetime.now()
     def add_server_config(self,data):
         try:
             with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id)) as f:
@@ -1510,7 +1510,7 @@ async def background_loop():
                     currentlyplaying=True
                 try:
                     if currentlyplaying==False:
-                        c=datetime.datetime.now()-serverinfo[server].music_timeout_timer
+                        c=datetime.datetime.now()-serverinfo[server].music_end_timer
                         if str(divmod(c.days * 86400 + c.seconds, 60)).split('(')[1].split(')')[0].split(',')[0] >= 5:
                             serverinfo[server].player=None
                             try:
@@ -1520,7 +1520,7 @@ async def background_loop():
                     if ((currentlyplaying == False) and serverinfo[server].musicmessage != None):
                         if serverinfo[server].count == 0:
                             print("COUNT=0")
-                            serverinfo[server].music_timeout_timer=datetime.datetime.now()
+                            serverinfo[server].music_end_timer=datetime.datetime.now()
                             em=discord.Embed(description = serverinfo[server].musicdesc.split('**Progress:**')[0]+'**Song ended**',colour=EMBEDCOLOR)
                             em.set_footer(text=serverinfo[server].musicfooter)
                             em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")

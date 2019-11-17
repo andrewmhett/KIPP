@@ -1514,7 +1514,7 @@ async def background_loop():
                         if str(divmod(c.days * 86400 + c.seconds, 60)).split('(')[1].split(')')[0].split(',')[0] >= 5:
                             serverinfo[server].player=None
                             try:
-                                server.voice_client.disconnect()
+                                await server.voice_client.disconnect()
                             except Exception as e:
                                 print ("Voice client timeout, can't disconnect: "+e)
                     if ((currentlyplaying == False) and serverinfo[server].musicmessage != None):

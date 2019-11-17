@@ -1511,7 +1511,7 @@ async def background_loop():
                 try:
                     if currentlyplaying==False:
                         c=datetime.datetime.now()-serverinfo[server].music_end_timer
-                        if str(divmod(c.days * 86400 + c.seconds, 60)).split('(')[1].split(')')[0].split(',')[0] >= 5:
+                        if int(str(divmod(c.days * 86400 + c.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5:
                             serverinfo[server].player=None
                             try:
                                 await server.voice_client.disconnect()

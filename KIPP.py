@@ -71,7 +71,7 @@ class Server:
         self.player = None
         self.volume = 0.5
         self.blocked = []
-        self.starttime = ""
+        self.starttime = datetime.now()
         self.musicmessage = None
         self.musicdesc = ""
         self.musicfooter = ""
@@ -100,6 +100,8 @@ class Server:
         self.d2role=None
         self.events=[]
         self.music_end_timer=datetime.now()
+        self.loading=False
+        self.jointime=datetime.now()
     def add_server_config(self,data):
         try:
             with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id)) as f:
@@ -975,12 +977,10 @@ async def MUSIC(message,message2):
         currentlyplaying = False
     if (currentlyplaying == False) or (currentlyplaying == True and message.author.voice.voice_channel == message.server.get_member(KIPP_ID).voice.voice_channel):
         try:
-            global loading
             if (message2.split('!MUSIC')[1]).startswith('|') == True:
-                if loading == False:
-                    loading = True
+                if serverinfo[message.server].loading == False:
+                    serverinfo[message.server].loading = True
                     player = (serverinfo[message.server].player)
-                    loading = True
                     music2 = str(message.content)
                     music3 = music2.split('|')
                     music4= music3[1]
@@ -1002,7 +1002,7 @@ async def MUSIC(message,message2):
                                 music4 = ("http://www.youtube.com/watch?v=" + searchresults[0])
                             except IndexError:
                                 await client.send_message(message.channel, ("Could not find '"+music4+"' on YouTube."))
-                                loading = False
+                                serverinfo[message.server].loading = False
                                 notsearched = True
                         server = message.server
                         if notsearched == False:
@@ -1016,6 +1016,7 @@ async def MUSIC(message,message2):
                                         if message.server.voice_client == None:
                                             channel = message.author.voice.voice_channel
                                             await client.join_voice_channel(channel)
+                                            serverinfo[message.server].jointime=datetime.now()
                                         if message.server.get_member(KIPP_ID) not in users:
                                             channel = message.author.voice.voice_channel
                                             user = message.server.get_member(KIPP_ID)
@@ -1025,7 +1026,7 @@ async def MUSIC(message,message2):
                                             if serverinfo[message.server].player != None:
                                                 if len(serverinfo[message.server].queue)>1:
                                                     await client.send_message(message.channel, "Song added to queue. #"+str(len(serverinfo[message.server].queue)-1))
-                                            loading=False
+                                            serverinfo[message.server].loading=False
                                         except AttributeError:
                                             pass
                                         if len(serverinfo[message.server].queue) == 1:
@@ -1077,24 +1078,24 @@ async def MUSIC(message,message2):
                                                         serverinfo[message.server].imagelink = thumbnail
                                                         serverinfo[message.server].duration = player.duration
                                                         serverinfo[message.server].length = str(length)
-                                                        loading = False
+                                                        serverinfo[message.server].loading = False
                                     else:
                                         await client.send_message(message.channel, "Please do not try to play an entire youtube channel. Get one specific song you would like to hear, and play that.")
-                                        loading = False
+                                        serverinfo[message.server].loading = False
                                 else:
                                     msg = "The music must come from YouTube"
                                     await client.send_message(message.channel, msg)
-                                    loading = False
+                                    serverinfo[message.server].loading = False
                     else:
                         await client.send_message(message.channel, "You are not in a voice channel. Get in one for KIPP to play music.")
-                        loading = False
+                        serverinfo[message.server].loading = False
                 else:
                     await client.delete_message(message)
             else:
                 await client.send_message(message.channel, "Please use the correct syntax. Use !music|youtubelink or !music|youtubesearch to use the music command.")
-                loading = False
+                serverinfo[message.server].loading = False
         except Exception as err:
-            loading = False
+            serverinfo[message.server].loading = False
             await client.send_message(message.channel, err)
             raise
     elif (currentlyplaying == True) and (message.author.voice.voice_channel != message.server.get_member(KIPP_ID).voice.voice_channel):
@@ -1511,8 +1512,8 @@ async def background_loop():
                 try:
                     if currentlyplaying==False:
                         c=datetime.datetime.now()-serverinfo[server].music_end_timer
-                        b=datetime.datetime.now()-serverinfo[server].starttime
-                        if int(str(divmod(c.days * 86400 + c.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5 and int(str(divmod(b.days * 86400 + b.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 2:
+                        b=datetime.datetime.now()-serverinfo[server].jointime
+                        if int(str(divmod(c.days * 86400 + c.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 10 and int(str(divmod(b.days * 86400 + b.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5:
                             serverinfo[server].player=None
                             if server.voice_client != None:
                                 try:
@@ -1839,7 +1840,6 @@ async def web_command(message, message2):
                 cont=cont+1
 #discord.opus.load_opus('/usr/lib/arm-linux-gnueabihf/libopus.so.0.5.3')
 InterstellarQuotes = ["'Do not go gentle into that good night'\n**Professor Brand**", "'Come on, TARS!'\n**Cooper**", "'Cooper, this is no time for caution!'\n**TARS**", "'You tell that to Doyle.'\n**Cooper**", "'Newton's third law. You gotta leave something behind.'\n**Cooper**", "'Step back, professor, step back!'\n**TARS**","'No, it's necessary.'\n**Cooper**"]
-loading = False
 playingName = 'Type !help'
 oldyear = ((str(datetime.now())[0])+(str(datetime.now())[1])+(str(datetime.now())[2])+(str(datetime.now())[3]))
 oldmonth = ((str(datetime.now())[5])+(str(datetime.now())[6]))

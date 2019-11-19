@@ -1536,7 +1536,7 @@ async def background_loop():
                                 print(err)
                             serverinfo[server].count=1
                             serverinfo[server].queue.remove(serverinfo[server].queue[0])
-                    elif currentlyplaying=False and serverinfopserver].player=False and len(serverinfo[server].queue)>0:
+                    elif currentlyplaying==False and serverinfo[server].player==False and len(serverinfo[server].queue)>0:
                         if (len(serverinfo[server].queue)>0):
                             server.voice_client.encoder_options(sample_rate=48000,channels=2)
                             player = await server.voice_client.create_ytdl_player(serverinfo[server].queue[0][1],before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")

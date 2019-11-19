@@ -1523,6 +1523,7 @@ async def background_loop():
                     if ((currentlyplaying == False) and serverinfo[server].musicmessage != None):
                         if serverinfo[server].count == 0:
                             print("COUNT=0")
+                            serverinfo[server].player=False
                             serverinfo[server].music_end_timer=datetime.datetime.now()
                             em=discord.Embed(description = serverinfo[server].musicdesc.split('**Progress:**')[0]+'**Song ended**',colour=EMBEDCOLOR)
                             em.set_footer(text=serverinfo[server].musicfooter)
@@ -1534,56 +1535,56 @@ async def background_loop():
                             except Exception as err:
                                 print(err)
                             serverinfo[server].count=1
-                            if (len(serverinfo[server].queue)>0):
-                                serverinfo[server].queue.remove(serverinfo[server].queue[0])
-                                if (len(serverinfo[server].queue)>0):
-                                    server.voice_client.encoder_options(sample_rate=48000,channels=2)
-                                    player = await server.voice_client.create_ytdl_player(serverinfo[server].queue[0][1],before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
-                                    player.start()
-                                    player.volume = serverinfo[server].volume
-                                    serverinfo[server].player = player
-                                    serverinfo[server].playing = player.title
-                                    serverinfo[server].likes = player.likes
-                                    serverinfo[server].dislikes = player.dislikes
-                                    serverinfo[server].views = player.views
-                                    serverinfo[server].uploader = player.uploader
-                                    length = player.duration
-                                    if serverinfo[server].player.is_live == False:
-                                        mins=int(length/60)
-                                        seconds=int(length-(mins*60))
-                                        hours=int(mins/60)
-                                        if hours > 0:
-                                            mins=mins-(hours*60)
-                                            if len(str(mins))==1:
-                                                mins="0"+str(mins)
-                                            if len(str(seconds)) == 1:
-                                                length=str(hours)+":"+str(mins)+":"+"0"+str(seconds)
-                                            else:
-                                                length=str(hours)+":"+str(mins)+":"+str(seconds)
-                                        else:
-                                            if len(str(seconds)) == 1:
-                                                length=str(mins)+":"+"0"+str(seconds)
-                                            else:
-                                                length=str(mins)+":"+str(seconds)
+                            serverinfo[server].queue.remove(serverinfo[server].queue[0])
+                    elif currentlyplaying=False and serverinfopserver].player=False and len(serverinfo[server].queue)>0:
+                        if (len(serverinfo[server].queue)>0):
+                            server.voice_client.encoder_options(sample_rate=48000,channels=2)
+                            player = await server.voice_client.create_ytdl_player(serverinfo[server].queue[0][1],before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
+                            player.start()
+                            player.volume = serverinfo[server].volume
+                            serverinfo[server].player = player
+                            serverinfo[server].playing = player.title
+                            serverinfo[server].likes = player.likes
+                            serverinfo[server].dislikes = player.dislikes
+                            serverinfo[server].views = player.views
+                            serverinfo[server].uploader = player.uploader
+                            length = player.duration
+                            if serverinfo[server].player.is_live == False:
+                                mins=int(length/60)
+                                seconds=int(length-(mins*60))
+                                hours=int(mins/60)
+                                if hours > 0:
+                                    mins=mins-(hours*60)
+                                    if len(str(mins))==1:
+                                        mins="0"+str(mins)
+                                    if len(str(seconds)) == 1:
+                                        length=str(hours)+":"+str(mins)+":"+"0"+str(seconds)
                                     else:
-                                        length = "Currently Streaming"
-                                    serverinfo[server].length = length
-                                    serverinfo[server].pausetime = 0
-                                    msg3 = ("["+str(serverinfo[server].playing)+"]("+serverinfo[server].queue[0][1]+")\n**Progress:**: `0:00 / "+serverinfo[server].length+"`\n**Volume:** "+str(serverinfo[server].player.volume))
-                                    em = discord.Embed(description=msg3,colour=EMBEDCOLOR)
-                                    em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
-                                    video_id = serverinfo[server].queue[0][1].split("watch?v=")[1]
-                                    thumbnail = "https://img.youtube.com/vi/"+video_id+"/0.jpg"
-                                    serverinfo[server].thumbnail = thumbnail
-                                    em.set_footer(text=profooter)
-                                    serverinfo[server].musicmessage = await client.send_message(serverinfo[server].musictextchannel, embed=em)
-                                    serverinfo[server].musicdesc = msg3
-                                    serverinfo[server].musicfooter = profooter
-                                    serverinfo[server].pausetime = 0
-                                    serverinfo[server].imagelink = thumbnail
-                                    serverinfo[server].duration = player.duration
-                                    serverinfo[server].player=player
-                                    serverinfo[server].starttime = datetime.datetime.now()
+                                        length=str(hours)+":"+str(mins)+":"+str(seconds)
+                                else:
+                                    if len(str(seconds)) == 1:
+                                        length=str(mins)+":"+"0"+str(seconds)
+                                    else:
+                                        length=str(mins)+":"+str(seconds)
+                            else:
+                                length = "Currently Streaming"
+                            serverinfo[server].length = length
+                            serverinfo[server].pausetime = 0
+                            msg3 = ("["+str(serverinfo[server].playing)+"]("+serverinfo[server].queue[0][1]+")\n**Progress:**: `0:00 / "+serverinfo[server].length+"`\n**Volume:** "+str(serverinfo[server].player.volume))
+                            em = discord.Embed(description=msg3,colour=EMBEDCOLOR)
+                            em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
+                            video_id = serverinfo[server].queue[0][1].split("watch?v=")[1]
+                            thumbnail = "https://img.youtube.com/vi/"+video_id+"/0.jpg"
+                            serverinfo[server].thumbnail = thumbnail
+                            em.set_footer(text=profooter)
+                            serverinfo[server].musicmessage = await client.send_message(serverinfo[server].musictextchannel, embed=em)
+                            serverinfo[server].musicdesc = msg3
+                            serverinfo[server].musicfooter = profooter
+                            serverinfo[server].pausetime = 0
+                            serverinfo[server].imagelink = thumbnail
+                            serverinfo[server].duration = player.duration
+                            serverinfo[server].player=player
+                            serverinfo[server].starttime = datetime.datetime.now()
                     elif currentlyplaying==True and serverinfo[server].paused == False:
                         if serverinfo[server].count1==1:
                             serverinfo[server].pausetime=serverinfo[server].pausetime+((datetime.datetime.now()-serverinfo[server].pausedatetime).total_seconds())

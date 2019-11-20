@@ -1523,7 +1523,7 @@ async def background_loop():
                     if ((currentlyplaying == False) and serverinfo[server].musicmessage != None):
                         if serverinfo[server].count == 0:
                             print("COUNT=0")
-                            serverinfo[server].player=False
+                            serverinfo[server].player=None
                             serverinfo[server].music_end_timer=datetime.datetime.now()
                             em=discord.Embed(description = serverinfo[server].musicdesc.split('**Progress:**')[0]+'**Song ended**',colour=EMBEDCOLOR)
                             em.set_footer(text=serverinfo[server].musicfooter)
@@ -1536,8 +1536,6 @@ async def background_loop():
                                 print(err)
                             serverinfo[server].count=1
                             serverinfo[server].queue.remove(serverinfo[server].queue[0])
-                    elif currentlyplaying==False and serverinfo[server].player==None and len(serverinfo[server].queue)>0 and serverinfo[server].musicmessage==None:
-                        if (len(serverinfo[server].queue)>0):
                             server.voice_client.encoder_options(sample_rate=48000,channels=2)
                             player = await server.voice_client.create_ytdl_player(serverinfo[server].queue[0][1],before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
                             player.start()

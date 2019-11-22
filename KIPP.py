@@ -1630,7 +1630,7 @@ async def background_loop():
                     if currentlyplaying==False:
                         c=datetime.datetime.now()-serverinfo[server].music_end_timer
                         b=datetime.datetime.now()-serverinfo[server].jointime
-                        if int(str(divmod(c.days * 86400 + c.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5 && int(str(divmod(b.days * 86400 + b.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5:
+                        if int(str(divmod(c.days * 86400 + c.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5 and int(str(divmod(b.days * 86400 + b.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5:
                             serverinfo[server].player=None
                             if server.voice_client != None:
                                 try:

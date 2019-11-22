@@ -1510,16 +1510,6 @@ async def background_loop():
                 else:
                     currentlyplaying=True
                 try:
-                    if currentlyplaying==False:
-                        c=datetime.datetime.now()-serverinfo[server].music_end_timer
-                        b=datetime.datetime.now()-serverinfo[server].jointime
-                        if int(str(divmod(c.days * 86400 + c.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 10 and int(str(divmod(b.days * 86400 + b.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5:
-                            serverinfo[server].player=None
-                            if server.voice_client != None:
-                                try:
-                                    await server.voice_client.disconnect()
-                                except Exception as e:
-                                    print ("Voice client timeout, can't disconnect")
                     if ((currentlyplaying == False) and serverinfo[server].musicmessage != None):
                         if serverinfo[server].count == 0:
                             print("COUNT=0")
@@ -1637,6 +1627,15 @@ async def background_loop():
                             except discord.DiscordException:
                                 serverinfo[server].musicmessage=await client.send_message(serverinfo[server].musictextchannel,embed=em)
                             serverinfo[server].count1=1
+                    if currentlyplaying==False:
+                        c=datetime.datetime.now()-serverinfo[server].music_end_timer
+                        if int(str(divmod(c.days * 86400 + c.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5:
+                            serverinfo[server].player=None
+                            if server.voice_client != None:
+                                try:
+                                    await server.voice_client.disconnect()
+                                except Exception as e:
+                                    print ("Voice client timeout, can't disconnect")
                 except TypeError as err:
                     print("MUSIC ERROR")
                     print(err)

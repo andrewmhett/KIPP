@@ -1627,7 +1627,7 @@ async def background_loop():
                             except discord.DiscordException:
                                 serverinfo[server].musicmessage=await client.send_message(serverinfo[server].musictextchannel,embed=em)
                             serverinfo[server].count1=1
-                    if currentlyplaying==False and len(serverinfo[server].queue)>0:
+                    if currentlyplaying==False and len(serverinfo[server].queue)==0:
                         c=datetime.datetime.now()-serverinfo[server].music_end_timer
                         b=datetime.datetime.now()-serverinfo[server].jointime
                         if int(str(divmod(c.days * 86400 + c.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5 and int(str(divmod(b.days * 86400 + b.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5:

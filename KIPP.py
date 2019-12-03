@@ -103,59 +103,27 @@ class Server:
         self.loading=False
         self.jointime=datetime.now()
     def add_server_config(self,data):
-        try:
-            with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id)) as f:
-                f.close()
-        except Exception:
-             with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w+') as f:
-                 f.close()
-        arr=[]
-        with open("/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id)) as fl:
-            for row in csv.reader(fl):
-                arr.append(row)
-            arr.append(data)
-            fl.close()
+        arr=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
         with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w') as f:
             writer=csv.writer(f)
             for row in arr:
                 writer.writerow(row)
             f.close()
     def change_server_config(self,data,newdata):
-        try:
-            with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id)) as f:
-                f.close()
-        except Exception:
-             with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w+') as f:
-                 f.close()
-        arr=[]
-        with open("/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id)) as fl:
-            for row in csv.reader(fl):
-                arr.append(row)
-            cntr=0
-            for row in arr:
-                if data in str(row):
-                    arr[cntr] = newdata
-                    break
-                cntr=cntr+1
-            fl.close()
+        arr=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
+        cntr=0
+        for row in arr:
+            if data in str(row):
+                arr[cntr] = newdata
+                break
+            cntr=cntr+1
         with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w') as f:
             writer=csv.writer(f)
             for row in arr:
                 writer.writerow(row)
             f.close()
     def search_server_configs(self,query):
-        data=None
-        try:
-            with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id)) as f:
-                f.close()
-        except Exception:
-            with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w+') as f:
-                f.close()
-        with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id)) as fl:
-            for row in csv.reader(fl):
-                if query in str(row):
-                    data=row
-            fl.close()
+        data=READ_DATA_IN('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),condition=lambda x: True if query in str(x) else False)
         return data
 class Profile:
     def __init__(self,user):
@@ -209,31 +177,18 @@ class Profile:
                         return False
             fl.close()
     def GIVE_KIPPCOINS(self, KC):
-        readarray=[]
-        with open('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS') as fl:
-            reader=csv.reader(fl)
-            for row in reader:
-                readarray.append(row)
-            for row in readarray:
-                if row[0] == str(self.user.id):
-                    orig=int(row[1])
-                    row[1] = orig+int(KC)
-            fl.close()
+        readarray=READ_DATA_IN('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS')
+        for row in readarray:
+             if row[0] == str(self.user.id):
+                orig=int(row[1])
+                row[1] = orig+int(KC)
         with open('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS','w') as f:
             writer=csv.writer(f)
             for row in readarray:
                 writer.writerow(row)
             f.close()
     def GIVE_ITEM(self, item):
-        readarray=[]
-        with open('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS') as fl:
-            reader=csv.reader(fl)
-            for row in reader:
-                readarray.append(row)
-            for row in readarray:
-                if row[0] == str(self.user.id):
-                    row.append(item)
-            fl.close()
+        readarray=READ_DATA_IN('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS',condition=lambda x: True if x[0] == str(self.user.id) else False)
         with open('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS','w') as f:
             writer=csv.writer(f)
             for row in readarray:
@@ -304,6 +259,22 @@ async def VerifyMusicUser(message):
     else:
         await client.send_message(message.channel, "Please start some music in order to use these commands:\n**!CLEARQUEUE**\n**!SKIP**\n**!GETVOL**\n**!SETVOL**\n**!PAUSE**\n**!RESUME**")
         return False
+def READ_DATA_IN(path, condition=lambda x: True, attr_condition=lambda x: True):
+    try:
+        with open(path) as f:
+            f.close()
+    except Exception:
+         with open(path,'w+') as f:
+             f.close()
+    arr=[]
+    with open(path) as fl:
+        for row in csv.reader(fl):
+            if condition(row):
+                for attr in row:
+                    if attr_condition(attr):
+                        arr.append(row)
+                        break
+    return arr
 def GET_ITEM_INFO(item):
     price=item.split(": ")[1].split("KC")[0]
     name = item.split(": ")[0]
@@ -316,37 +287,15 @@ def add_chat_log(message):
     if message.author.bot:
         return
     if str(message.channel).upper().startswith('DIRECT MESSAGE') == False:
-        try:
-            with open('/home/pi/Desktop/KIPPSTUFF/ChatLogs/{0}'.format(message.server.id)) as f:
-                f.close()
-        except Exception:
-             with open('/home/pi/Desktop/KIPPSTUFF/ChatLogs/{0}'.format(message.server.id),'w+') as f:
-                 f.close()
-        arr=[]
-        with open("/home/pi/Desktop/KIPPSTUFF/ChatLogs/{0}".format(message.server.id)) as fl:
-            for row in csv.reader(fl):
-                arr.append(row)
-            arr.append([str(datetime.today().date()),message.author.id,str(message.content)])
-            fl.close()
+        arr=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/ChatLogs/{0}")
+        arr.append([str(datetime.today().date()),message.author.id,str(message.content)])
         with open('/home/pi/Desktop/KIPPSTUFF/ChatLogs/{0}'.format(message.server.id),'w') as f:
             writer=csv.writer(f)
             for row in arr:
                 writer.writerow(row)
             f.close()
 def search_chat_log(message,query):
-    arr=[]
-    try:
-        with open('/home/pi/Desktop/KIPPSTUFF/ChatLogs/{0}'.format(message.server.id)) as f:
-            f.close()
-    except Exception:
-        with open('/home/pi/Desktop/KIPPSTUFF/ChatLogs/{0}'.format(message.server.id),'w+') as f:
-            f.close()
-    with open('/home/pi/Desktop/KIPPSTUFF/ChatLogs/{0}'.format(message.server.id)) as fl:
-        for row in csv.reader(fl):
-            for attr in row:
-                if query.upper() in str(attr).upper():
-                    arr.append(row)
-        fl.close()
+    arr=READ_DATA_IN('/home/pi/Desktop/KIPPSTUFF/ChatLogs/{0}'.format(message.server.id),attr_condition=lambda x: True if query.upper() in str(x).upper() else False)
     return arr
 class Event:
     def __init__(self,time,date,name,message):
@@ -410,10 +359,7 @@ async def EVENT(message,message2):
                         await client.add_reaction(m1,"\U0001F44D")
                         e=Event(time,date,name,m1)
                         serverinfo[message.server].events.append(e)
-                        readarray=[]
-                        reader = csv.reader(open("/home/pi/Desktop/KIPPSTUFF/EVENTS"))
-                        for row in reader:
-                            readarray.append(row)
+                        readarray=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/EVENTS")
                         e.id=int(readarray[0][0])+1
                         readarray[0]=[e.id]
                         readarray.append([e.id,e.name,e.date,e.time,e.members])
@@ -1647,10 +1593,7 @@ async def background_loop():
 async def schedule_handler():
     import datetime
     while True:
-        readarray=[]
-        reader = csv.reader(open("/home/pi/Desktop/KIPPSTUFF/EVENTS"))
-        for row in reader:
-            readarray.append(row)
+        readarray=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/EVENTS")
         for row in readarray:
             if len(row)>1:
                 e=Event(row[3],row[2],row[1],None)
@@ -1857,10 +1800,7 @@ while True:
                     if str(user.id) != KIPP_ID:
                         event.members.append(str(user))
                         event.ids.append(str(user.id))
-                        readarray=[]
-                        reader = csv.reader(open("/home/pi/Desktop/KIPPSTUFF/EVENTS"))
-                        for row in reader:
-                            readarray.append(row)
+                        readarray=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/EVENTS")
                         for row in readarray:
                             if row[0]==str(event.id) and len(row)>1:
                                 row[4:]=event.ids 
@@ -1876,10 +1816,7 @@ while True:
                 if reaction.emoji=="\U0001F44D":
                     event.members.remove(str(user))
                     event.ids.remove(user.id)
-                    readarray=[]
-                    reader = csv.reader(open("/home/pi/Desktop/KIPPSTUFF/EVENTS"))
-                    for row in reader:
-                        readarray.append(row)
+                    readarray=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/EVENTS")
                     for row in readarray:
                         if row[0]==str(event.id) and len(row)>1:
                             row[4:]=event.ids
@@ -1993,9 +1930,7 @@ while True:
         if str(message.channel).upper().startswith('DIRECT MESSAGE') == False:
             serverinfo[message.server].recentchannel = message.channel
         readarray=[]
-        reader = csv.reader(open("/home/pi/Desktop/KIPPSTUFF/KIPPCOINS"))
-        for row in reader:
-            readarray.append(row)
+        readarray=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/KIPPCOINS")
         for server in client.servers:
             if str(server.id) == "451227721545285649":
                 if serverinfo[server].election == True:

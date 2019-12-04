@@ -25,7 +25,8 @@ GPIO.output(4,GPIO.HIGH)
 lcd=RPi_I2C_driver.lcd()
 lcd.lcd_display_string("------KIPP------",1)
 lcd.lcd_display_string("     ONLINE     ", 2)
-await asyncio.sleep(5)
+import time
+time.sleep(3)
 GPIO.output(4,GPIO.LOW)
 GPIO.cleanup()
 CREATOR_ONLY_COMMANDS = ["EXECUTE ORDER 66",

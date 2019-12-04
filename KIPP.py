@@ -19,6 +19,15 @@ CREATOR_ID="289920025077219328"
 KIPP_ID="386352783550447628"
 MSG_COUNTER=0
 START_TIME=datetime.now()
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(4,GPIO.OUT)
+GPIO.output(4,GPIO.HIGH)
+lcd=RPi_I2C_driver.lcd()
+lcd.lcd_display_string("------KIPP------",1)
+lcd.lcd_display_string("     ONLINE     ", 2)
+await asyncio.sleep(5)
+GPIO.output(4,GPIO.LOW)
+GPIO.cleanup()
 CREATOR_ONLY_COMMANDS = ["EXECUTE ORDER 66",
                          "!NICKNAME",
                          "!EXEC",

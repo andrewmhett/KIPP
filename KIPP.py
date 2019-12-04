@@ -447,7 +447,7 @@ async def PLAY(message,message2):
             playerinfo[message.author].challenger=None
 async def LCD(message,message2):
     global MSG_COUNTER
-    if await VerifyOwnerMeema(message):
+    if message.author.id == CREATOR_ID:
         await client.send_message(message.channel,"Displaying statistics on LCD now...")
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(4,GPIO.OUT)

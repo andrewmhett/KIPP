@@ -15,17 +15,10 @@ sys.path.append('./KIPPSTUFF')
 from ESSENTIAL_PACKAGES import *
 import RPi_I2C_driver
 import RPi.GPIO as GPIO
-from time import *
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(4,GPIO.OUT)
-GPIO.output(4,GPIO.HIGH)
-lcd=RPi_I2C_driver.lcd()
-lcd.lcd_display_string("HELLO WORLD", 1)
-sleep(1)
-GPIO.output(4,GPIO.LOW)
-GPIO.cleanup()
 CREATOR_ID="289920025077219328"
 KIPP_ID="386352783550447628"
+MSG_COUNTER=0
+START_TIME=datetime.now()
 CREATOR_ONLY_COMMANDS = ["EXECUTE ORDER 66",
                          "!NICKNAME",
                          "!EXEC",
@@ -452,6 +445,19 @@ async def PLAY(message,message2):
             playerinfo[playerinfo[message.author].challenger].betting=False
             playerinfo[message.author].betting=False
             playerinfo[message.author].challenger=None
+async def LCD(message,message2):
+    global MSG_COUNTER
+    if await VerifyOwnerMeema(message):
+        await client.send_message(message.channel,"Displaying statistics on LCD now...")
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(4,GPIO.OUT)
+        GPIO.output(4,GPIO.HIGH)
+        lcd=RPi_I2C_driver.lcd()
+        lcd.lcd_display_string("TIME: {0}".format(str(datetime.now()-START_TIME).split('.')[0]),1)
+        lcd.lcd_display_string("MESSAGES: {0}".format(str(MSG_COUNTER)), 2)
+        await asyncio.sleep(5)
+        GPIO.output(4,GPIO.LOW)
+        GPIO.cleanup()
 async def CODE(message,message2):
     from subprocess import Popen, PIPE
     p=Popen('/home/pi/Desktop/KIPPSTUFF/NewestCommit.sh',stdout=PIPE,stderr=PIPE)
@@ -1415,7 +1421,8 @@ command["!WCHANNEL"]=OWON("!WCHANNEL","This command will set the current text ch
 command["!INVITE"]=OWON("!INVITE","This command will DM an invite to the user with the specified user id\n**Usage**\n`!INVITE|user id`",INVITE)
 command["!UNBLOCK"]=OWON("!UNBLOCK","This command will unblock the specified user\n**Usage**\n`!UNBLOCK|user`",UNBLOCK)
 command["!SKIP"]=MUSC("!SKIP","This command will skip the current song, and play the next song in queue.\n**Usage**\n`!SKIP`",SKIP)
-command["!EVENT"]=MUSC("!EVENT","This command will send you a prompt to create a scheduled event.\n**Usage**\n`!EVENT`",EVENT)
+command["!EVENT"]=MISC("!EVENT","This command will send you a prompt to create a scheduled event.\n**Usage**\n`!EVENT`",EVENT)
+command["!LCD"]=MISC("!LCD","This command may be used by LockdownDoom in order to activate KIPP's LCD.\n**Usage**\n`!LCD`",LCD)
 async def background_loop():
     import datetime
     try:
@@ -1929,6 +1936,8 @@ while True:
                print("Welcome channel was deleted, couldn't send message to welcome channel")
     @client.event
     async def on_message(message):
+        global MSG_COUNTER
+        MSG_COUNTER=MSG_COUNTER+1
         if message.server != None or str(message.channel).upper=="DIRECT MESSAGE":
             if message.author.id in serverinfo[message.server].blocked:
                 await client.delete_message(message)

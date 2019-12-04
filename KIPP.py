@@ -13,6 +13,17 @@ import os
 import threading
 sys.path.append('./KIPPSTUFF')
 from ESSENTIAL_PACKAGES import *
+import RPi_I2C_driver
+import RPi.GPIO as GPIO
+from time import *
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(4,GPIO.OUT)
+GPIO.output(4,GPIO.HIGH)
+lcd=RPi_I2C_driver.lcd()
+lcd.lcd_display_string("HELLO WORLD", 1)
+sleep(1)
+GPIO.output(4,GPIO.LOW)
+GPIO.cleanup()
 CREATOR_ID="289920025077219328"
 KIPP_ID="386352783550447628"
 CREATOR_ONLY_COMMANDS = ["EXECUTE ORDER 66",

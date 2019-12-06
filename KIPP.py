@@ -19,16 +19,6 @@ CREATOR_ID="289920025077219328"
 KIPP_ID="386352783550447628"
 MSG_COUNTER=0
 START_TIME=datetime.now()
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(4,GPIO.OUT)
-GPIO.output(4,GPIO.HIGH)
-lcd=RPi_I2C_driver.lcd()
-lcd.lcd_display_string("------KIPP------",1)
-lcd.lcd_display_string("     ONLINE     ", 2)
-import time
-time.sleep(3)
-GPIO.output(4,GPIO.LOW)
-GPIO.cleanup()
 CREATOR_ONLY_COMMANDS = ["EXECUTE ORDER 66",
                          "!NICKNAME",
                          "!EXEC",
@@ -227,6 +217,13 @@ class SCIN(Command):
     pass
 class HISO(Command):
     pass
+async def slide_lcd_text(rows,lcd):
+    for i in range(0,16):
+        text1=rows[0][i:]
+        text2=rows[1][i:]
+        lcd.lcd_display_string(text1+(" "*(16-len(text1))),1)
+        lcd.lcd_display_string(text2+(" "*(16-len(text2))),2)
+        await asyncio.sleep(0.01)
 async def ping_check():
     global last_ping
     while True:
@@ -463,9 +460,21 @@ async def LCD(message,message2):
         GPIO.setup(4,GPIO.OUT)
         GPIO.output(4,GPIO.HIGH)
         lcd=RPi_I2C_driver.lcd()
-        lcd.lcd_display_string("TIME: {0}".format(str(datetime.now()-START_TIME).split('.')[0]),1)
-        lcd.lcd_display_string("MESSAGES: {0}".format(str(MSG_COUNTER)), 2)
-        await asyncio.sleep(5)
+        text1=str(datetime.now()-START_TIME).split('.')[0]
+        text1=(int((16-len(text1))/2)*" ")+text1
+        text2="MESSAGES: {0}".format(str(MSG_COUNTER))
+        tmp = open('/sys/class/thermal/thermal_zone0/temp')
+        cpu = tmp.read()
+        tmp.close()
+        text3="TEMP: "+('{:.2f}'.format( float(cpu)/1000 ) + ' C')
+        lcd.lcd_display_string("  TIME ELAPSED  ",1)
+        lcd.lcd_display_string(text1, 2)
+        await asyncio.sleep(3)
+        await slide_lcd_text(["  TIME ELAPSED  ",text1],lcd=lcd)
+        lcd.lcd_display_string(text2,1)
+        lcd.lcd_display_string(text3, 2)
+        await asyncio.sleep(3)
+        await slide_lcd_text([text2,text3],lcd)
         GPIO.output(4,GPIO.LOW)
         GPIO.cleanup()
 async def CODE(message,message2):
@@ -1931,6 +1940,18 @@ while True:
                     serverinfo[server].mcrole=role
                 if str(role) == "Destiny 2":
                     serverinfo[server].d2role=role
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(4,GPIO.OUT)
+        GPIO.output(4,GPIO.HIGH)
+        lcd=RPi_I2C_driver.lcd()
+        text1="------KIPP------"
+        text2="     ONLINE     "
+        lcd.lcd_display_string(text1, 1)
+        lcd.lcd_display_string(text2, 2)
+        await asyncio.sleep(3)
+        await slide_lcd_text([text1,text2],lcd=lcd)
+        GPIO.output(4,GPIO.LOW)
+        GPIO.cleanup()
     @client.event
     async def on_join(member):
         server = member.server

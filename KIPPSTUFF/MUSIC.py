@@ -1,4 +1,4 @@
-cclass music_handler():
+class music_handler():
     def __init__(self,server,player,channel):
         self.server=server
         self.channel=channel

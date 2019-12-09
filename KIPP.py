@@ -307,7 +307,7 @@ class music_handler():
                     self.message=await client.send_message(self.channel,embed=self.em)
                 else:
                     await client.edit_message(self.message,embed=self.em)
-            await asyncio.sleep(1.5)
+            await asyncio.sleep(2)
 async def slide_lcd_text(rows,lcd):
     for i in range(0,16):
         text1=rows[0][i:]
@@ -315,15 +315,6 @@ async def slide_lcd_text(rows,lcd):
         lcd.lcd_display_string(text1+(" "*(16-len(text1))),1)
         lcd.lcd_display_string(text2+(" "*(16-len(text2))),2)
         await asyncio.sleep(0.01)
-async def ping_check():
-    global last_ping
-    while True:
-        if t.time()-last_ping>2:
-            for l in asyncio.Task.all_tasks(loop=client.loop):
-                if "background_loop" in str(l):
-                    l.cancel()
-            client.loop.create_task(background_loop())
-        await asyncio.sleep(1)
 async def VerifyOwnerMeema(message):
     if str(message.server.id) == "451227721545285649":
         role = discord.utils.get(message.server.roles, name="meema")
@@ -1483,7 +1474,7 @@ async def background_loop():
                 if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
                     c=datetime.datetime.now()-serverinfo[server].end_time
                     b=datetime.datetime.now()-serverinfo[server].jointime
-                    if int(str(divmod(c.days * 86400 + c.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5 and int(str(divmod(b.days * 86400 + b.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5:
+                    if c.minutes >= 5 and b.minutes >= 5:
                         if server.voice_client != None:
                             try:
                                 await server.voice_client.disconnect()
@@ -1728,7 +1719,6 @@ while True:
         #s.connect(("8.8.8.8",80))
         #await client.send_message(await client.get_user_info(CREATOR_ID),"Status Panel available at: {0}".format("http://"+s.getsockname()[0]+":5000/"))
         loop = asyncio.get_event_loop()
-        loop.create_task(ping_check())
         loop.create_task(background_loop())
         #loop.create_task(schedule_handler())
         logging.log(5,"KIPP started.")

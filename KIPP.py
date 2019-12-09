@@ -1471,8 +1471,6 @@ async def background_loop():
     import datetime
     try:
         while True:
-            global last_ping
-            last_ping=t.time()
             for server in client.servers:
                 if serverinfo[server].mHandler != None:
                     await serverinfo[server].mHandler.update_loop()
@@ -1558,65 +1556,6 @@ async def schedule_handler():
                         except discord.DiscordException:
                             event.message=await client.send_message(event.channel,embed=em)
                         await client.edit_message(event.message,embed=em)
-        await asyncio.sleep(1)
-async def election_timer():
-    import datetime
-    while True:
-        for server in client.servers:
-            if str(server.id) == "451227721545285649":
-                if serverinfo[server].election == True:
-                    for member in server.members:
-                        if member in serverinfo[server].voters:
-                            if str(member.status).upper() == 'OFFLINE':
-                                serverinfo[server].voters.remove(member)
-                    c = datetime.datetime.now()-serverinfo[server].sElectiontime
-                    progress = divmod(c.days * 86400 + c.seconds, 60)
-                    minutedelta=str(progress).split('(')[1].split(')')[0].split(',')[0]
-                    i=int(minutedelta)
-                    timer = str(15-i)
-                    if i < 15:
-                        emb = discord.Embed(title="Election",description="Candidate 1: {0}\n**Votes: {1}**\n\nCandidate 2: {2}\n**Votes: {3}**\n\n**Time Left: {4} minutes**".format(str(serverinfo[server].can1),str(serverinfo[server].can1votes), str(serverinfo[server].can2), str(serverinfo[server].can2votes), timer),colour=EMBEDCOLOR)
-                        await client.edit_message(serverinfo[server].electionmessage, embed=emb)
-                        if timer != serverinfo[server].oldtime:
-                            serverinfo[server].oldtime=timer
-                            channel = serverinfo[server].electionmessage.channel
-                            await client.delete_message(serverinfo[server].electionmessage)
-                            serverinfo[server].electionmessage = await client.send_message(channel, embed=emb)
-                            cand1=serverinfo[server].can1
-                            cand2=serverinfo[server].can2
-                            for member in server.members:
-                                if member not in serverinfo[server].messagesent and server.role_hierarchy.index(member.top_role)>2 and member != cand1 and member != cand2 and (str(member.status).upper() == "ONLINE" or str(member.status) == "idle"):
-                                    await client.send_message(member, "An election has started in The New Society. Please respond to this message by typing **1** or **2**. Candidate 1 is {0}, and candidate 2 is {1}.".format(str(cand1),str(cand2)))
-                                    serverinfo[server].voters.append(member)
-                                    serverinfo[server].messagesent.append(member)
-                    if i >= 15 or len(serverinfo[server].voters) == 0:
-                        if serverinfo[server].can1votes >0 or serverinfo[server].can2votes>0:
-                            emb = discord.Embed(title="Election", description="Election Ended",colour=EMBEDCOLOR)
-                            await client.edit_message(serverinfo[server].electionmessage, embed=emb)
-                            if serverinfo[server].can1votes > serverinfo[server].can2votes:
-                                winner = serverinfo[server].can1
-                            elif serverinfo[server].can1votes < serverinfo[server].can2votes:
-                                winner = serverinfo[server].can2
-                            elif serverinfo[server].can1votes == serverinfo[server].can2votes:
-                                await client.send_message(serverinfo[server].electionmessage.channel, "It was a tie! Flipping a coin...")
-                                rand = SystemRandom().randrange(1,3)
-                                if rand == 1:
-                                    winner = serverinfo[server].can1
-                                if rand == 2:
-                                    winner = serverinfo[server].can2
-                            for role in server.roles:
-                                if str(role) == "meema":
-                                    winrole = role
-                            await client.send_message(serverinfo[server].electionmessage.channel, "The winner of this election was **{0}**. Congratulations! You are now the rank {1} and have power over the people.".format(str(winner),winrole.mention))
-                            for member in server.members:
-                                if str(member.top_role) == 'meema':
-                                    await client.remove_roles(member, member.top_role)
-                                if str(member) == str(winner):
-                                    await client.add_roles(member, winrole)
-                            serverinfo[server].election=False
-                        else:
-                            emb = discord.Embed(title="Election", description="Election Ended",colour=EMBEDCOLOR)
-                            await client.edit_message(serverinfo[server].electionmessage, embed=emb)
         await asyncio.sleep(1)
 async def web_command(message, message2):
     if message2.startswith("!D2"):
@@ -1786,7 +1725,6 @@ while True:
         #s.connect(("8.8.8.8",80))
         #await client.send_message(await client.get_user_info(CREATOR_ID),"Status Panel available at: {0}".format("http://"+s.getsockname()[0]+":5000/"))
         loop = asyncio.get_event_loop()
-        loop.create_task(election_timer())
         loop.create_task(ping_check())
         loop.create_task(background_loop())
         #loop.create_task(schedule_handler())

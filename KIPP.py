@@ -65,26 +65,9 @@ EMBEDCOLOR=0x36393E
 class Server:
     def __init__(self,server):
         self.server=server
-        self.paused = False
-        self.musictextchannel = None
-        self.playing = ""
+        self.mHandler=None
         self.everyoneleft = False
-        self.title = ""
-        self.length = ""
-        self.thumbnail = ""
-        self.player = None
-        self.volume = 0.5
         self.blocked = []
-        self.starttime = datetime.now()
-        self.musicmessage = None
-        self.musicdesc = ""
-        self.musicfooter = ""
-        self.pausetime = 0
-        self.pausedatetime = None
-        self.imagelink = ""
-        self.duration=0
-        self.count=0
-        self.count1=0
         self.gamgamestarter = None
         self.gamgameopp = None
         self.recentchannel=None
@@ -103,7 +86,7 @@ class Server:
         self.r6role=None
         self.d2role=None
         self.events=[]
-        self.music_end_timer=datetime.now()
+        self.end_time=datetime.now()
         self.loading=False
         self.jointime=datetime.now()
     def add_server_config(self,data):
@@ -217,6 +200,111 @@ class SCIN(Command):
     pass
 class HISO(Command):
     pass
+class music_handler():
+    def __init__(self,server,player,channel):
+        self.server=server
+        self.channel=channel
+        server.voice_client.encoder_options(sample_rate=48000,channels=2)
+        player.start()
+        self.player=player
+        self.paused=False
+        self.message=None
+        self.starttime=datetime.now()
+        self.duration=player.duration
+        self.title=player.title
+        self.link=player.url
+        if self.player.is_live == False:
+            mins=int(self.duration/60)
+            seconds=int(self.duration-(mins*60))
+            hours=int(mins/60)
+            if hours > 0:
+                mins=mins-(hours*60)
+                if len(str(mins))==1:
+                    mins="0"+str(mins)
+                if len(str(seconds)) == 1:
+                    self.length=str(hours)+":"+str(mins)+":"+"0"+str(seconds)
+                else:
+                    self.length=str(hours)+":"+str(mins)+":"+str(seconds)
+            else:
+                if len(str(seconds)) == 1:
+                    self.length=str(mins)+":"+"0"+str(seconds)
+                else:
+                    self.length=str(mins)+":"+str(seconds)
+        else:
+            self.length = "Currently Streaming"
+        self.desc = ("["+self.title+"]("+self.link+")\n**Progress:**: `0:00 / "+self.length+"`\n**Volume:** "+str(int(self.player.volume*100)))
+        self.em = discord.Embed(description=self.desc,colour=EMBEDCOLOR)
+        self.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
+        #video_id = music4.split("watch?v=")[1]
+        #thumbnail = "https://img.youtube.com/vi/"+video_id+"/0.jpg"
+        #self.em.set_thumbnail(url=thumbnail)
+        #self.thumbnail = thumbnail
+        self.footer=profooter
+        self.em.set_footer(text=profooter)
+        self.is_playing=True
+        self.pausedatetime=None
+        self.pausetime=None
+        #client.loop.create_task(self.update_loop())
+    async def update_loop(self):
+        self.is_playing=self.player.is_playing()
+        import datetime
+        queuelist="\nNo songs in queue"
+        if len(serverinfo[self.server].queue)>1:
+            queuelist=""
+            i=0
+            for song in serverinfo[self.server].queue[1:]:
+                i=i+1
+                queuelist=queuelist+"\n`#{0}` {1}".format(i,"["+(''.join(song[0]))+"]("+song[1]+")")
+        if self.paused:
+            self.pausetime=datetime.datetime.now()-self.pausedatetime
+        if self.pausetime==None:
+            c = datetime.datetime.now()-self.starttime
+        else:
+            c = datetime.datetime.now()-(self.starttime+datetime.timedelta(seconds=self.pausetime.seconds))
+        if self.paused == False:
+            progress = divmod(c.days * 86400 + c.seconds, 60)
+            self.minutedelta=str(progress).split('(')[1].split(')')[0].split(',')[0]
+            self.seconddelta=str(progress).split('(')[1].split(')')[0].split(', ')[1]
+            if len(str(self.seconddelta)) == 1:
+                self.seconddelta='0'+str(self.seconddelta)
+            self.hours=int(int(self.minutedelta)/60)
+            percent=int(18*(((int(self.hours)*3600)+(int(self.minutedelta)*60)+int(self.seconddelta))/int(self.duration)))+1
+            if self.player.is_live == False:
+                self.bar=("▣"*percent)+"▢"*(18-percent)
+            else:
+                self.bar="▣"*18
+        pauseStr=""
+        if self.paused:
+            pauseStr=" (paused)"
+        if self.hours>0:
+            self.minutedelta=int(self.minutedelta)-(hours*60)
+            if len(str(self.minutedelta))==1:
+                self.minutedelta="0"+str(self.minutedelta)
+            else:
+                self.minutedelta=str(self.minutedelta)
+            self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'**Volume:** '+str(int(self.player.volume*100))+'%'+'\n**Progress:** `'+str(self.hours)+":"+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+pauseStr+'`\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
+        else:
+            self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'**Volume:** '+str(int(self.player.volume*100))+'%'+'\n**Progress:** `'+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+pauseStr+'`\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
+        self.em.set_footer(text=self.footer)
+        self.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
+        if self.is_playing==False or c.seconds >= self.duration and self.player.is_live == False:
+            em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Song Ended**", colour=EMBEDCOLOR)
+            em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
+            await client.edit_message(self.message,embed=em)
+            serverinfo[self.server].queue.remove(serverinfo[self.server].queue[0])
+            self.is_playing=False
+            serverinfo[self.server].mHandler=None
+            serverinfo[self.server].end_time=datetime.datetime.now()
+        else:
+            if self.message != None:
+                try:
+                    await client.edit_message(self.message,embed=self.em)
+                except:
+                    self.message=None
+            if self.message==None:
+                self.message=await client.send_message(self.channel,embed=self.em)
+            else:
+                await client.edit_message(self.message,embed=self.em)
 async def slide_lcd_text(rows,lcd):
     for i in range(0,16):
         text1=rows[0][i:]
@@ -247,20 +335,9 @@ async def VerifyOwnerMeema(message):
         await client.send_message(message.channel, "{0} is a Creator-Only command".format(str(message.content).split('|')[0].upper()))
         return False
 async def VerifyMusicUser(message):
-    player = serverinfo[message.server].player
-    try:
-        if player.is_playing() == True:
-            serverinfo[message.server].paused = False
-        if player.is_playing() == False:
-            serverinfo[message.server].paused = True
-    except AttributeError:
-        pass
-    try:
-        player = serverinfo[message.server].player
-        str(int(player.volume*100))
-        currentlyplaying = True
-    except AttributeError:
-        currentlyplaying = False
+    currentlyplaying=False
+    if serverinfo[message.server].mHandler != None:
+        currentlyplaying=serverinfo[message.server].mHandler.is_playing
     if currentlyplaying == True:
         if str(message.author.voice.voice_channel) != str(message.server.get_member(KIPP_ID).voice.voice_channel):
             await client.send_message(message.channel, "Please join the channel where the music is playing ("+str(message.server.get_member(KIPP_ID).voice.voice_channel)+") in order to use these commands:\n**!CLEARQUEUE**\n**!SKIP**\n**!SETVOL**\n**!PAUSE**\n**!RESUME**")
@@ -406,7 +483,7 @@ async def SR(message,message2):
     calc = (2*(eval('6.67*10**-11'))*(eval(mass)))/eval('299792458**2')
     await client.send_message(message.channel, "The Schwarzschild Radius of an object with a mass of "+str(mass).replace('**','^')+" kg is: "+str(calc)+" m")
 async def EXIT(message,message2):
-    if playerinfo[message.player].betting==True:
+    if playerinfo[message.author].betting==True:
         playerinfo[message.author].gamblerequest=False
         emb=discord.Embed(title="GambleGame",description="GAME ENDED",colour=EMBEDCOLOR)
         emb.set_footer(text=profooter)
@@ -870,10 +947,11 @@ async def MFIX(message,message2):
     await client.send_message(message.channel,"Resetting variables...")
     serverinfo[message.server].count=0
     try:
-        serverinfo[message.server].player.stop()
+        serverinfo[message.server].mHandler.is_playing=False
+        serverinfo[message.server].mHandler.player.stop()
     except Exception as err:
         print(err)
-    serverinfo[message.server].player=None
+    serverinfo[message.server].mHandler=None
     await client.send_message(message.channel,"Clearing queue...")
     serverinfo[message.server].queue = []
     await client.send_message(message.channel,"Resetting voice client...")
@@ -951,18 +1029,14 @@ async def MUSIC(message,message2):
     server=message.server
     notsearched = False
     serverinfo[message.server].musictextchannel = message.channel
-    try:
-        player = serverinfo[message.server].player
-        str(int(player.volume*100))
-        currentlyplaying = True
-    except AttributeError:
-        currentlyplaying = False
+    currentlyplaying=False
+    if serverinfo[message.server].mHandler != None:
+        currentlyplaying=serverinfo[message.server].mHandler.is_playing
     if (currentlyplaying == False) or (currentlyplaying == True and message.author.voice.voice_channel == message.server.get_member(KIPP_ID).voice.voice_channel):
         try:
             if (message2.split('!MUSIC')[1]).startswith('|') == True:
                 if serverinfo[message.server].loading == False:
                     serverinfo[message.server].loading = True
-                    player = (serverinfo[message.server].player)
                     music2 = str(message.content)
                     music3 = music2.split('|')
                     music4= music3[1]
@@ -1004,63 +1078,14 @@ async def MUSIC(message,message2):
                                             user = message.server.get_member(KIPP_ID)
                                             await client.move_member(user, channel)
                                         add_to_queue(message.server, music4)
-                                        try:
-                                            if serverinfo[message.server].player != None:
-                                                if len(serverinfo[message.server].queue)>1:
-                                                    await client.send_message(message.channel, "Song added to queue. #"+str(len(serverinfo[message.server].queue)-1))
-                                            serverinfo[message.server].loading=False
-                                        except AttributeError:
-                                            pass
+                                        if serverinfo[message.server].mHandler != None:
+                                            if len(serverinfo[message.server].queue)>1:
+                                                await client.send_message(message.channel, "Song added to queue. #"+str(len(serverinfo[message.server].queue)-1))
+                                        serverinfo[message.server].loading=False
                                         if len(serverinfo[message.server].queue) == 1:
-                                            message.server.voice_client.encoder_options(sample_rate=48000,channels=2)
-                                            print("creating ytdl player...")
                                             player = await message.server.voice_client.create_ytdl_player(music4,before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
-                                            player.start()
-                                            serverinfo[message.server].count=1
-                                            player.volume = serverinfo[message.server].volume
-                                            serverinfo[message.server].player = player
-                                            serverinfo[message.server].playing = player.title
-                                            length = player.duration
-                                            for channel in server.channels:
-                                                if str(channel.user_limit) != "None":
-                                                    if channel == message.author.voice.voice_channel:
-                                                        if serverinfo[message.server].player.is_live == False:
-                                                            mins=int(length/60)
-                                                            seconds=int(length-(mins*60))
-                                                            hours=int(mins/60)
-                                                            if hours > 0:
-                                                                mins=mins-(hours*60)
-                                                                if len(str(mins))==1:
-                                                                    mins="0"+str(mins)
-                                                                if len(str(seconds)) == 1:
-                                                                    length=str(hours)+":"+str(mins)+":"+"0"+str(seconds)
-                                                                else:
-                                                                    length=str(hours)+":"+str(mins)+":"+str(seconds)
-                                                            else:
-                                                                if len(str(seconds)) == 1:
-                                                                    length=str(mins)+":"+"0"+str(seconds)
-                                                                else:
-                                                                    length=str(mins)+":"+str(seconds)
-                                                        else:
-                                                            length = "Currently Streaming"
-                                                        serverinfo[message.server].length = length
-                                                        msg3 = ("["+str(serverinfo[message.server].playing)+"]("+music4+")\n**Progress:**: `0:00 / "+str(length)+"`\n**Volume:** "+str(serverinfo[message.server].player.volume))
-                                                        em = discord.Embed(description=msg3,colour=EMBEDCOLOR)
-                                                        em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
-                                                        video_id = music4.split("watch?v=")[1]
-                                                        thumbnail = "https://img.youtube.com/vi/"+video_id+"/0.jpg"
-                                                        #em.set_thumbnail(url=thumbnail)
-                                                        serverinfo[message.server].thumbnail = thumbnail
-                                                        em.set_footer(text=profooter)
-                                                        serverinfo[server].musicmessage = await client.send_message(message.channel, embed=em)
-                                                        serverinfo[message.server].starttime = datetime.now()
-                                                        serverinfo[message.server].musicdesc = msg3
-                                                        serverinfo[message.server].musicfooter = profooter
-                                                        serverinfo[message.server].pausetime = 0
-                                                        serverinfo[message.server].imagelink = thumbnail
-                                                        serverinfo[message.server].duration = player.duration
-                                                        serverinfo[message.server].length = str(length)
-                                                        serverinfo[message.server].loading = False
+                                            serverinfo[message.server].mHandler=music_handler(message.server,player,message.channel)
+                                            serverinfo[message.server].loading = False
                                     else:
                                         await client.send_message(message.channel, "Please do not try to play an entire youtube channel. Get one specific song you would like to hear, and play that.")
                                         serverinfo[message.server].loading = False
@@ -1087,13 +1112,13 @@ async def MONO(message,message2):
         message.server.voice_client.encoder_options(sample_rate=48000,channels=1)
         await client.send_message(message.channel, 'Audio set to mono. Audio will be set back to stereo before next song.')
 async def SKIP(message,message2):
-    player = serverinfo[message.server].player
+    player = serverinfo[message.server].mHandler.player
     if await VerifyMusicUser(message):
         import datetime as d
         if serverinfo[message.server].paused == True:
             player.resume()
             serverinfo[message.server].paused = False
-        serverinfo[message.server].starttime=serverinfo[message.server].starttime-d.timedelta(seconds=serverinfo[message.server].player.duration)
+        serverinfo[message.server].mHandler.starttime=serverinfo[message.server].mHandler.starttime-d.timedelta(seconds=serverinfo[message.server].mHandler.duration)
         if len(serverinfo[message.server].queue)==1:
             await client.send_message(message.channel, "There are no more songs in the queue. Current song ended.")
 async def STEREO(message,message2):
@@ -1116,7 +1141,7 @@ async def REMOVESONG(message,message2):
             await client.send_message(message.channel,"There are no songs in the queue.")
 async def SETVOL(message,message2):
     if await VerifyMusicUser(message):
-        player = serverinfo[message.server].player
+        player = serverinfo[message.server].mHandler.player
         vol = player.volume
         try:
             if (int(message2.split('|')[1])<101 and int(message2.split('|')[1])>-1) and str(message.server.id) != '329449782160654336' and str(message.server.id) != '451227721545285649':
@@ -1138,20 +1163,20 @@ async def SETVOL(message,message2):
             await client.send_message(message.channel, "Invalid setting. Volume must be an integer from 0-100.")
 async def PAUSE(message,message2):
     if await VerifyMusicUser(message):
-        player = serverinfo[message.server].player
-        if serverinfo[message.server].paused == False:
-            player.pause()
-            serverinfo[message.server].paused = True
+        player = serverinfo[message.server].mHandler.player
+        if serverinfo[message.server].mHandler.paused == False:
             await client.send_message(message.channel, "Music paused.")
+            serverinfo[message.server].mHandler.player.pause()
+            serverinfo[message.server].mHandler.player.pausedatetime=datetime.datetime.now()
         else:
             await client.send_message(message.channel, "Music already is paused. To resume, use the **!resume** command.")
 async def RESUME(message,message2):
     if await VerifyMusicUser(message):
-        player = serverinfo[message.server].player
-        if serverinfo[message.server].paused == True:
-            player.resume()
+        player = serverinfo[message.server].mHandler.player
+        if serverinfo[message.server].mHandler.paused:
+            serverinfo[message.server].mHandler.player.resume()
+            serverinfo[message.server].mHandler.paused=False
             await client.send_message(message.channel, "Music resumed.")
-            serverinfo[message.server].paused = False
         else:
             await client.send_message(message.channel, "There is currently music playing. To pause the music, use the **!pause** command.")
 async def BLOCK(message,message2):
@@ -1449,181 +1474,20 @@ async def background_loop():
             global last_ping
             last_ping=t.time()
             for server in client.servers:
-##                for member in server.members:
-##                    if member.bot == False:
-##                        if member.game != None:
-##                            if member.game.type == 1:
-##                                if playerinfo[member].streaming == False:
-##                                    if serverinfo[server].search_server_configs("TWITCH_CHANNEL") != None:
-##                                        try:
-##                                            await client.send_message(client.get_channel(serverinfo[server].search_server_configs("TWITCH_CHANNEL")[1]), '@everyone, '+str(member)+' just started streaming on Twitch! Check it out here: '+str(member.game.url))
-##                                        except discord.DiscordException:
-##                                            print("Twitch announcement channel was deleted, could not announce streamer")
-##                                playerinfo[member].streaming = True
-##                            else:
-##                                playerinfo[member].streaming=False
-##                    if str(server.id) == "451227721545285649":
-##                        if "RAINBOW SIX SIEGE" in str(member.game).upper():
-##                            if serverinfo[server].r6role not in member.roles:
-##                                await client.add_roles(member, serverinfo[server].r6role)
-##                        else:
-##                            if serverinfo[server].r6role in member.roles:
-##                                await client.remove_roles(member, serverinfo[server].r6role)
-##                        if "MINECRAFT" in str(member.game).upper():
-##                            if serverinfo[server].mcrole not in member.roles:
-##                                await client.add_roles(member, serverinfo[server].mcrole)
-##                        else:
-##                            if serverinfo[server].mcrole in member.roles:
-##                                await client.remove_roles(member, serverinfo[server].mcrole)
-##                        if "DESTINY 2" in str(member.game).upper():
-##                            if serverinfo[server].d2role not in member.roles:
-##                                await client.add_roles(member, serverinfo[server].d2role)
-##                        else:
-##                            if serverinfo[server].d2role in member.roles:
-##                                await client.remove_roles(member, serverinfo[server].d2role)
-                queuelist="\nNo songs in queue"
-                if len(serverinfo[server].queue)>1:
-                    queuelist=""
-                    i=0
-                    for song in serverinfo[server].queue[1:]:
-                        i=i+1
-                        queuelist=queuelist+"\n`#{0}` {1}".format(i,"["+(''.join(song[0]))+"]("+song[1]+")")
-                if serverinfo[server].player==None:
-                    currentlyplaying=False
-                else:
-                    currentlyplaying=True
-                try:
-                    if ((currentlyplaying == False) and serverinfo[server].musicmessage != None):
-                        if serverinfo[server].count == 0:
-                            #print("COUNT=0")
-                            serverinfo[server].player=None
-                            serverinfo[server].music_end_timer=datetime.datetime.now()
-                            em=discord.Embed(description = serverinfo[server].musicdesc.split('**Progress:**')[0]+'**Song ended**',colour=EMBEDCOLOR)
-                            em.set_footer(text=serverinfo[server].musicfooter)
-                            em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
+                if serverinfo[server].mHandler != None:
+                    await serverinfo[server].mHandler.update_loop()
+                    if serverinfo[server].mHandler == None and len(serverinfo[server].queue)>=1:
+                        player = await message.server.voice_client.create_ytdl_player(serverinfo[server].queue[0][1],before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
+                        serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
+                if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
+                    c=datetime.datetime.now()-serverinfo[server].end_time
+                    b=datetime.datetime.now()-serverinfo[server].jointime
+                    if int(str(divmod(c.days * 86400 + c.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5 and int(str(divmod(b.days * 86400 + b.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5:
+                        if server.voice_client != None:
                             try:
-                                await client.edit_message(serverinfo[server].musicmessage,embed=em)
-                            except discord.DiscordException:
-                                serverinfo[server].musicmessage=await client.send_message(serverinfo[server].musictextchannel,embed=em)
-                            except Exception as err:
-                                print(err)
-                            serverinfo[server].count=1
-                            serverinfo[server].queue.remove(serverinfo[server].queue[0])
-                            server.voice_client.encoder_options(sample_rate=48000,channels=2)
-                            player = await server.voice_client.create_ytdl_player(serverinfo[server].queue[0][1],before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
-                            player.start()
-                            player.volume = serverinfo[server].volume
-                            serverinfo[server].player = player
-                            serverinfo[server].playing = player.title
-                            serverinfo[server].likes = player.likes
-                            serverinfo[server].dislikes = player.dislikes
-                            serverinfo[server].views = player.views
-                            serverinfo[server].uploader = player.uploader
-                            length = player.duration
-                            if serverinfo[server].player.is_live == False:
-                                mins=int(length/60)
-                                seconds=int(length-(mins*60))
-                                hours=int(mins/60)
-                                if hours > 0:
-                                    mins=mins-(hours*60)
-                                    if len(str(mins))==1:
-                                        mins="0"+str(mins)
-                                    if len(str(seconds)) == 1:
-                                        length=str(hours)+":"+str(mins)+":"+"0"+str(seconds)
-                                    else:
-                                        length=str(hours)+":"+str(mins)+":"+str(seconds)
-                                else:
-                                    if len(str(seconds)) == 1:
-                                        length=str(mins)+":"+"0"+str(seconds)
-                                    else:
-                                        length=str(mins)+":"+str(seconds)
-                            else:
-                                length = "Currently Streaming"
-                            serverinfo[server].length = length
-                            serverinfo[server].pausetime = 0
-                            msg3 = ("["+str(serverinfo[server].playing)+"]("+serverinfo[server].queue[0][1]+")\n**Progress:**: `0:00 / "+serverinfo[server].length+"`\n**Volume:** "+str(serverinfo[server].player.volume))
-                            em = discord.Embed(description=msg3,colour=EMBEDCOLOR)
-                            em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
-                            video_id = serverinfo[server].queue[0][1].split("watch?v=")[1]
-                            thumbnail = "https://img.youtube.com/vi/"+video_id+"/0.jpg"
-                            serverinfo[server].thumbnail = thumbnail
-                            em.set_footer(text=profooter)
-                            serverinfo[server].musicmessage = await client.send_message(serverinfo[server].musictextchannel, embed=em)
-                            serverinfo[server].musicdesc = msg3
-                            serverinfo[server].musicfooter = profooter
-                            serverinfo[server].pausetime = 0
-                            serverinfo[server].imagelink = thumbnail
-                            serverinfo[server].duration = player.duration
-                            serverinfo[server].player=player
-                            serverinfo[server].starttime = datetime.datetime.now()
-                    elif currentlyplaying==True and serverinfo[server].paused == False:
-                        if serverinfo[server].count1==1:
-                            serverinfo[server].pausetime=serverinfo[server].pausetime+((datetime.datetime.now()-serverinfo[server].pausedatetime).total_seconds())
-                        c = datetime.datetime.now()-(serverinfo[server].starttime+datetime.timedelta(seconds=serverinfo[server].pausetime))
-                        progress = divmod(c.days * 86400 + c.seconds, 60)
-                        minutedelta=str(progress).split('(')[1].split(')')[0].split(',')[0]
-                        seconddelta=str(progress).split('(')[1].split(')')[0].split(', ')[1]
-                        if len(str(seconddelta)) == 1:
-                            seconddelta='0'+str(seconddelta)
-                        hours=int(int(minutedelta)/60)
-                        percent=int(18*(((int(hours)*3600)+(int(minutedelta)*60)+int(seconddelta))/int(serverinfo[server].duration)))+1
-                        if serverinfo[server].player.is_live == False:
-                            bar=("▣"*percent)+"▢"*(18-percent)
-                        else:
-                            bar="▣"*18
-                        if hours>0:
-                            minutedelta=int(minutedelta)-(hours*60)
-                            if len(str(minutedelta))==1:
-                                minutedelta="0"+str(minutedelta)
-                            else:
-                                minutedelta=str(minutedelta)
-                            em=discord.Embed(description = serverinfo[server].musicdesc.split('**Progress:**')[0]+'**Volume:** '+str(int(serverinfo[server].volume*100))+'%'+'\n**Progress:** `'+str(hours)+":"+str(minutedelta)+':'+str(seconddelta)+' / '+serverinfo[server].length+'`\n'+bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
-                        else:
-                            em=discord.Embed(description = serverinfo[server].musicdesc.split('**Progress:**')[0]+'**Volume:** '+str(int(serverinfo[server].volume*100))+'%'+'\n**Progress:** `'+str(minutedelta)+':'+str(seconddelta)+' / '+serverinfo[server].length+'`\n'+bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
-                        em.set_footer(text=serverinfo[server].musicfooter)
-                        em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
-                        if ((int(hours)*3600)+(int(minutedelta)*60)+int(seconddelta))>=int(serverinfo[server].duration) and serverinfo[server].player.is_live == False:
-                            serverinfo[server].player.stop()
-                            serverinfo[server].player = None
-                            serverinfo[server].count=0
-                            currentlyplaying=False
-                        else:
-                            try:
-                                await client.edit_message(serverinfo[server].musicmessage,embed=em)
-                            except discord.DiscordException:
-                                serverinfo[server].musicmessage=await client.send_message(serverinfo[server].musictextchannel,embed=em)
-                        serverinfo[server].count1=0
-                    elif serverinfo[server].paused == True and serverinfo[server].player != None:
-                        if serverinfo[server].count1 == 0:
-                            serverinfo[server].pausedatetime = datetime.datetime.now()
-                            if hours>0:
-                                if len(str(minutedelta)) == 1:
-                                    minutedelta='0'+str(minutedelta)
-                                em=discord.Embed(description = serverinfo[server].musicdesc.split('**Progress:**')[0]+'**Volume:** '+str(int(serverinfo[server].volume*100))+'%'+'\n**Progress:** `'+str(hours)+":"+str(minutedelta)+':'+str(seconddelta)+' / '+serverinfo[server].length+'` (paused)\n'+bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
-                            else:
-                                em=discord.Embed(description = serverinfo[server].musicdesc.split('**Progress:**')[0]+'**Volume:** '+str(int(serverinfo[server].volume*100))+'%'+'\n**Progress:** `'+str(minutedelta)+':'+str(seconddelta)+' / '+serverinfo[server].length+'` (paused)\n'+bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
-                            em.set_footer(text=serverinfo[server].musicfooter)
-                            #em.set_thumbnail(url=serverinfo[server].imagelink)
-                            em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
-                            try:
-                                await client.edit_message(serverinfo[server].musicmessage,embed=em)
-                            except discord.DiscordException:
-                                serverinfo[server].musicmessage=await client.send_message(serverinfo[server].musictextchannel,embed=em)
-                            serverinfo[server].count1=1
-                    if currentlyplaying==False and len(serverinfo[server].queue)==0:
-                        c=datetime.datetime.now()-serverinfo[server].music_end_timer
-                        b=datetime.datetime.now()-serverinfo[server].jointime
-                        if int(str(divmod(c.days * 86400 + c.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5 and int(str(divmod(b.days * 86400 + b.seconds, 60)).split('(')[1].split(')')[0].split(',')[0]) >= 5:
-                            serverinfo[server].player=None
-                            if server.voice_client != None:
-                                try:
-                                    await server.voice_client.disconnect()
-                                except Exception as e:
-                                    print ("Voice client timeout, can't disconnect")
-                except TypeError as err:
-                    print("MUSIC ERROR")
-                    print(err)
-                    raise
+                                await server.voice_client.disconnect()
+                            except Exception as e:
+                                print ("Voice client timeout, can't disconnect")
             await asyncio.sleep(1)
     except Exception as err:
         print(err)
@@ -1871,17 +1735,15 @@ while True:
             for user in server.get_member(KIPP_ID).voice.voice_channel.voice_members:
                 users.append(user)
             if int(len(users))<2:
-                try:
-                    player = serverinfo[server].player
-                    str(int(player.volume*100))
-                    currentlyplaying = True
-                except AttributeError:
-                    currentlyplaying = False
+                currentlyplaying=False
+                if serverinfo[server].mHandler != None:
+                    currentlyplaying=serverinfo[server].mHandler.is_playing
                 if currentlyplaying == True:
                     if serverinfo[server].paused == False:
                         await client.send_message(serverinfo[server].musictextchannel, "Nobody is listening to KIPP. Pausing music...")
-                        serverinfo[server].player.pause()
-                        serverinfo[server].paused = True
+                        serverinfo[server].mHandler.player.pause()
+                        serverinfo[server].mHandler.paused = True
+                        serverinfo[server].mHandler.pausedatetime=datetime.now()
                         serverinfo[server].everyoneleft = True
             if (after.voice.voice_channel == server.get_member(KIPP_ID).voice.voice_channel) and serverinfo[server].everyoneleft == True:
                 serverinfo[server].everyoneleft = False
@@ -2088,62 +1950,58 @@ while True:
             return
         if message.server.get_member(KIPP_ID).mention in message2:
             await client.send_message(message.channel,"What do you want? Use **!help** for the commands.")
-        if message2.startswith("!HELP|"):
-            found=False
-            for command in commands:
-                if "!" in message2.split("|")[1]:
-                    if command.Name==message2.split("|")[1]:
-                        emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
-                        emb.set_footer(text=profooter)
-                        await client.send_message(message.channel, embed=emb)
-                        found=True
+        if message.author.id not in serverinfo[message.server].blocked:
+            if message2.startswith("!HELP|"):
+                found=False
+                for command in commands:
+                    if "!" in message2.split("|")[1]:
+                        if command.Name==message2.split("|")[1]:
+                            emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
+                            emb.set_footer(text=profooter)
+                            await client.send_message(message.channel, embed=emb)
+                            found=True
+                    else:
+                        if command.Name=="!"+message2.split("|")[1]:
+                            emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
+                            emb.set_footer(text=profooter)
+                            await client.send_message(message.channel, embed=emb)
+                            found=True
+                if found==False:
+                    await client.send_message(message.channel,"Sorry, but I couldn't find a registered command with that name.")
+            else:
+                if "|" in message2:
+                    c=message2.split("|")[0]
                 else:
-                    if command.Name=="!"+message2.split("|")[1]:
-                        emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
-                        emb.set_footer(text=profooter)
-                        await client.send_message(message.channel, embed=emb)
-                        found=True
-            if found==False:
-                await client.send_message(message.channel,"Sorry, but I couldn't find a registered command with that name.")
-        else:
-            if "|" in message2:
-                c=message2.split("|")[0]
-            else:
-                c=message2
-            for command in commands:
-                if command.Name == c:
-                    await command.Execute[0](message,message2)
-        if message2 == ('!HELP'):
-            misc=[]
-            musc=[]
-            hierarchical=[]
-            sc=[]
-            kc=[]
-            oo=[]
-            for c in commands:
-                if isinstance(c,MISC):
-                    misc.append(c.Name)
-                elif isinstance(c,HISO):
-                    hierarchical.append(c.Name)
-                elif isinstance(c,MUSC):
-                    musc.append(c.Name)
-                elif isinstance(c,SCIN):
-                    sc.append(c.Name)
-                elif isinstance(c,KIPC):
-                    kc.append(c.Name)
-                elif isinstance(c,OWON):
-                    oo.append(c.Name)
-            em = discord.Embed(title='Help',description="**Use !Help|command for command-specific information**",colour=EMBEDCOLOR)
-            em.add_field(name="Miscellaneous",value="```"+"\n".join(misc)+"```")
-            em.add_field(name="Music",value="```"+"\n".join(musc)+"```")
-            em.add_field(name="Scientific",value="```"+"\n".join(sc)+"```")
-            if str(message.server.id) == '451227721545285649':
-                em.add_field(name="Meema Only",value="```"+"\n".join(oo)+"```")
-            else:
-                em.add_field(name="Owner Only",value="```"+"\n".join(oo)+"```")
-            em.add_field(name="KIPPCOINS",value="```"+"\n".join(kc)+"```")
-            if str(message.server.id) == '451227721545285649':
-                em.add_field(name="H. Society",value="```"+"\n".join(hierarchical)+"```")
-            em.set_footer(text=profooter)
-            await client.send_message(message.channel, embed=em)
+                    c=message2
+                for command in commands:
+                    if command.Name == c:
+                        await command.Execute[0](message,message2)
+            if message2 == ('!HELP'):
+                misc=[]
+                musc=[]
+                sc=[]
+                kc=[]
+                oo=[]
+                for c in commands:
+                    if isinstance(c,MISC):
+                        misc.append(c.Name)
+                    elif isinstance(c,MUSC):
+                        musc.append(c.Name)
+                    elif isinstance(c,SCIN):
+                        sc.append(c.Name)
+                    elif isinstance(c,KIPC):
+                        kc.append(c.Name)
+                    elif isinstance(c,OWON):
+                        oo.append(c.Name)
+                em = discord.Embed(title='Help',description="**Use !Help|command for command-specific information**",colour=EMBEDCOLOR)
+                em.add_field(name="Miscellaneous",value="```"+"\n".join(misc)+"```")
+                em.add_field(name="Music",value="```"+"\n".join(musc)+"```")
+                em.add_field(name="Scientific",value="```"+"\n".join(sc)+"```")
+                if str(message.server.id) == '451227721545285649':
+                    em.add_field(name="Meema Only",value="```"+"\n".join(oo)+"```")
+                else:
+                    em.add_field(name="Owner Only",value="```"+"\n".join(oo)+"```")
+                em.add_field(name="KIPPCOINS",value="```"+"\n".join(kc)+"```")
+                em.set_footer(text=profooter)
+                await client.send_message(message.channel, embed=em)
     client.loop.run_until_complete(client.start(TOKEN))

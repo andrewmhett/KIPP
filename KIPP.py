@@ -246,8 +246,11 @@ class music_handler():
         self.pausetime=None
         client.loop.create_task(self.update_loop())
     async def update_loop(self):
-        while True:
-            self.is_playing=self.player.is_playing()
+        while self.is_playing:
+            if self.player.is_playing():
+                self.is_playing=True
+            elif self.player.is_playing==False and self.paused==True:
+                self.is_playing=False
             import datetime
             queuelist="\nNo songs in queue"
             if len(serverinfo[self.server].queue)>1:
@@ -288,7 +291,7 @@ class music_handler():
                 self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'**Volume:** '+str(int(self.player.volume*100))+'%'+'\n**Progress:** `'+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+pauseStr+'`\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
             self.em.set_footer(text=self.footer)
             self.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
-            if (self.player.is_playing()==False or c.seconds >= self.duration) and self.player.is_live == False:
+            if (self.is_playing == False or c.seconds >= self.duration) and self.player.is_live == False:
                 self.player.stop()
                 em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Song Ended**", colour=EMBEDCOLOR)
                 em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
@@ -1160,8 +1163,9 @@ async def PAUSE(message,message2):
         player = serverinfo[message.server].mHandler.player
         if serverinfo[message.server].mHandler.paused == False:
             await client.send_message(message.channel, "Music paused.")
+            serverinfo[message.server].mHandler.pausedatetime=datetime.now()
+            serverinfo[message.server].mHandler.paused=True
             serverinfo[message.server].mHandler.player.pause()
-            serverinfo[message.server].mHandler.player.pausedatetime=datetime.datetime.now()
         else:
             await client.send_message(message.channel, "Music already is paused. To resume, use the **!resume** command.")
 async def RESUME(message,message2):
@@ -1474,7 +1478,7 @@ async def background_loop():
                 if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
                     c=datetime.datetime.now()-serverinfo[server].end_time
                     b=datetime.datetime.now()-serverinfo[server].jointime
-                    if c.minutes >= 5 and b.minutes >= 5:
+                    if c.seconds/60 >= 5 and b.seconds/60 >= 5:
                         if server.voice_client != None:
                             try:
                                 await server.voice_client.disconnect()

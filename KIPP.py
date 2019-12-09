@@ -244,67 +244,70 @@ class music_handler():
         self.is_playing=True
         self.pausedatetime=None
         self.pausetime=None
-        #client.loop.create_task(self.update_loop())
+        client.loop.create_task(self.update_loop())
     async def update_loop(self):
-        self.is_playing=self.player.is_playing()
-        import datetime
-        queuelist="\nNo songs in queue"
-        if len(serverinfo[self.server].queue)>1:
-            queuelist=""
-            i=0
-            for song in serverinfo[self.server].queue[1:]:
-                i=i+1
-                queuelist=queuelist+"\n`#{0}` {1}".format(i,"["+(''.join(song[0]))+"]("+song[1]+")")
-        if self.paused:
-            self.pausetime=datetime.datetime.now()-self.pausedatetime
-        if self.pausetime==None:
-            c = datetime.datetime.now()-self.starttime
-        else:
-            c = datetime.datetime.now()-(self.starttime+datetime.timedelta(seconds=self.pausetime.seconds))
-        if self.paused == False:
-            progress = divmod(c.days * 86400 + c.seconds, 60)
-            self.minutedelta=str(progress).split('(')[1].split(')')[0].split(',')[0]
-            self.seconddelta=str(progress).split('(')[1].split(')')[0].split(', ')[1]
-            if len(str(self.seconddelta)) == 1:
-                self.seconddelta='0'+str(self.seconddelta)
-            self.hours=int(int(self.minutedelta)/60)
-            percent=int(18*(((int(self.hours)*3600)+(int(self.minutedelta)*60)+int(self.seconddelta))/int(self.duration)))+1
-            if self.player.is_live == False:
-                self.bar=("▣"*percent)+"▢"*(18-percent)
+        while True:
+            self.is_playing=self.player.is_playing()
+            import datetime
+            queuelist="\nNo songs in queue"
+            if len(serverinfo[self.server].queue)>1:
+                queuelist=""
+                i=0
+                for song in serverinfo[self.server].queue[1:]:
+                    i=i+1
+                    queuelist=queuelist+"\n`#{0}` {1}".format(i,"["+(''.join(song[0]))+"]("+song[1]+")")
+            if self.paused:
+                self.pausetime=datetime.datetime.now()-self.pausedatetime
+            if self.pausetime==None:
+                c = datetime.datetime.now()-self.starttime
             else:
-                self.bar="▣"*18
-        pauseStr=""
-        if self.paused:
-            pauseStr=" (paused)"
-        if self.hours>0:
-            self.minutedelta=int(self.minutedelta)-(hours*60)
-            if len(str(self.minutedelta))==1:
-                self.minutedelta="0"+str(self.minutedelta)
+                c = datetime.datetime.now()-(self.starttime+datetime.timedelta(seconds=self.pausetime.seconds))
+            if self.paused == False:
+                progress = divmod(c.days * 86400 + c.seconds, 60)
+                self.minutedelta=str(progress).split('(')[1].split(')')[0].split(',')[0]
+                self.seconddelta=str(progress).split('(')[1].split(')')[0].split(', ')[1]
+                if len(str(self.seconddelta)) == 1:
+                    self.seconddelta='0'+str(self.seconddelta)
+                self.hours=int(int(self.minutedelta)/60)
+                percent=int(18*(((int(self.hours)*3600)+(int(self.minutedelta)*60)+int(self.seconddelta))/int(self.duration)))+1
+                if self.player.is_live == False:
+                    self.bar=("▣"*percent)+"▢"*(18-percent)
+                else:
+                    self.bar="▣"*18
+            pauseStr=""
+            if self.paused:
+                pauseStr=" (paused)"
+            if self.hours>0:
+                self.minutedelta=int(self.minutedelta)-(hours*60)
+                if len(str(self.minutedelta))==1:
+                    self.minutedelta="0"+str(self.minutedelta)
+                else:
+                    self.minutedelta=str(self.minutedelta)
+                self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'**Volume:** '+str(int(self.player.volume*100))+'%'+'\n**Progress:** `'+str(self.hours)+":"+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+pauseStr+'`\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
             else:
-                self.minutedelta=str(self.minutedelta)
-            self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'**Volume:** '+str(int(self.player.volume*100))+'%'+'\n**Progress:** `'+str(self.hours)+":"+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+pauseStr+'`\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
-        else:
-            self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'**Volume:** '+str(int(self.player.volume*100))+'%'+'\n**Progress:** `'+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+pauseStr+'`\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
-        self.em.set_footer(text=self.footer)
-        self.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
-        if self.is_playing==False or c.seconds >= self.duration and self.player.is_live == False:
-            em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Song Ended**", colour=EMBEDCOLOR)
-            em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
-            await client.edit_message(self.message,embed=em)
-            serverinfo[self.server].queue.remove(serverinfo[self.server].queue[0])
-            self.is_playing=False
-            serverinfo[self.server].mHandler=None
-            serverinfo[self.server].end_time=datetime.datetime.now()
-        else:
-            if self.message != None:
-                try:
+                self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'**Volume:** '+str(int(self.player.volume*100))+'%'+'\n**Progress:** `'+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+pauseStr+'`\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
+            self.em.set_footer(text=self.footer)
+            self.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
+            if (self.player.is_playing()==False or c.seconds >= self.duration) and self.player.is_live == False:
+                self.player.stop()
+                em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Song Ended**", colour=EMBEDCOLOR)
+                em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
+                await client.edit_message(self.message,embed=em)
+                serverinfo[self.server].queue.remove(serverinfo[self.server].queue[0])
+                self.is_playing=False
+                serverinfo[self.server].mHandler=None
+                serverinfo[self.server].end_time=datetime.datetime.now()
+            else:
+                if self.message != None:
+                    try:
+                        await client.edit_message(self.message,embed=self.em)
+                    except:
+                        self.message=None
+                if self.message==None:
+                    self.message=await client.send_message(self.channel,embed=self.em)
+                else:
                     await client.edit_message(self.message,embed=self.em)
-                except:
-                    self.message=None
-            if self.message==None:
-                self.message=await client.send_message(self.channel,embed=self.em)
-            else:
-                await client.edit_message(self.message,embed=self.em)
+            await asyncio.sleep(1.5)
 async def slide_lcd_text(rows,lcd):
     for i in range(0,16):
         text1=rows[0][i:]
@@ -1473,7 +1476,7 @@ async def background_loop():
         while True:
             for server in client.servers:
                 if serverinfo[server].mHandler != None:
-                    await serverinfo[server].mHandler.update_loop()
+                    #await serverinfo[server].mHandler.update_loop()
                     if serverinfo[server].mHandler == None and len(serverinfo[server].queue)>=1:
                         player = await message.server.voice_client.create_ytdl_player(serverinfo[server].queue[0][1],before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
                         serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)

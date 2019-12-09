@@ -18,6 +18,7 @@ import RPi.GPIO as GPIO
 from MUSIC import *
 from SERVER import *
 from PLAYER import *
+from datetime import datetime
 CREATOR_ID="289920025077219328"
 KIPP_ID="386352783550447628"
 MSG_COUNTER=0
@@ -64,7 +65,6 @@ storeitems=[
 "10x income multiplier: 10000KC",
 "100x income multiplier: 75000KC"
 ]
-EMBEDCOLOR=0x36393E
 class Command():
     def __init__(self,n,h,e):
         global commands
@@ -863,7 +863,7 @@ async def MUSIC(message,message2):
                                         serverinfo[message.server].loading=False
                                         if len(serverinfo[message.server].queue) == 1:
                                             player = await message.server.voice_client.create_ytdl_player(music4,before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
-                                            serverinfo[message.server].mHandler=music_handler(message.server,player,message.channel)
+                                            serverinfo[message.server].mHandler=music_handler(message.server,player,message.channel,profooter)
                                             serverinfo[message.server].loading = False
                                     else:
                                         await client.send_message(message.channel, "Please do not try to play an entire youtube channel. Get one specific song you would like to hear, and play that.")
@@ -1255,7 +1255,7 @@ async def background_loop():
                     await serverinfo[server].mHandler.update_loop()
                     if serverinfo[server].mHandler == None and len(serverinfo[server].queue)>=1:
                         player = await message.server.voice_client.create_ytdl_player(serverinfo[server].queue[0][1],before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
-                        serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
+                        serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel,profooter)
                 if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
                     c=datetime.datetime.now()-serverinfo[server].end_time
                     b=datetime.datetime.now()-serverinfo[server].jointime

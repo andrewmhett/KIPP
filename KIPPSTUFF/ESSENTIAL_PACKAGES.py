@@ -9,7 +9,7 @@ import urllib.request
 import urllib.parse
 from urllib.request import Request
 import re
-from datetime import datetime
+import datetime
 import time as t
 from PIL import Image
 import requests
@@ -18,6 +18,7 @@ from math import *
 import aiohttp
 import socket
 from lxml import etree
+EMBEDCOLOR=0x36393E
 try:
 	from Token import TOKEN
 except:

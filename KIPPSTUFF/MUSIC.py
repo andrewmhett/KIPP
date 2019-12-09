@@ -1,5 +1,6 @@
+from ESSENTIAL_PACKAGES import *
 class music_handler():
-    def __init__(self,server,player,channel):
+    def __init__(self,server,player,channel,footer):
         self.server=server
         self.channel=channel
         server.voice_client.encoder_options(sample_rate=48000,channels=2)
@@ -7,7 +8,8 @@ class music_handler():
         self.player=player
         self.paused=False
         self.message=None
-        self.starttime=datetime.now()
+	self.footer=footer
+        self.starttime=datetime.datetime.now()
         self.duration=player.duration
         self.title=player.title
         self.link=player.url
@@ -37,15 +39,14 @@ class music_handler():
         #thumbnail = "https://img.youtube.com/vi/"+video_id+"/0.jpg"
         #self.em.set_thumbnail(url=thumbnail)
         #self.thumbnail = thumbnail
-        self.footer=profooter
-        self.em.set_footer(text=profooter)
+        self.footer=self.footer
+        self.em.set_footer(text=self.footer)
         self.is_playing=True
         self.pausedatetime=None
         self.pausetime=None
         #client.loop.create_task(self.update_loop())
     async def update_loop(self):
         self.is_playing=self.player.is_playing()
-        import datetime
         queuelist="\nNo songs in queue"
         if len(serverinfo[self.server].queue)>1:
             queuelist=""

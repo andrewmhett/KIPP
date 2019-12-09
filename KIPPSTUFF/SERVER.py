@@ -1,3 +1,4 @@
+from ESSENTIAL_PACKAGES import *
 class Server:
     def __init__(self,server):
         self.server=server
@@ -22,9 +23,9 @@ class Server:
         self.r6role=None
         self.d2role=None
         self.events=[]
-        self.end_time=datetime.now()
+        self.end_time=datetime.datetime.now()
         self.loading=False
-        self.jointime=datetime.now()
+        self.jointime=datetime.datetime.now()
     def add_server_config(self,data):
         arr=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
         with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w') as f:

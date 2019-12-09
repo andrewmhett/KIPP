@@ -1,3 +1,4 @@
+from ESSENTIAL_PACKAGES import *
 class Profile:
     def __init__(self,user):
         self.gamblemessage=None

@@ -1112,9 +1112,9 @@ async def SKIP(message,message2):
     player = serverinfo[message.server].mHandler.player
     if await VerifyMusicUser(message):
         import datetime as d
-        if serverinfo[message.server].paused == True:
+        if serverinfo[message.server].mHandler.paused == True:
             player.resume()
-            serverinfo[message.server].paused = False
+            serverinfo[message.server].mHandler.paused = False
         serverinfo[message.server].mHandler.starttime=serverinfo[message.server].mHandler.starttime-d.timedelta(seconds=serverinfo[message.server].mHandler.duration)
         if len(serverinfo[message.server].queue)==1:
             await client.send_message(message.channel, "There are no more songs in the queue. Current song ended.")

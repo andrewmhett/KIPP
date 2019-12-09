@@ -8,7 +8,7 @@ class music_handler():
         self.player=player
         self.paused=False
         self.message=None
-	self.footer=footer
+        self.footer=footer
         self.starttime=datetime.datetime.now()
         self.duration=player.duration
         self.title=player.title

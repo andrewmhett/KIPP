@@ -9,7 +9,7 @@ import urllib.request
 import urllib.parse
 from urllib.request import Request
 import re
-import datetime
+from datetime import datetime
 import time as t
 from PIL import Image
 import requests

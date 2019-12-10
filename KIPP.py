@@ -1078,10 +1078,9 @@ async def MUSIC(message,message2):
                                         if serverinfo[message.server].mHandler != None:
                                             if len(serverinfo[message.server].queue)>1:
                                                 await client.send_message(message.channel, "Song added to queue. #"+str(len(serverinfo[message.server].queue)-1))
-                                        serverinfo[message.server].loading=False
+                                                serverinfo[message.server].loading=False
                                         if len(serverinfo[message.server].queue) == 1:
-                                            player = await message.server.voice_client.create_ytdl_player(music4,before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
-                                            serverinfo[message.server].mHandler=music_handler(message.server,player,message.channel)
+                                            serverinfo[message.server].musicchannel=message.channel
                                             serverinfo[message.server].loading = False
                                     else:
                                         await client.send_message(message.channel, "Please do not try to play an entire youtube channel. Get one specific song you would like to hear, and play that.")
@@ -1467,26 +1466,21 @@ command["!EVENT"]=MISC("!EVENT","This command will send you a prompt to create a
 command["!LCD"]=MISC("!LCD","This command may be used by LockdownDoom in order to activate KIPP's LCD.\n**Usage**\n`!LCD`",LCD)
 async def background_loop():
     import datetime
-    try:
-        while True:
-            for server in client.servers:
-                if serverinfo[server].mHandler != None:
-                    #await serverinfo[server].mHandler.update_loop()
-                    if serverinfo[server].mHandler == None and len(serverinfo[server].queue)>=1:
-                        player = await message.server.voice_client.create_ytdl_player(serverinfo[server].queue[0][1],before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
-                        serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
-                if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
-                    c=datetime.datetime.now()-serverinfo[server].end_time
-                    b=datetime.datetime.now()-serverinfo[server].jointime
-                    if c.seconds/60 >= 5 and b.seconds/60 >= 5:
-                        if server.voice_client != None:
-                            try:
-                                await server.voice_client.disconnect()
-                            except Exception as e:
-                                print ("Voice client timeout, can't disconnect")
-            await asyncio.sleep(1)
-    except Exception as err:
-        print(err)
+    while True:
+        for server in client.servers:
+            if serverinfo[server].mHandler == None and len(serverinfo[server].queue)>=1:
+                player = await server.voice_client.create_ytdl_player(serverinfo[server].queue[0][1],before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
+                serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
+            if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
+                c=datetime.datetime.now()-serverinfo[server].end_time
+                b=datetime.datetime.now()-serverinfo[server].jointime
+                if c.seconds/60 >= 5 and b.seconds/60 >= 5:
+                    if server.voice_client != None:
+                        try:
+                            await server.voice_client.disconnect()
+                        except Exception as e:
+                            print ("Voice client timeout, can't disconnect")
+        await asyncio.sleep(1)
 async def schedule_handler():
     import datetime
     while True:

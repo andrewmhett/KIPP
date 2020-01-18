@@ -42,17 +42,6 @@ profooter=""
 last_ping=t.time()
 ytdl_format_options = {
     'format': 'bestaudio/best',
-    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
-    'restrictfilenames': True,
-    'noplaylist': True,
-    'nocheckcertificate': True,
-    'ignoreerrors': False,
-    'logtostderr': False,
-    'quiet': True,
-    'no_warnings': True,
-    'default_search': 'auto',
-    'source_address': '192.168.0.1',
-    'usenetrc': True,
     'download': False
 }
 storeitems=[
@@ -1469,7 +1458,7 @@ async def background_loop():
     while True:
         for server in client.servers:
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)>=1:
-                player = await server.voice_client.create_ytdl_player(serverinfo[server].queue[0][1],before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
+                player = await server.voice_client.create_ytdl_player(serverinfo[server].queue[0][1],options=ytdl_format_options,before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
                 serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
                 c=datetime.datetime.now()-serverinfo[server].end_time

@@ -1451,7 +1451,7 @@ command["!WCHANNEL"]=OWON("!WCHANNEL","This command will set the current text ch
 command["!INVITE"]=OWON("!INVITE","This command will DM an invite to the user with the specified user id\n**Usage**\n`!INVITE|user id`",INVITE)
 command["!UNBLOCK"]=OWON("!UNBLOCK","This command will unblock the specified user\n**Usage**\n`!UNBLOCK|user`",UNBLOCK)
 command["!SKIP"]=MUSC("!SKIP","This command will skip the current song, and play the next song in queue.\n**Usage**\n`!SKIP`",SKIP)
-command["!EVENT"]=MISC("!EVENT","This command will send you a prompt to create a scheduled event.\n**Usage**\n`!EVENT`",EVENT)
+#command["!EVENT"]=MISC("!EVENT","This command will send you a prompt to create a scheduled event.\n**Usage**\n`!EVENT`",EVENT)
 command["!LCD"]=MISC("!LCD","This command may be used by LockdownDoom in order to activate KIPP's LCD.\n**Usage**\n`!LCD`",LCD)
 async def background_loop():
     import datetime

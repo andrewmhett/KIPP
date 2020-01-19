@@ -1571,12 +1571,12 @@ async def web_command(message, message2):
                     break
                 if ".JPEG" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper() or ".JPG" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper():
                     image = "https://"+str(req).split('https://')[i].split('"')[0]
-                    emb=discord.Embed(title=("Image result for '{0}'".format(str(message.content).split('|')[1])),colour=EMBEDCOLOR)
-                    emb.set_image(url=image)
-                    emb.set_footer(text=profooter)
-                    print(image)
-                    await client.send_message(message.channel, embed=emb)
-                    break
+                    if requests.get(image).status_code==200:
+                        emb=discord.Embed(title=("Image result for '{0}'".format(str(message.content).split('|')[1])),colour=EMBEDCOLOR)
+                        emb.set_image(url=image)
+                        emb.set_footer(text=profooter)
+                        await client.send_message(message.channel, embed=emb)
+                        break
             except Exception:
                 cont=cont+1
     if message2.startswith('!GIF|'):
@@ -1593,13 +1593,14 @@ async def web_command(message, message2):
                     await client.send_message(message.channel,"No results for gif search **{0}**".format(str(message.content).split('|')[1]))
                     break
                 i=i+1
-                if ".gif" in ("https://"+str(req).split('https://')[i].split('"')[0]):
+                if ".GIF" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper():
                     image = "https://"+str(req).split('https://')[i].split('"')[0]
-                    emb=discord.Embed(title=("Gif result for '{0}'".format(str(message.content).split('|')[1])),colour=EMBEDCOLOR)
-                    emb.set_image(url=image)
-                    emb.set_footer(text=profooter)
-                    await client.send_message(message.channel, embed=emb)
-                    break
+                    if requests.get(image).status_code==200:
+                        emb=discord.Embed(title=("Gif result for '{0}'".format(str(message.content).split('|')[1])),colour=EMBEDCOLOR)
+                        emb.set_image(url=image)
+                        emb.set_footer(text=profooter)
+                        await client.send_message(message.channel, embed=emb)
+                        break
             except Exception:
                 cont=cont+1
 #discord.opus.load_opus('/usr/lib/arm-linux-gnueabihf/libopus.so.0.5.3')

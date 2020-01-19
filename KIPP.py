@@ -1574,6 +1574,7 @@ async def web_command(message, message2):
                     emb=discord.Embed(title=("Image result for '{0}'".format(str(message.content).split('|')[1])),colour=EMBEDCOLOR)
                     emb.set_image(url=image)
                     emb.set_footer(text=profooter)
+                    print(image)
                     await client.send_message(message.channel, embed=emb)
                     break
             except Exception:

@@ -1655,7 +1655,8 @@ while True:
         users = []
         try:
             for user in server.get_member(KIPP_ID).voice.voice_channel.voice_members:
-                users.append(user)
+                if user.bot == False:
+                    users.append(user)
             if int(len(users))<2:
                 currentlyplaying=False
                 if serverinfo[server].mHandler != None:

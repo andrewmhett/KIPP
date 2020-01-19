@@ -1569,7 +1569,7 @@ async def web_command(message, message2):
                 if cont>300:
                     await client.send_message(message.channel,"No results for image search **{0}**".format(str(message.content).split('|')[1]))
                     break
-                if ".jpeg" in ("https://"+str(req).split('https://')[i].split('"')[0]) or ".jpg" in ("https://"+str(req).split('https://')[i].split('"')[0]):
+                if ".JPEG" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper() or ".JPG" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper():
                     image = "https://"+str(req).split('https://')[i].split('"')[0]
                     emb=discord.Embed(title=("Image result for '{0}'".format(str(message.content).split('|')[1])),colour=EMBEDCOLOR)
                     emb.set_image(url=image)

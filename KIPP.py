@@ -187,8 +187,6 @@ class MUSC(Command):
     pass
 class SCIN(Command):
     pass
-class HISO(Command):
-    pass
 class music_handler():
     def __init__(self,server,player,channel):
         self.server=server
@@ -645,36 +643,6 @@ async def D2(message,message2):
         await client.send_message(message.channel, embed=emb)
     except IndexError:
         await client.send_message(message.channel, "Sorry, I could not find any data on the given user.")
-async def ELECTION(message,message2):
-    if message.author == message.server.owner:
-        if str(message.server.id) == "451227721545285649":
-            serverinfo[message.server].voters = []
-            serverinfo[message.server].can1votes = 0
-            serverinfo[message.server].can2votes = 0
-            try:
-                cand1 = message.server.get_member_named(message.content.split('|')[1])
-                cand2 = message.server.get_member_named(message.content.split('|')[2])
-            except Exception:
-                await client.send_message(message.channel, "You must specify at least two candidates to start an election.")
-            if str(cand1.top_role) == "The People" and str(cand2.top_role) == "The People":
-                emb = discord.Embed(title="Election",description="Candidate 1: "+str(cand1)+"\n**Votes: 0**\n\nCandidate 2: "+str(cand2)+"\n**Votes: 0**\n\n**Time Left: 15 minutes**",colour=EMBEDCOLOR)
-                serverinfo[message.server].electionmessage = await client.send_message(message.channel, embed=emb)
-                serverinfo[message.server].sElectiontime = datetime.now()
-                serverinfo[message.server].can1=cand1
-                serverinfo[message.server].can2=cand2
-                serverinfo[message.server].election = True
-                serverinfo[message.server].oldtime=0
-                for member in message.server.members:
-                    if member.bot==False:
-                        if message.server.role_hierarchy.index(member.top_role)>2 and member != cand1 and member != cand2 and (str(member.status).upper() == "ONLINE" or str(member.status) == "idle") :
-                            try:
-                                await client.send_message(member, "An election has started in The Hierarchical Society. Please respond to this message by typing **1** or **2**. Candidate 1 is {0}, and candidate 2 is {1}.".format(str(cand1),str(cand2)))
-                                serverinfo[message.server].voters.append(member)
-                                serverinfo[message.server].messagesent.append(member)
-                            except discord.DiscordException:
-                                pass
-            else:
-                await client.send_message(message.channel, "Both candidates' highest roles must be 'The People' in order for them to be in an election.")
 async def IMAGE(message,message2):
     await client.send_message(message.channel, "Processing image request...")
     url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(message2.split('|')[1].replace(' ','+').replace("'","%27"),message2.split('|')[1].replace(' ','+').replace("'","%27"))
@@ -953,28 +921,6 @@ async def STATUS(message,message2):
     p.kill()
     if "m" in stdout.split("ago")[0].split(";")[1] or "s" in stdout.split("ago")[0].split(";")[1]:
         await client.send_message(message.channel,"```"+stdout.decode().split('ago')[0]+"ago```")
-async def IMPEACHREQUEST(message,message2):
-    if str(message.server.id) == "451227721545285649":
-        owner=message.server.owner
-        role = discord.utils.get(message.server.roles, name="meema")
-        for member in message.server.members:
-            if role in member.roles:
-                meema = member
-        if len(str(message.content).split('|')[1])>0:
-            await client.send_message(owner, "Impeachment request:\nMeema: {0}\nAuthor: {1}\nContent: {2}".format(str(meema),str(message.author),str(message.content).split('|')[1]))
-            await client.send_message(message.channel, "An impeachment request for {0} has been filed by {1}:\n{2}".format(str(meema),str(message.author),str(message.content).split('|')[1]))
-        else:
-            await client.send_message(message.channel, "Please enter a valid request.")
-async def IMPEACHMEEMA(message,message2):
-    if str(message.server.id) == "451227721545285649":
-        owner=message.server.owner
-        if message.author == owner:
-            role = discord.utils.get(message.server.roles, name="meema")
-            for member in message.server.members:
-                if role in member.roles:
-                    meema = member
-            await client.remove_roles(meema, role)
-            await client.send_message(message.channel, "@everyone, the impeachment of {0} has been approved by {1}".format(meema.mention,owner.mention))
 async def MATH(message,message2):
     mathP = str(message.content)
     mathP2 = mathP.split('|')
@@ -1459,7 +1405,6 @@ command["!GRAPH"]=MISC("!GRAPH","This command will create a graph of a given fun
 command["!FATE"]=MISC("!FATE","This command will send a random fate image, with a small chance of getting Yakub\n**Usage**\n`!FATE`",FATE)
 command["!CORETEMP"]=MISC("!CORETEMP","This command will return KIPP's Raspberry Pi's core temperature\n**Usage**\n`!CORETEMP`",CORETEMP)
 command["!D2"]=MISC("!D2","This command will return Destiny 2 on a given user, on a given platform\n**Usage**\n`!D2|platform (XBOX or PC)|user`",D2)
-command["!ELECTION"]=HISO("!ELECTION","This command can be used by LockdownDoom in The Hierarchical Society in order to start a new election for meema\n**Usage**\n`!ELECTION|candidate 1|candidate 2`",ELECTION)
 command["!IMAGE"]=MISC("!IMAGE","This command will return an image of the given search query\n**Usage**\n`!IMAGE|search`",IMAGE)
 command["!GIF"]=MISC("!GIF","This command will return a gif of the given search query\n**Usage**\n`!GIF|search`",GIF)
 command["!MINE"]=KIPC("!MINE","This command stacks all of your KIPPCOIN multipliers and adds that amount of KIPPCOINS to your account. This command will not return any message\n**Usage**\n`!MINE`",MINE)
@@ -1476,8 +1421,6 @@ command["!DECLINE"]=Command("!DECLINE","Explained in GambleGame\n**Usage**\n`!DE
 command["!ACCEPT"]=Command("!ACCEPT","Explained in GambleGame\n**Usage**\n`!ACCEPT`",ACCEPT)
 command["!BET"]=Command("!BET","Explained in Solo/Non-Solo GambleGame\n**Usage**\n`!BET`",BET)
 command["!STATUS"]=Command("!STATUS","Shows KIPP's Daemon's current status\n**Usage**\n`Currently unavailable`",STATUS)
-command["!IMPEACHREQUEST"]=HISO("!IMPEACHREQUEST","DMs LockdownDoom about your impeachment request\n**Usage**\n`!IMPEACHREQUEST|reason`",IMPEACHREQUEST)
-command["!IMPEACHMEEMA"]=HISO("!IMPEACHMEEMA","This command can be used by LockdownDoom in order to depose the current meema\n**Usage**\n`!IMPEACHMEEMA`",IMPEACHMEEMA)
 command["!MATH"]=MISC("!MATH","This command will return the answer to any basic math problem given\n**Usage**\n`!MATH|problem`",MATH)
 command["!MFIX"]=MUSC("!MFIX","This command will reset KIPP's voice client and related variables in order to fix most problems with music\n**Usage**\n`!MFIX`",MFIX)
 command["!EVAL"]=Command("!EVAL","This command can be used by LockdownDoom in order to observe what a code block returns\n**Usage**\n`!EVAL|code`",EVAL)

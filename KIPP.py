@@ -629,10 +629,22 @@ async def CATORDOG(message,message2):
     else:
         prediction = results.predictions[0]
         await client.send_message(message.channel,"\t" + prediction.tag_name + ": {0:.2f}%".format(prediction.probability * 100))
-async def R6(message,message2):
-    await web_command(message,message2)
 async def D2(message,message2):
-    await web_command(message,message2)
+    try:
+        platform = str(message.content).split('|')[1].upper()
+        headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+        if platform == 'XBOX':
+            platform='xbl'
+            user=str(message.content).split('|')[2]
+        if platform=='PC':
+            platform='pc'
+            user=str(message.content).split('|')[2].replace('#','-')
+        url="https://destinytracker.com/d2/profile/{0}/{1}".format(platform,user)
+        resp = requests.get(url, headers=headers)
+        emb=discord.Embed(title = (message2.split('|')[2]+"'s D2 Stats"),description="**Casual KD:** "+str(resp.content).split(r'"casual":[{"label":"KD","field":"KD","category":"Performance","ValueInt":null,"ValueDec":')[1].split(',')[0]+"\n**Competitive KD:** "+str(resp.content).split(r'[{"label":"KD","field":"KD","category":"Performance","ValueInt":null,"ValueDec":')[1].split(',')[0],colour=EMBEDCOLOR)
+        await client.send_message(message.channel, embed=emb)
+    except IndexError:
+        await client.send_message(message.channel, "Sorry, I could not find any data on the given user.")
 async def ELECTION(message,message2):
     if message.author == message.server.owner:
         if str(message.server.id) == "451227721545285649":
@@ -664,9 +676,53 @@ async def ELECTION(message,message2):
             else:
                 await client.send_message(message.channel, "Both candidates' highest roles must be 'The People' in order for them to be in an election.")
 async def IMAGE(message,message2):
-    await web_command(message, message2)
+    await client.send_message(message.channel, "Processing image request...")
+    url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(message2.split('|')[1].replace(' ','+').replace("'","%27"),message2.split('|')[1].replace(' ','+').replace("'","%27"))
+    headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+    req = requests.get(url, headers=headers)
+    req=req.content
+    i=0
+    cont=0
+    while True:
+        try:
+            i=i+1
+            if cont>300:
+                await client.send_message(message.channel,"No results for image search **{0}**".format(str(message.content).split('|')[1]))
+                break
+            if ".JPEG" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper() or ".JPG" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper():
+                image = "https://"+str(req).split('https://')[i].split('"')[0]
+                if requests.get(image).status_code==200:
+                    emb=discord.Embed(title=("Image result for '{0}'".format(str(message.content).split('|')[1])),colour=EMBEDCOLOR)
+                    emb.set_image(url=image)
+                    emb.set_footer(text=profooter)
+                    await client.send_message(message.channel, embed=emb)
+                    break
+        except Exception:
+            cont=cont+1
 async def GIF(message,message2):
-    await web_command(message,message2)
+    await client.send_message(message.channel, "Processing gif request...")
+    url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(message2.split('|')[1].replace(' ','+').replace("'","%27")+" gif",message2.split('|')[1].replace(' ','+').replace("'","%27")+"gif")
+    headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+    req = requests.get(url, headers=headers)
+    req=req.content
+    i=0
+    cont=0
+    while True:
+        try:
+            if cont>300:
+                await client.send_message(message.channel,"No results for gif search **{0}**".format(str(message.content).split('|')[1]))
+                break
+            i=i+1
+            if ".GIF" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper():
+                image = "https://"+str(req).split('https://')[i].split('"')[0]
+                if requests.get(image).status_code==200:
+                    emb=discord.Embed(title=("Gif result for '{0}'".format(str(message.content).split('|')[1])),colour=EMBEDCOLOR)
+                    emb.set_image(url=image)
+                    emb.set_footer(text=profooter)
+                    await client.send_message(message.channel, embed=emb)
+                    break
+        except Exception:
+            cont=cont+1
 async def MINE(message,message2):
     mult = 1
     if playerinfo[message.author].HAS_ITEM("2x income multiplier") == True:
@@ -1402,7 +1458,6 @@ command["!EV"]=SCIN("!EV","EV stands for Escape Velocity. This command will calc
 command["!GRAPH"]=MISC("!GRAPH","This command will create a graph of a given function\n**Usage**\n`!GRAPH|function`",GRAPH)
 command["!FATE"]=MISC("!FATE","This command will send a random fate image, with a small chance of getting Yakub\n**Usage**\n`!FATE`",FATE)
 command["!CORETEMP"]=MISC("!CORETEMP","This command will return KIPP's Raspberry Pi's core temperature\n**Usage**\n`!CORETEMP`",CORETEMP)
-command["!R6"]=Command("!R6","This command will return Rainbow Six Siege stats on a given user, on a given platform\n**Usage**\n`Currently unavailable`",R6)
 command["!D2"]=MISC("!D2","This command will return Destiny 2 on a given user, on a given platform\n**Usage**\n`!D2|platform (XBOX or PC)|user`",D2)
 command["!ELECTION"]=HISO("!ELECTION","This command can be used by LockdownDoom in The Hierarchical Society in order to start a new election for meema\n**Usage**\n`!ELECTION|candidate 1|candidate 2`",ELECTION)
 command["!IMAGE"]=MISC("!IMAGE","This command will return an image of the given search query\n**Usage**\n`!IMAGE|search`",IMAGE)
@@ -1538,71 +1593,6 @@ async def schedule_handler():
                             event.message=await client.send_message(event.channel,embed=em)
                         await client.edit_message(event.message,embed=em)
         await asyncio.sleep(1)
-async def web_command(message, message2):
-    if message2.startswith("!D2"):
-        try:
-            platform = str(message.content).split('|')[1].upper()
-            headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-            if platform == 'XBOX':
-                platform='xbl'
-                user=str(message.content).split('|')[2]
-            if platform=='PC':
-                platform='pc'
-                user=str(message.content).split('|')[2].replace('#','-')
-            url="https://destinytracker.com/d2/profile/{0}/{1}".format(platform,user)
-            resp = requests.get(url, headers=headers)
-            emb=discord.Embed(title = (message2.split('|')[2]+"'s D2 Stats"),description="**Casual KD:** "+str(resp.content).split(r'"casual":[{"label":"KD","field":"KD","category":"Performance","ValueInt":null,"ValueDec":')[1].split(',')[0]+"\n**Competitive KD:** "+str(resp.content).split(r'[{"label":"KD","field":"KD","category":"Performance","ValueInt":null,"ValueDec":')[1].split(',')[0],colour=EMBEDCOLOR)
-            await client.send_message(message.channel, embed=emb)
-        except IndexError:
-            await client.send_message(message.channel, "Sorry, I could not find any data on the given user.")
-    if message2.startswith('!IMAGE|'):
-        await client.send_message(message.channel, "Processing image request...")
-        url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(message2.split('|')[1].replace(' ','+'),message2.split('|')[1].replace(' ','+'))
-        headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-        req = requests.get(url, headers=headers)
-        req=req.content
-        i=0
-        cont=0
-        while True:
-            try:
-                i=i+1
-                if cont>300:
-                    await client.send_message(message.channel,"No results for image search **{0}**".format(str(message.content).split('|')[1]))
-                    break
-                if ".JPEG" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper() or ".JPG" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper():
-                    image = "https://"+str(req).split('https://')[i].split('"')[0]
-                    if requests.get(image).status_code==200:
-                        emb=discord.Embed(title=("Image result for '{0}'".format(str(message.content).split('|')[1])),colour=EMBEDCOLOR)
-                        emb.set_image(url=image)
-                        emb.set_footer(text=profooter)
-                        await client.send_message(message.channel, embed=emb)
-                        break
-            except Exception:
-                cont=cont+1
-    if message2.startswith('!GIF|'):
-        await client.send_message(message.channel, "Processing gif request...")
-        url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(message2.split('|')[1].replace(' ','+')+" gif",message2.split('|')[1].replace(' ','+')+"gif")
-        headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-        req = requests.get(url, headers=headers)
-        req=req.content
-        i=0
-        cont=0
-        while True:
-            try:
-                if cont>300:
-                    await client.send_message(message.channel,"No results for gif search **{0}**".format(str(message.content).split('|')[1]))
-                    break
-                i=i+1
-                if ".GIF" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper():
-                    image = "https://"+str(req).split('https://')[i].split('"')[0]
-                    if requests.get(image).status_code==200:
-                        emb=discord.Embed(title=("Gif result for '{0}'".format(str(message.content).split('|')[1])),colour=EMBEDCOLOR)
-                        emb.set_image(url=image)
-                        emb.set_footer(text=profooter)
-                        await client.send_message(message.channel, embed=emb)
-                        break
-            except Exception:
-                cont=cont+1
 #discord.opus.load_opus('/usr/lib/arm-linux-gnueabihf/libopus.so.0.5.3')
 InterstellarQuotes = ["'Do not go gentle into that good night'\n**Professor Brand**", "'Come on, TARS!'\n**Cooper**", "'Cooper, this is no time for caution!'\n**TARS**", "'You tell that to Doyle.'\n**Cooper**", "'Newton's third law. You gotta leave something behind.'\n**Cooper**", "'Step back, professor, step back!'\n**TARS**","'No, it's necessary.'\n**Cooper**"]
 playingName = 'Type !help'

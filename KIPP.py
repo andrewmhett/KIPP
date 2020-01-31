@@ -1028,8 +1028,7 @@ async def CLEAR(message,message2):
             await client.delete_message(i)
 async def ADDKIPP(message,message2):
     msg = 'https://discordapp.com/oauth2/authorize?client_id=386352783550447628&permissions=2146958583&scope=bot'
-    await client.send_message(message.channel, msg)
-async def MUSIC(message,message2):
+    await client.send_message(message.channel, msg)(message,message2):
     server=message.server
     notsearched = False
     serverinfo[message.server].musictextchannel = message.channel
@@ -1385,7 +1384,7 @@ async def WCHANNEL(message,message2):
 async def NEWPLAYLIST(message,message2):
     name=message2.split("|")[1]
     if serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name)) == None:
-        serverinfo[message.server].add_server_config(["PLAYLIST:{0}".format(name),[]])
+        serverinfo[message.server].add_server_config(["PLAYLIST:{0}".format(name),""])
         await client.send_message(message.channel,"Created a new playlist named `{0}`.".format(name))
     else:
         await client.send_message(message.channel, "There is already a playlist named `{0}`. If you would like to make a new playlist of that name, please delete the current playlist.".format(name))
@@ -1396,7 +1395,35 @@ async def DELETEPLAYLIST(message,message2):
         await client.send_message(message.channel,"Deleted playlist `{0}`.".format(name))
     else:
         await client.send_message(message.channel, "There is no playlist named `{0}`. Please check spelling.".format(name))
-
+async def APPENDPLAYLIST(message,message2):
+    name=message2.split("|")[1]
+    if serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name)) != None:
+        if serverinfo[message.server].loading == False:
+            serverinfo[message.server].loading = True
+            music3 = message2.split('|')
+            music4= music3[1]
+            if "&index" in music4:
+                music4 = music4.split('&index')
+                music4 = music4[0]
+            if music4.startswith("https://youtu.be"):
+                music4 = music4.split('youtu.be/')[1]
+                music4 = "https://www.youtube.com/watch?v="+music4
+            if ((music4.startswith("https://www.youtube.com") == False) and (music4.startswith("https://youtu.be") == False) and (music4.startswith("http://www.youtube.com") == False)):
+                try:
+                    query_string = urllib.parse.urlencode({"search_query" : music4})
+                    req = urllib.request.Request("http://www.youtube.com/results?" + query_string)
+                    with urllib.request.urlopen(req) as html:
+                        searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.read().decode())
+                    music4 = ("http://www.youtube.com/watch?v=" + searchresults[0])
+                except IndexError:
+                    await client.send_message(message.channel, ("Could not find '"+music4+"' on YouTube."))
+                    serverinfo[message.server].loading = False
+                    return
+            arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))
+            arr=arr.replace("[","").replace("]","").split(",")
+            arr.append(music4)
+            serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),["PLAYLIST:{0}".format(name),arr)
+            
 async def INVITE(message,message2):
     if await VerifyOwnerMeema(message):
         unbanuser = str(message.content).split('|')[1]

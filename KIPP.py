@@ -1366,6 +1366,13 @@ async def WCHANNEL(message,message2):
     ##                        else:
     ##                            serverinfo[message.server].add_server_config(["TWITCH_CHANNEL",message.channel.id])
     ##                            await client.send_message(message.channel,"Set this text channel as the Twitch announcement channel. When a member of the server starts streaming, it will be announced here.")
+async def NEWPLAYLIST(message,message2):
+    name=str(message.content).split("|")[1]
+    if serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name)) == None:
+        serverinfo[message.server].add_server_config(["PLAYLIST:{0}".format(name),[]])
+        await client.send_message(message.channel,"Created a new playlist named `{0}`.".format(name))
+    else:
+        await client.send_message(message.channel, "There is already a playlist named `{0}`. If you would like to make a new playlist of that name, please delete the current playlist.")
 async def INVITE(message,message2):
     if await VerifyOwnerMeema(message):
         unbanuser = str(message.content).split('|')[1]
@@ -1392,6 +1399,7 @@ async def UNBLOCK(message,message2):
             msg = "Unblocked "+str(unblocked)
             serverinfo[message.server].blocked.remove(unblocked.id)
             await client.send_message(message.channel, msg)
+command["!NEWPLAYLIST"]=MUSC("!NEWPLAYLIST","Creates a new music playlist of a given name\n**Usage**\n`!NEWPLAYLIST|name`",NEWPLAYLIST)
 command["!IQ"]=MISC("!IQ","IQ stands for Interstellar Quote. This command will send a random Interstellar quote\n**Usage**\n`!IQ`",IQ)
 command["!SR"]=SCIN("!SR","SR stands for Schwarzschild Radius. This command will calculate the Schwarzschild radius of a given mass\n**Usage**\n`!SR|mass`",SR)
 command["!EXIT"]=Command("!EXIT","Explained in GambleGame\n**Usage**\n`!EXIT`",EXIT)

@@ -1028,7 +1028,8 @@ async def CLEAR(message,message2):
             await client.delete_message(i)
 async def ADDKIPP(message,message2):
     msg = 'https://discordapp.com/oauth2/authorize?client_id=386352783550447628&permissions=2146958583&scope=bot'
-    await client.send_message(message.channel, msg)(message,message2):
+    await client.send_message(message.channel, msg)
+async def MUSIC(message,message2):
     server=message.server
     notsearched = False
     serverinfo[message.server].musictextchannel = message.channel
@@ -1422,7 +1423,7 @@ async def APPENDPLAYLIST(message,message2):
             arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))
             arr=arr.replace("[","").replace("]","").split(",")
             arr.append(music4)
-            serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),["PLAYLIST:{0}".format(name),arr)
+            serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),["PLAYLIST:{0}".format(name),arr])
             
 async def INVITE(message,message2):
     if await VerifyOwnerMeema(message):

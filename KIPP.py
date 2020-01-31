@@ -1402,7 +1402,7 @@ async def APPENDPLAYLIST(message,message2):
         if serverinfo[message.server].loading == False:
             serverinfo[message.server].loading = True
             music3 = message2.split('|')
-            music4= music3[1]
+            music4= music3[2]
             if "&index" in music4:
                 music4 = music4.split('&index')
                 music4 = music4[0]

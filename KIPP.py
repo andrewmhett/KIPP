@@ -1424,7 +1424,6 @@ async def APPENDPLAYLIST(message,message2):
             arr=arr.replace("[","").replace("]","").split(",")
             arr.append(music4)
             serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),["PLAYLIST:{0}".format(name),arr])
-            
 async def INVITE(message,message2):
     if await VerifyOwnerMeema(message):
         unbanuser = str(message.content).split('|')[1]
@@ -1452,6 +1451,7 @@ async def UNBLOCK(message,message2):
             serverinfo[message.server].blocked.remove(unblocked.id)
             await client.send_message(message.channel, msg)
 command["!NEWPLAYLIST"]=MUSC("!NEWPLAYLIST","Creates a new music playlist of a given name\n**Usage**\n`!NEWPLAYLIST|name`",NEWPLAYLIST)
+command["!APPENDPLAYLIST"]=MUSC("!APPENDPLAYLIST","Adds a song corresponding to either entered query or link to a playlist of given name.\n**Usage**\n`!APPENDPLAYLIST|name|query or link`",APPENDPLAYLIST)
 command["!DELETEPLAYLIST"]=MUSC("!DELETEPLAYLIST","Deletes the music playlist of a given name\n**Usage**\n`!DELETEPLAYLIST|name`",DELETEPLAYLIST)
 command["!IQ"]=MISC("!IQ","IQ stands for Interstellar Quote. This command will send a random Interstellar quote\n**Usage**\n`!IQ`",IQ)
 command["!SR"]=SCIN("!SR","SR stands for Schwarzschild Radius. This command will calculate the Schwarzschild radius of a given mass\n**Usage**\n`!SR|mass`",SR)

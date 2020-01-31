@@ -338,19 +338,17 @@ def READ_DATA_IN(path, condition=lambda x: True, attr_condition=lambda x: True):
     except Exception:
          with open(path,'w+') as f:
              f.close()
-    arr=[]
+    arr=None
     found=False
     with open(path) as fl:
         for row in csv.reader(fl):
             if condition(row):
-                found=True
+                arr=[]
                 for attr in row:
                     if attr_condition(attr):
                         arr.append(row)
                         break
         fl.close()
-    if found==False:
-        arr=None
     return arr
 def GET_ITEM_INFO(item):
     price=item.split(": ")[1].split("KC")[0]

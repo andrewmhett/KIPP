@@ -1347,7 +1347,7 @@ async def UNBAN(message,message2):
             await client.send_message(message.channel, "Make sure you use '!unban|username#tag'.")
 async def WCHANNEL(message,message2):
     if await VerifyOwnerMeema(message):
-        if serverinfo[message.server].search_server_configs("WELCOME_CHANNEL") != None:
+        if serverinfo[message.server].search_server_configs("WELCOME_CHANNEL") != []:
             if serverinfo[message.server].search_server_configs("WELCOME_CHANNEL")[1] == message.channel.id:
                 await client.send_message(message.channel,"This channel already is the welcome channel.")
             else:
@@ -1368,7 +1368,7 @@ async def WCHANNEL(message,message2):
     ##                            await client.send_message(message.channel,"Set this text channel as the Twitch announcement channel. When a member of the server starts streaming, it will be announced here.")
 async def NEWPLAYLIST(message,message2):
     name=str(message.content).split("|")[1]
-    if serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name)) == None:
+    if serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name)) == []:
         serverinfo[message.server].add_server_config(["PLAYLIST:{0}".format(name),[]])
         await client.send_message(message.channel,"Created a new playlist named `{0}`.".format(name))
     else:

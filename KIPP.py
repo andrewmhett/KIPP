@@ -1400,7 +1400,7 @@ async def APPENDPLAYLIST(message,message2):
     name=message2.split("|")[1]
     if serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name)) != None:
         if serverinfo[message.server].loading == False:
-            await client.send_message(message.server,"Processing...")
+            await client.send_message(message.channel,"Processing...")
             serverinfo[message.server].loading = True
             music3 = message2.split('|')
             music4= music3[2]

@@ -336,16 +336,20 @@ def READ_DATA_IN(path, condition=lambda x: True, attr_condition=lambda x: True):
         with open(path) as f:
             f.close()
     except Exception:
-         with open(path,'w+') as f:
+         with open(path,'w') as f:
              f.close()
     arr=[]
-    with open(path) as fl:
-        for row in csv.reader(fl):
-            if condition(row):
-                for attr in row:
-                    if attr_condition(attr):
-                        arr.append(row)
-                        break
+    try:
+        with open(path) as fl:
+            for row in csv.reader(fl):
+                if condition(row):
+                    for attr in row:
+                        if attr_condition(attr):
+                            arr.append(row)
+                            break
+            fl.close()
+    except Exception:
+        arr=None
     return arr
 def GET_ITEM_INFO(item):
     price=item.split(": ")[1].split("KC")[0]
@@ -1347,7 +1351,7 @@ async def UNBAN(message,message2):
             await client.send_message(message.channel, "Make sure you use '!unban|username#tag'.")
 async def WCHANNEL(message,message2):
     if await VerifyOwnerMeema(message):
-        if len(serverinfo[message.server].search_server_configs("WELCOME_CHANNEL")) != 0:
+        if serverinfo[message.server].search_server_configs("WELCOME_CHANNEL") != None:
             if serverinfo[message.server].search_server_configs("WELCOME_CHANNEL")[1] == message.channel.id:
                 await client.send_message(message.channel,"This channel already is the welcome channel.")
             else:
@@ -1368,7 +1372,7 @@ async def WCHANNEL(message,message2):
     ##                            await client.send_message(message.channel,"Set this text channel as the Twitch announcement channel. When a member of the server starts streaming, it will be announced here.")
 async def NEWPLAYLIST(message,message2):
     name=str(message.content).split("|")[1]
-    if len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))) == 0:
+    if serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name)) == None:
         serverinfo[message.server].add_server_config(["PLAYLIST:{0}".format(name),[]])
         await client.send_message(message.channel,"Created a new playlist named `{0}`.".format(name))
     else:
@@ -1684,7 +1688,7 @@ while True:
         except KeyError:
             playerinfo[member] = Profile(member)
             playerinfo[member].user = member
-        if len(serverinfo[server].search_server_configs("WELCOME_CHANNEL")) != 0:
+        if serverinfo[server].search_server_configs("WELCOME_CHANNEL") != None:
             try:
                 await client.send_message(client.get_channel(serverinfo[server].search_server_configs("WELCOME_CHANNEL")[1]),"Welcome to **{0}**, {1}".format(server, member.mention))
             except discord.DiscordException:

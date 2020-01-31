@@ -1400,6 +1400,7 @@ async def APPENDPLAYLIST(message,message2):
     name=message2.split("|")[1]
     if serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name)) != None:
         if serverinfo[message.server].loading == False:
+            await client.send_message(message.server,"Processing...")
             serverinfo[message.server].loading = True
             music3 = message2.split('|')
             music4= music3[2]
@@ -1422,7 +1423,7 @@ async def APPENDPLAYLIST(message,message2):
                     return
             arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))
             youtube = etree.HTML(urllib.request.urlopen(music4).read())
-            song=youtube.xpath("//span[@id='eow-title']/@title")
+            song=youtube.xpath("//span[@id='eow-title']/@title")[0]
             arr.append([song,music4])
             serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),["PLAYLIST:{0}".format(name),arr])
             await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))

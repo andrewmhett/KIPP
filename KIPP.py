@@ -82,6 +82,7 @@ class Server:
         arr=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
         if arr==None:
             arr=[]
+        arr.append(data)
         with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w') as f:
             writer=csv.writer(f)
             for row in arr:

@@ -1383,7 +1383,7 @@ async def WCHANNEL(message,message2):
     ##                            serverinfo[message.server].add_server_config(["TWITCH_CHANNEL",message.channel.id])
     ##                            await client.send_message(message.channel,"Set this text channel as the Twitch announcement channel. When a member of the server starts streaming, it will be announced here.")
 async def NEWPLAYLIST(message,message2):
-    name=str(message.content).split("|")[1]
+    name=message2.split("|")[1]
     if serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name)) == None:
         serverinfo[message.server].add_server_config(["PLAYLIST:{0}".format(name),[]])
         await client.send_message(message.channel,"Created a new playlist named `{0}`.".format(name))

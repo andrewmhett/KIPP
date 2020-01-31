@@ -80,6 +80,8 @@ class Server:
         self.jointime=datetime.now()
     def add_server_config(self,data):
         arr=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
+        if arr==None:
+            arr=[]
         with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w') as f:
             writer=csv.writer(f)
             for row in arr:
@@ -87,6 +89,8 @@ class Server:
             f.close()
     def change_server_config(self,data,newdata):
         arr=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
+        if arr==None:
+            arr=[]
         cntr=0
         for row in arr:
             if data in str(row):
@@ -154,6 +158,8 @@ class Profile:
             fl.close()
     def GIVE_KIPPCOINS(self, KC):
         readarray=READ_DATA_IN('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS')
+        if readarray==None:
+            readarray=[]
         for row in readarray:
              if row[0] == str(self.user.id):
                 orig=int(row[1])
@@ -165,6 +171,8 @@ class Profile:
             f.close()
     def GIVE_ITEM(self, item):
         readarray=READ_DATA_IN('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS',condition=lambda x: True if x[0] == str(self.user.id) else False)
+        if readarray==None:
+            readarray=[]
         with open('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS','w') as f:
             writer=csv.writer(f)
             for row in readarray:
@@ -363,6 +371,8 @@ def add_chat_log(message):
         return
     if str(message.channel).upper().startswith('DIRECT MESSAGE') == False:
         arr=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/ChatLogs/{0}")
+        if arr == None:
+            arr=[]
         arr.append([str(datetime.today().date()),message.author.id,str(message.content)])
         with open('/home/pi/Desktop/KIPPSTUFF/ChatLogs/{0}'.format(message.server.id),'w') as f:
             writer=csv.writer(f)
@@ -435,6 +445,8 @@ async def EVENT(message,message2):
                         e=Event(time,date,name,m1)
                         serverinfo[message.server].events.append(e)
                         readarray=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/EVENTS")
+                        if readarray == None:
+                            readarray=[]
                         e.id=int(readarray[0][0])+1
                         readarray[0]=[e.id]
                         readarray.append([e.id,e.name,e.date,e.time,e.members])
@@ -1483,6 +1495,8 @@ async def schedule_handler():
     import datetime
     while True:
         readarray=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/EVENTS")
+        if readarray==None:
+            readarray=[]
         for row in readarray:
             if len(row)>1:
                 e=Event(row[3],row[2],row[1],None)
@@ -1568,6 +1582,8 @@ while True:
                         event.members.append(str(user))
                         event.ids.append(str(user.id))
                         readarray=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/EVENTS")
+                        if readarray==None:
+                            readarray=[]
                         for row in readarray:
                             if row[0]==str(event.id) and len(row)>1:
                                 row[4:]=event.ids 

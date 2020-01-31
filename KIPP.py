@@ -1347,7 +1347,7 @@ async def UNBAN(message,message2):
             await client.send_message(message.channel, "Make sure you use '!unban|username#tag'.")
 async def WCHANNEL(message,message2):
     if await VerifyOwnerMeema(message):
-        if serverinfo[message.server].search_server_configs("WELCOME_CHANNEL") != []:
+        if len(serverinfo[message.server].search_server_configs("WELCOME_CHANNEL")) != 0:
             if serverinfo[message.server].search_server_configs("WELCOME_CHANNEL")[1] == message.channel.id:
                 await client.send_message(message.channel,"This channel already is the welcome channel.")
             else:
@@ -1368,7 +1368,7 @@ async def WCHANNEL(message,message2):
     ##                            await client.send_message(message.channel,"Set this text channel as the Twitch announcement channel. When a member of the server starts streaming, it will be announced here.")
 async def NEWPLAYLIST(message,message2):
     name=str(message.content).split("|")[1]
-    if serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name)) == []:
+    if len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))) == 0:
         serverinfo[message.server].add_server_config(["PLAYLIST:{0}".format(name),[]])
         await client.send_message(message.channel,"Created a new playlist named `{0}`.".format(name))
     else:
@@ -1684,7 +1684,7 @@ while True:
         except KeyError:
             playerinfo[member] = Profile(member)
             playerinfo[member].user = member
-        if serverinfo[server].search_server_configs("WELCOME_CHANNEL") != None:
+        if len(serverinfo[server].search_server_configs("WELCOME_CHANNEL")) != 0:
             try:
                 await client.send_message(client.get_channel(serverinfo[server].search_server_configs("WELCOME_CHANNEL")[1]),"Welcome to **{0}**, {1}".format(server, member.mention))
             except discord.DiscordException:

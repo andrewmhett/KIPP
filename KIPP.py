@@ -1424,8 +1424,8 @@ async def APPENDPLAYLIST(message,message2):
             youtube = etree.HTML(urllib.request.urlopen(music4).read())
             song=youtube.xpath("//span[@id='eow-title']/@title")
             arr.append([song,music4])
-            logging.log(50,arr)
             serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),["PLAYLIST:{0}".format(name),arr])
+            await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))
 async def INVITE(message,message2):
     if await VerifyOwnerMeema(message):
         unbanuser = str(message.content).split('|')[1]

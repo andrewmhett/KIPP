@@ -1417,7 +1417,6 @@ async def APPENDPLAYLIST(message,message2):
                     with urllib.request.urlopen(req) as html:
                         searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.read().decode())
                     music4 = ("http://www.youtube.com/watch?v=" + searchresults[0])
-                    await client.send_message(message.channel,music4)
                 except IndexError:
                     await client.send_message(message.channel, ("Could not find '"+music4+"' on YouTube."))
                     serverinfo[message.server].loading = False
@@ -1427,7 +1426,7 @@ async def APPENDPLAYLIST(message,message2):
             youtube = etree.HTML(urllib.request.urlopen(music4).read())
             song=youtube.xpath("//span[@id='eow-title']/@title")[0]
             arr.append([song,music4])
-            serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),["PLAYLIST:{0}".format(name),arr])
+            #serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),["PLAYLIST:{0}".format(name),arr])
             await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))
 async def INVITE(message,message2):
     if await VerifyOwnerMeema(message):

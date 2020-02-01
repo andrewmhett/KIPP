@@ -1422,12 +1422,15 @@ async def APPENDPLAYLIST(message,message2):
                     serverinfo[message.server].loading = False
                     return
             serverinfo[message.server].loading = False
-            arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0][1]
-            youtube = etree.HTML(urllib.request.urlopen(music4).read())
-            song=youtube.xpath("//span[@id='eow-title']/@title")[0]
-            arr.append([song,music4])
-            #serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),["PLAYLIST:{0}".format(name),arr])
-            await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))
+            try:
+                arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0][1]
+                youtube = etree.HTML(urllib.request.urlopen(music4).read())
+                song=youtube.xpath("//span[@id='eow-title']/@title")[0]
+                arr.append([song,music4])
+                serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),["PLAYLIST:{0}".format(name),arr])
+                await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))
+            except Exception as e:
+                await client.send_message(message.channel,str(e))
 async def INVITE(message,message2):
     if await VerifyOwnerMeema(message):
         unbanuser = str(message.content).split('|')[1]

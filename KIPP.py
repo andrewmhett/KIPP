@@ -1437,7 +1437,7 @@ async def APPENDPLAYLIST(message,message2):
             parsearr.append([song,music4])
             await client.send_message(message.channel,parsearr)
             serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),["PLAYLIST:{0}".format(name),parsearr])
-            await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))
+            await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(parsearr)))
 async def INVITE(message,message2):
     if await VerifyOwnerMeema(message):
         unbanuser = str(message.content).split('|')[1]

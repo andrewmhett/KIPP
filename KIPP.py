@@ -1421,6 +1421,7 @@ async def APPENDPLAYLIST(message,message2):
                     await client.send_message(message.channel, ("Could not find '"+music4+"' on YouTube."))
                     serverinfo[message.server].loading = False
                     return
+            serverinfo[message.server].loading = False
             arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[1]
             youtube = etree.HTML(urllib.request.urlopen(music4).read())
             song=youtube.xpath("//span[@id='eow-title']/@title")[0]

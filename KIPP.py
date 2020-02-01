@@ -1385,7 +1385,7 @@ async def WCHANNEL(message,message2):
 async def NEWPLAYLIST(message,message2):
     name=message2.split("|")[1]
     if serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name)) == None:
-        serverinfo[message.server].add_server_config("PLAYLIST:{0}".format(name),[])
+        serverinfo[message.server].add_server_config(["PLAYLIST:{0}".format(name),[]])
         await client.send_message(message.channel,"Created a new playlist named `{0}`.".format(name))
     else:
         await client.send_message(message.channel, "There is already a playlist named `{0}`. If you would like to make a new playlist of that name, please delete the current playlist.".format(name))

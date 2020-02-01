@@ -1417,6 +1417,7 @@ async def APPENDPLAYLIST(message,message2):
                     with urllib.request.urlopen(req) as html:
                         searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.read().decode())
                     music4 = ("http://www.youtube.com/watch?v=" + searchresults[0])
+                    await client.send_message(message.channel,music4)
                 except IndexError:
                     await client.send_message(message.channel, ("Could not find '"+music4+"' on YouTube."))
                     serverinfo[message.server].loading = False

@@ -1422,20 +1422,14 @@ async def APPENDPLAYLIST(message,message2):
                     serverinfo[message.server].loading = False
                     return
             serverinfo[message.server].loading = False
-            arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0][1]
-            s=0
-            parsearr=[]
-            arr=arr.replace('"',"")
-            for i in range(1,len(arr)-1):
-                if arr[i]=="[":
-                    s=i
-                if arr[i]=="]":
-                    parsearr.append(arr[s+1:i].split(','))
-            await client.send_message(message.channel,parsearr)
+            arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0][1:]
             youtube = etree.HTML(urllib.request.urlopen(music4).read())
             song=youtube.xpath("//span[@id='eow-title']/@title")[0]
-            parsearr.append([song,music4])
-            serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),["PLAYLIST:{0}".format(name),parsearr])
+            arr.append([song,music4])
+            line=["PLAYLIST:{0}".format(name)]
+            for item in arr:
+                line.append(item)
+            serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),line)
             await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(parsearr)))
 async def INVITE(message,message2):
     if await VerifyOwnerMeema(message):

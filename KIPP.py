@@ -88,7 +88,7 @@ class Server:
             for row in arr:
                 writer.writerow(row)
             f.close()
-    def (self,data,newdata):
+    def change_server_config(self,data,newdata):
         arr=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
         if arr==None:
             arr=[]

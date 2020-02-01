@@ -352,7 +352,8 @@ def READ_DATA_IN(path, condition=lambda x: True, attr_condition=lambda x: True):
     with open(path) as fl:
         for row in csv.reader(fl):
             if condition(row):
-                arr=[]
+                if arr==None:
+                    arr=[]
                 for attr in row:
                     if attr_condition(attr):
                         arr.append(row)
@@ -1425,7 +1426,7 @@ async def APPENDPLAYLIST(message,message2):
             arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0][1:]
             youtube = etree.HTML(urllib.request.urlopen(music4).read())
             song=youtube.xpath("//span[@id='eow-title']/@title")[0]
-            arr.append(song+"||"+music4)
+            arr.append(song+"-~|~-"+music4)
             line=["PLAYLIST:{0}".format(name)]
             for item in arr:
                 line.append(item)

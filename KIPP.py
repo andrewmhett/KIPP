@@ -1423,17 +1423,10 @@ async def APPENDPLAYLIST(message,message2):
                     return
             serverinfo[message.server].loading = False
             arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0][1]
-            await client.send_message(message.channel,arr)
-            arr=arr[1:].split("[")
-            count=-1
-            for item in arr:
-                count+=1
-                arr[count].replace("]","")
-            await client.send_message(message.channel,arr)
+            arr=arr[1:len(arr)-1]
             youtube = etree.HTML(urllib.request.urlopen(music4).read())
             song=youtube.xpath("//span[@id='eow-title']/@title")[0]
             arr.append([song,music4])
-            await client.send_message(message.channel,arr)
             serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),["PLAYLIST:{0}".format(name),str(arr)])
             await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))
 async def INVITE(message,message2):

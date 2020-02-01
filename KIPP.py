@@ -1430,7 +1430,7 @@ async def APPENDPLAYLIST(message,message2):
                 if arr[i]=="[":
                     s=i
                 if arr[i]=="]":
-                    parsearr.append(arr[s+1:i])
+                    parsearr.append(arr[s+1:i].split(','))
             await client.send_message(message.channel,parsearr)
             youtube = etree.HTML(urllib.request.urlopen(music4).read())
             song=youtube.xpath("//span[@id='eow-title']/@title")[0]

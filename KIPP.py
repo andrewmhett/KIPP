@@ -1436,7 +1436,7 @@ async def APPENDPLAYLIST(message,message2):
             song=youtube.xpath("//span[@id='eow-title']/@title")[0]
             parsearr.append([song,music4])
             await client.send_message(message.channel,parsearr)
-            serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),["PLAYLIST:{0}".format(name),str(parsearr)])
+            serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),["PLAYLIST:{0}".format(name)+","+parsearr])
             await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(parsearr)))
 async def INVITE(message,message2):
     if await VerifyOwnerMeema(message):

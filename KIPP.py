@@ -1429,12 +1429,26 @@ async def APPENDPLAYLIST(message,message2):
                 arr=[]
             youtube = etree.HTML(urllib.request.urlopen(music4).read())
             song=youtube.xpath("//span[@id='eow-title']/@title")[0]
-            arr.append([song,music4])
+            arr.append(song+"~||~"+music4)
             line=["PLAYLIST:{0}".format(name)]
             for item in arr:
                 line.append(item)
             serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),line)
             await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))
+async def PLAYLISTS(message,message2):
+    playlist_dict={}
+    for playlist in search_server_configs("PLAYLIST"):
+        playlist_dict[playlist[0]]=len(playlist[1:])
+    embed=discord.Embed(title="Playlists")
+    val=""
+    for i in range(len(list(playlist_dict))):
+        val=val+"`"+list(playlist_dict.keys())[i]+"`\n"
+    embed.add_field(name="Name",value=val)
+    val=""
+    for i in range(len(list(playlist_dict))):
+        val=val+"`"+list(playlist_dict.values())[i]+"`\n"
+    embed.add_field(name="# Songs",value=val,inline=True)
+    await client.send_message(message.channel,embed=embed)
 async def INVITE(message,message2):
     if await VerifyOwnerMeema(message):
         unbanuser = str(message.content).split('|')[1]

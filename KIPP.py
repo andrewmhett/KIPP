@@ -84,7 +84,7 @@ class Server:
             arr=[]
         arr.append(data)
         with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w') as f:
-            writer=csv.writer(f, delimiter="~,")
+            writer=csv.writer(f, delimiter='~,')
             for row in arr:
                 writer.writerow(row)
             f.close()
@@ -99,7 +99,7 @@ class Server:
                 break
             cntr=cntr+1
         with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w') as f:
-            writer=csv.writer(f,delimiter="~,")
+            writer=csv.writer(f,delimiter='~,')
             for row in arr:
                 writer.writerow(row)
             f.close()

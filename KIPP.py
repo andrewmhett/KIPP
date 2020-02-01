@@ -99,7 +99,7 @@ class Server:
                 break
             cntr=cntr+1
         with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w') as f:
-            writer=csv.writer(f, quoting=csv.QUOTE_MINIMAL)
+            writer=csv.writer(f, quotechar="'")
             for row in arr:
                 writer.writerow(row)
             f.close()

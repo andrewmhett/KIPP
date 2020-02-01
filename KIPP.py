@@ -84,7 +84,7 @@ class Server:
             arr=[]
         arr.append(data)
         with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w') as f:
-            writer=csv.writer(f, delimiter='~')
+            writer=csv.writer(f)
             for row in arr:
                 writer.writerow(row)
             f.close()
@@ -99,7 +99,7 @@ class Server:
                 break
             cntr=cntr+1
         with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w') as f:
-            writer=csv.writer(f,delimiter='~')
+            writer=csv.writer(f)
             for row in arr:
                 writer.writerow(row)
             f.close()
@@ -1426,6 +1426,7 @@ async def APPENDPLAYLIST(message,message2):
             s=0
             e=0
             parsearr=[]
+            arr=arr.replace('"',"")
             for i in range(1,len(arr)-1):
                 if arr[i]=="[":
                     s=i

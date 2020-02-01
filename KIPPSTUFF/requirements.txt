@@ -1,6 +1,6 @@
-git+https://www.github.com/LockdownDoom/async_discord.py
+youtube-dl
 asyncio
-aiohttp
+aiohttp<3.6.0,>=3.3.0
 aiodns
 pillow
 lxml

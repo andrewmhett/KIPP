@@ -63,8 +63,8 @@ class Server:
         self.loading=False
         self.jointime=datetime.now()
         self.playlist=None
-    def pick_playlist_song(self,playlist):
-        song=random.choice(self.search_server_configs("PLAYLIST:{0}".format(playlist))[0][1:])
+    def pick_playlist_song(self):
+        song=SystemRandom().choice(self.search_server_configs("PLAYLIST:{0}".format(self.playlist))[0][1:])
         song=song.split("~||~")
         return song
     def add_server_config(self,data):
@@ -243,7 +243,10 @@ class music_handler():
                 i=0
                 for song in serverinfo[self.server].queue[1:]:
                     i=i+1
-                    queuelist=queuelist+"\n`#{0}` {1}".format(i,"["+(''.join(song[0]))+"]("+song[1]+")")
+                    if len(song)>2:
+                        queuelist=queuelist+"\n`#{0}` {1}".format(i,song)
+                    else:
+                        queuelist=queuelist+"\n`#{0}` {1}".format(i,"["+(''.join(song[0]))+"]("+song[1]+")")
             if self.paused:
                 self.pausetime=datetime.datetime.now()-self.pausedatetime
             if self.pausetime==None:
@@ -1096,12 +1099,24 @@ async def MUSIC(message,message2):
                     await client.send_message(message.channel, "Please use the correct syntax. Use !music|youtubelink or !music|youtubesearch to use the music command.")
                     serverinfo[message.server].loading = False
             else:
-                if message2.split("|")[1].startswith("PLAYLIST:")==False and serverinfo[message.server].playlist!=None:
-                    await client.send_message(message.channel,"You cannot play regular music while a playlist is playing. To stop the playlist, use **!ENDPLAYLIST**.")
+                if serverinfo[message.server].playlist!=None:
+                    await client.send_message(message.channel,"You cannot queue music while a playlist is playing. To stop the playlist, use **!REMOVESONG|1** in order to remove it from the queue.")
                     return
                 if serverinfo[message.server].search_server_configs(message2.split("|")[1]) != None:
                     if len(serverinfo[message.server].search_server_configs(message2.split("|")[1])[0][1:])>0:
-                        serverinfo[message.server].queue.append("PLAYLIST: {0}".format(serverinfo[message.server].playlist))
+                        users = []
+                        for user in message.author.voice.voice_channel.voice_members:
+                            users.append(user)
+                        if message.server.voice_client == None:
+                            channel = message.author.voice.voice_channel
+                            await client.join_voice_channel(channel)
+                            serverinfo[message.server].jointime=datetime.now()
+                        if message.server.get_member(KIPP_ID) not in users:
+                            channel = message.author.voice.voice_channel
+                            user = message.server.get_member(KIPP_ID)
+                            await client.move_member(user, channel)
+                        serverinfo[message.server].musicchannel=message.channel
+                        serverinfo[message.server].queue.append("PLAYLIST: {0}".format(message2.split("PLAYLIST:")[1]))
         except Exception as err:
             serverinfo[message.server].loading = False
             await client.send_message(message.channel, err)
@@ -1136,6 +1151,8 @@ async def REMOVESONG(message,message2):
             if index >0 and index <= len(serverinfo[message.server].queue):
                 serverinfo[message.server].queue.remove(serverinfo[message.server].queue[index])
                 await client.send_message(message.channel, "Removed song #{0} from queue".format(index))
+                if serverinfo[message.server].playlist != None:
+                    serverinfo[message.server].playlist = None
             else:
                 await client.send_message(message.channel,"Invalid song index")
         else:
@@ -1545,9 +1562,11 @@ async def background_loop():
         for server in client.servers:
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)>=1:
                 music=serverinfo[server].queue[0][1]
-                if len(serverinfo[message.server].queue[0])>2:
-                    serverinfo[message.server].playlist=serverinfo[message.server].queue[0].split("PLAYLIST:")[1]
-                    music=serverinfo[message.server].pick_playlist_song(serverinfo[message.server].playlist)
+                if len(serverinfo[server].queue[0])>2:
+                    serverinfo[server].playlist=serverinfo[server].queue[0].split("PLAYLIST:")[1][1:]
+                    music=serverinfo[server].pick_playlist_song()[1]
+                    if serverinfo[server].playlist != None:
+                        serverinfo[server].queue.append(serverinfo[server].queue[0])
                 player = await server.voice_client.create_ytdl_player(music,options=ytdl_format_options,before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
                 serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:

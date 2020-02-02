@@ -1095,12 +1095,10 @@ async def MUSIC(message,message2):
                 if message2.split("|")[1].startswith("PLAYLIST:")==False and serverinfo[message.server].playlist!=None:
                     await client.send_message(message.channel,"You cannot play regular music while a playlist is playing. To stop the playlist, use **!ENDPLAYLIST**.")
                     return
-                await client.send_message(message.channel,"1")
-                if serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(message2.split("PLAYLIST:")[1])) != None:
-                    if len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(message2.split("|")[1].split("PLAYLIST:")[1]))[1:])>0:
-                        await client.sned_message(message.channel,"2")
+                if serverinfo[message.server].search_server_configs(message2.split("|")[1]) != None:
+                    if len(serverinfo[message.server].search_server_configs(message2.split("|")[1]))[0][1:])>0:
                         serverinfo[msesage.server].playlist=message2.split("|")[1].split("PLAYLIST:")[1]
-                        serverinfo[messagr.server].queue=["PLAYLIST: {0}".format(serverinfo[message.server].playlist)]
+                        serverinfo[message.server].queue=["PLAYLIST: {0}".format(serverinfo[message.server].playlist)]
         except Exception as err:
             serverinfo[message.server].loading = False
             await client.send_message(message.channel, err)

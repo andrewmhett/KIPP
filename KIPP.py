@@ -1426,6 +1426,7 @@ async def PLAYLISTS(message,message2):
     embed=discord.Embed(title="Playlists")
     val=""
     for i in range(len(list(playlist_dict))-1):
+        await client.send_message(message.channel, val)
         val=val+"`"+list(playlist_dict.keys())[i]+"`\n"
     embed.add_field(name="Name",value=val)
     val=""

@@ -1423,15 +1423,13 @@ async def PLAYLISTS(message,message2):
     playlist_dict={}
     for playlist in serverinfo[message.server].search_server_configs("PLAYLIST"):
         playlist_dict[playlist[0].split(":")[1]]=len(playlist[1:])
-    await client.send_message(message.channel,playlist_dict)
     embed=discord.Embed(title="Playlists")
     val=""
-    for i in range(len(list(playlist_dict))):
-        await client.send_message(message.channel,val)
+    for i in range(len(list(playlist_dict))-1):
         val=val+"`"+list(playlist_dict.keys())[i]+"`\n"
     embed.add_field(name="Name",value=val)
     val=""
-    for i in range(len(list(playlist_dict))):
+    for i in range(len(list(playlist_dict))-1):
         val=val+"`"+list(playlist_dict.values())[i]+"`\n"
     embed.add_field(name="# Songs",value=val,inline=True)
     await client.send_message(message.channel,embed=embed)

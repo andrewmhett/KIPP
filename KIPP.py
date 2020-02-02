@@ -65,8 +65,8 @@ class Server:
         self.playlist=None
         self.playlistindex=0
     def pick_playlist_song(self):
-        i=-1
-        while i != self.playlistindex:
+        i=self.playlistindex
+        while i == self.playlistindex:
             i=SystemRandom().randrange(0,len(self.search_server_configs("PLAYLIST:{0}".format(self.playlist))[0][1:]))
         self.playlistindex=i
         song=self.search_server_configs("PLAYLIST:{0}".format(self.playlist))[0][1:][i]
@@ -953,6 +953,7 @@ async def MFIX(message,message2):
         serverinfo[message.server].mHandler.player.stop()
     except Exception as err:
         print(err)
+    serverinfo[message.server].playlist=None
     serverinfo[message.server].mHandler=None
     await client.send_message(message.channel,"Clearing queue...")
     serverinfo[message.server].queue = []

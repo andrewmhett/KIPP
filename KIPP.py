@@ -1423,7 +1423,7 @@ async def PLAYLISTS(message,message2):
     playlist_dict={}
     for playlist in serverinfo[message.server].search_server_configs("PLAYLIST"):
         playlist_dict[playlist[0].split(":")[1]]=len(playlist[1:])
-    embed=discord.Embed(title="Playlists",color=EMBED_COLOR)
+    embed=discord.Embed(title="Playlists",color=EMBEDCOLOR)
     val=""
     for key in list(playlist_dict.keys()):
         val=val+"`"+str(key)+"`\n"

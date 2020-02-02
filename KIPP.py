@@ -1052,7 +1052,7 @@ async def MUSIC(message,message2):
                             music4 = music4.split('youtu.be/')[1]
                             music4 = "https://www.youtube.com/watch?v="+music4
                         if str(message.author.voice.voice_channel) != "None":
-                            if ((music4.startswith("https://www.youtube.com") == False) and (music4.startswith("https://youtu.be") == False) and (music4.startswith("http://www.youtube.com") == False)):
+                            if ((music4.startswith("https://www.youtube.com") == False) and (music4.startswith("https://youtu.be") == False) and (music4.startswith("http://www.youtube.com") == False) and "//soundcloud.com" not in music4):
                                 try:
                                     query_string = urllib.parse.urlencode({"search_query" : music4})
                                     req = urllib.request.Request("http://www.youtube.com/results?" + query_string)
@@ -1066,35 +1066,35 @@ async def MUSIC(message,message2):
                             server = message.server
                             if notsearched == False:
                                 if ((music3[0]).upper() == "!MUSIC"):
-                                    if (music4.startswith("https://www.youtube.com") or music4.startswith("https://youtu.be") or music4.startswith("http://www.youtube.com")):
-                                        if "user" not in music4:
-                                            serverinfo[message.server].musiccolor=playerinfo[message.author].hrolecolor
-                                            users = []
-                                            for user in message.author.voice.voice_channel.voice_members:
-                                                users.append(user)
-                                            if message.server.voice_client == None:
-                                                channel = message.author.voice.voice_channel
-                                                await client.join_voice_channel(channel)
-                                                serverinfo[message.server].jointime=datetime.now()
-                                            if message.server.get_member(KIPP_ID) not in users:
-                                                channel = message.author.voice.voice_channel
-                                                user = message.server.get_member(KIPP_ID)
-                                                await client.move_member(user, channel)
-                                            add_to_queue(message.server, music4)
-                                            if serverinfo[message.server].mHandler != None:
-                                                if len(serverinfo[message.server].queue)>1:
-                                                    await client.send_message(message.channel, "Song added to queue. #"+str(len(serverinfo[message.server].queue)-1))
-                                                    serverinfo[message.server].loading=False
-                                            if len(serverinfo[message.server].queue) == 1:
-                                                serverinfo[message.server].musicchannel=message.channel
-                                                serverinfo[message.server].loading = False
-                                        else:
-                                            await client.send_message(message.channel, "Please do not try to play an entire youtube channel. Get one specific song you would like to hear, and play that.")
+                                    #if (music4.startswith("https://www.youtube.com") or music4.startswith("https://youtu.be") or music4.startswith("http://www.youtube.com")):
+                                    if "user" not in music4:
+                                        serverinfo[message.server].musiccolor=playerinfo[message.author].hrolecolor
+                                        users = []
+                                        for user in message.author.voice.voice_channel.voice_members:
+                                            users.append(user)
+                                        if message.server.voice_client == None:
+                                            channel = message.author.voice.voice_channel
+                                            await client.join_voice_channel(channel)
+                                            serverinfo[message.server].jointime=datetime.now()
+                                        if message.server.get_member(KIPP_ID) not in users:
+                                            channel = message.author.voice.voice_channel
+                                            user = message.server.get_member(KIPP_ID)
+                                            await client.move_member(user, channel)
+                                        add_to_queue(message.server, music4)
+                                        if serverinfo[message.server].mHandler != None:
+                                            if len(serverinfo[message.server].queue)>1:
+                                                await client.send_message(message.channel, "Song added to queue. #"+str(len(serverinfo[message.server].queue)-1))
+                                                serverinfo[message.server].loading=False
+                                        if len(serverinfo[message.server].queue) == 1:
+                                            serverinfo[message.server].musicchannel=message.channel
                                             serverinfo[message.server].loading = False
                                     else:
-                                        msg = "The music must come from YouTube"
-                                        await client.send_message(message.channel, msg)
+                                        await client.send_message(message.channel, "Please do not try to play an entire youtube channel. Get one specific song you would like to hear, and play that.")
                                         serverinfo[message.server].loading = False
+                                    #else:
+                                        #msg = "The music must come from YouTube"
+                                        #await client.send_message(message.channel, msg)
+                                        #serverinfo[message.server].loading = False
                         else:
                             await client.send_message(message.channel, "You are not in a voice channel. Get in one for KIPP to play music.")
                             serverinfo[message.server].loading = False

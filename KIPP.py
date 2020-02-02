@@ -1423,7 +1423,7 @@ async def PLAYLISTS(message,message2):
     playlist_dict={}
     for playlist in serverinfo[message.server].search_server_configs("PLAYLIST"):
         playlist_dict[playlist[0].split(":")[1]]=len(playlist[1:])
-    embed=discord.Embed(title="Playlists")
+    embed=discord.Embed(title="Playlists",color=EMBED_COLOR)
     val=""
     for key in list(playlist_dict.keys()):
         val=val+"`"+str(key)+"`\n"
@@ -1431,7 +1431,7 @@ async def PLAYLISTS(message,message2):
     val=""
     for value in list(playlist_dict.values()):
         val=val+"`"+str(value)+"`\n"
-    embed.add_field(name="# Songs",value=val,inline=True,color=EMBED_COLOR)
+    embed.add_field(name="# Songs",value=val,inline=True)
     await client.send_message(message.channel,embed=embed)
 async def INVITE(message,message2):
     if await VerifyOwnerMeema(message):

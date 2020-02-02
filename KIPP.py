@@ -1421,10 +1421,8 @@ async def APPENDPLAYLIST(message,message2):
             await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))
 async def PLAYLISTS(message,message2):
     playlist_dict={}
-    for playlist in search_server_configs("PLAYLIST"):
-        await client.send_message(message.channel, playlist)
+    for playlist in serverinfo[message.server].search_server_configs("PLAYLIST"):
         playlist_dict[playlist[0]]=len(playlist[1:])
-    await client.send_message(message.channel,playlist_dict)
     embed=discord.Embed(title="Playlists")
     val=""
     for i in range(len(list(playlist_dict))):

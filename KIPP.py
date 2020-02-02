@@ -63,6 +63,10 @@ class Server:
         self.loading=False
         self.jointime=datetime.now()
         self.playlist=None
+    def pick_playlist_song(self,playlist):
+        song=random.choice(self.search_server_configs("PLAYLIST:{0}".format(playlist))[0][1:])
+        song=song.split("~||~")
+        return song
     def add_server_config(self,data):
         arr=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
         if arr==None:
@@ -1097,8 +1101,7 @@ async def MUSIC(message,message2):
                     return
                 if serverinfo[message.server].search_server_configs(message2.split("|")[1]) != None:
                     if len(serverinfo[message.server].search_server_configs(message2.split("|")[1])[0][1:])>0:
-                        serverinfo[message.server].playlist=message2.split("|")[1].split("PLAYLIST:")[1]
-                        serverinfo[message.server].queue=["PLAYLIST: {0}".format(serverinfo[message.server].playlist)]
+                        serverinfo[message.server].queue.append("PLAYLIST: {0}".format(serverinfo[message.server].playlist))
         except Exception as err:
             serverinfo[message.server].loading = False
             await client.send_message(message.channel, err)
@@ -1541,7 +1544,11 @@ async def background_loop():
     while True:
         for server in client.servers:
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)>=1:
-                player = await server.voice_client.create_ytdl_player(serverinfo[server].queue[0][1],options=ytdl_format_options,before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
+                music=serverinfo[server].queue[0][1]
+                if serverinfo[message.server].queue[0].startswith("PLAYLIST:"):
+                    serverinfo[message.server].playlist=serverinfo[message.server].queue[0].split("PLAYLIST:")[1]
+                    music=serverinfo[message.server].pick_playlist_song(serverinfo[message.server].playlist)
+                player = await server.voice_client.create_ytdl_player(music,options=ytdl_format_options,before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")
                 serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
                 c=datetime.datetime.now()-serverinfo[server].end_time

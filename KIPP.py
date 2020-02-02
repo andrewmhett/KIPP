@@ -70,7 +70,6 @@ class Server:
             i=SystemRandom().randrange(0,len(self.search_server_configs("PLAYLIST:{0}".format(self.playlist))[0][1:]))
         self.playlistindex=i
         song=self.search_server_configs("PLAYLIST:{0}".format(self.playlist))[0][1:][i]
-        song=song.split("~||~")
         return song
     def add_server_config(self,data):
         arr=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
@@ -1447,14 +1446,31 @@ async def APPENDPLAYLIST(message,message2):
                 arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0][1:]
             else:
                 arr=[]
-            youtube = etree.HTML(urllib.request.urlopen(music4).read())
-            song=youtube.xpath("//span[@id='eow-title']/@title")[0]
-            arr.append(song+"~||~"+music4)
+            if "user" in music4:
+                return
+            single=False
+            counter=0
+            if "list" in music4:
+                from bs4 import BeautifulSoup
+                import urllib2
+                import re
+                page=urllib2.urlopen(music4)
+                soup=BeautifulSoup(page)
+                for i in soup.find_all('link'):
+                    if "watch" in i['href']:
+                        arr.append(i)
+                        counter+=1
+            else:
+                single=True
+                arr.append(music4)
             line=["PLAYLIST:{0}".format(name)]
             for item in arr:
                 line.append(item)
             serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),line)
-            await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))
+            if single:
+                await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))
+            else:
+                await client.send_message(message.channel,"Successfully added `{0}` songs to playlist `{1}`.".format(counter,name))
 async def PLAYLISTS(message,message2):
     playlist_dict={}
     if serverinfo[message.server].search_server_configs("PLAYLIST") != None:
@@ -1570,7 +1586,7 @@ async def background_loop():
                 music=serverinfo[server].queue[0][1]
                 if len(serverinfo[server].queue[0])>2:
                     serverinfo[server].playlist=serverinfo[server].queue[0].split("PLAYLIST:")[1][1:]
-                    music=serverinfo[server].pick_playlist_song()[1]
+                    music=serverinfo[server].pick_playlist_song()
                     if serverinfo[server].playlist != None:
                         serverinfo[server].queue.append(serverinfo[server].queue[0])
                 player = await server.voice_client.create_ytdl_player(music,options=ytdl_format_options,before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")

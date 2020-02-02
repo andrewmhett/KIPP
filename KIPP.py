@@ -1430,7 +1430,7 @@ async def APPENDPLAYLIST(message,message2):
             if music4.startswith("https://youtu.be"):
                 music4 = music4.split('youtu.be/')[1]
                 music4 = "https://www.youtube.com/watch?v="+music4
-            if ((music4.startswith("https://www.youtube.com") == False) and (music4.startswith("https://youtu.be") == False) and (music4.startswith("http://www.youtube.com") == False)):
+            if "user" not in music4 and "list" not in music4 and ((music4.startswith("https://www.youtube.com") == False) and (music4.startswith("https://youtu.be") == False) and (music4.startswith("http://www.youtube.com") == False)):
                 try:
                     query_string = urllib.parse.urlencode({"search_query" : music4})
                     req = urllib.request.Request("http://www.youtube.com/results?" + query_string)
@@ -1452,9 +1452,7 @@ async def APPENDPLAYLIST(message,message2):
             counter=0
             if "list" in music4:
                 from bs4 import BeautifulSoup
-                import urllib2
-                import re
-                page=urllib2.urlopen(music4)
+                page=requests.get(music4)
                 soup=BeautifulSoup(page)
                 for i in soup.find_all('link'):
                     if "watch" in i['href']:

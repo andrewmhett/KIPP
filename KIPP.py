@@ -1545,7 +1545,7 @@ async def background_loop():
         for server in client.servers:
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)>=1:
                 music=serverinfo[server].queue[0][1]
-                if len(serverinfo[message.server].queue[0])==1:
+                if len(serverinfo[message.server].queue[0])>2:
                     serverinfo[message.server].playlist=serverinfo[message.server].queue[0].split("PLAYLIST:")[1]
                     music=serverinfo[message.server].pick_playlist_song(serverinfo[message.server].playlist)
                 player = await server.voice_client.create_ytdl_player(music,options=ytdl_format_options,before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5")

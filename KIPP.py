@@ -1422,8 +1422,7 @@ async def APPENDPLAYLIST(message,message2):
         if serverinfo[message.server].loading == False:
             await client.send_message(message.channel,"Processing...")
             serverinfo[message.server].loading = True
-            music3 = message2.split('|')
-            music4= music3[2]
+            music4=str(message.content).split("|")[2]
             if "&index" in music4:
                 music4 = music4.split('&index')
                 music4 = music4[0]
@@ -1452,11 +1451,11 @@ async def APPENDPLAYLIST(message,message2):
             counter=0
             if "list" in music4:
                 from bs4 import BeautifulSoup
-                page=urllib.request.urlopen(music4)
-                soup=BeautifulSoup(page)
-                for i in soup.find_all('link'):
-                    if "watch" in i['href']:
-                        arr.append(i)
+                page=requests.get(music4).text
+                soup=BeautifulSoup(page,features='html.parser')
+                for link in soup.find_all("a", {"dir":"ltr"}):
+                    if "watch" in link['href']:
+                        arr.append(link)
                         counter+=1
             else:
                 single=True

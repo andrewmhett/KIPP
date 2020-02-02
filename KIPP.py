@@ -1426,7 +1426,7 @@ async def PLAYLISTS(message,message2):
     desc="Name     # Songs"
     for key in list(playlist_dict.keys()):
         try:    
-            desc=desc+"\n`{0}`".format(str(key))+(" "*15-(len(str(key))+len(str(playlist_dict[key]))))+"`"+str(playlist_dict[key])+"`"
+            desc=desc+"\n`{0}`".format(str(key))+" "*(15-(len(str(key))+len(str(playlist_dict[key]))))+"`"+str(playlist_dict[key])+"`"
         except Exception as e:
             await client.send_message(message.channel,e)
     embed=discord.Embed(title="Playlists",description=desc)

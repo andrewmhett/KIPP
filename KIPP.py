@@ -63,8 +63,13 @@ class Server:
         self.loading=False
         self.jointime=datetime.now()
         self.playlist=None
+        self.playlistindex=0
     def pick_playlist_song(self):
-        song=SystemRandom().choice(self.search_server_configs("PLAYLIST:{0}".format(self.playlist))[0][1:])
+        i=-1
+        while i != self.playlistindex:
+            i=SystemRandom().randrange(0,len(self.search_server_configs("PLAYLIST:{0}".format(self.playlist))[0][1:]))
+        self.playlistindex=i
+        song=self.search_server_configs("PLAYLIST:{0}".format(self.playlist))[0][1:][i]
         song=song.split("~||~")
         return song
     def add_server_config(self,data):
@@ -1494,7 +1499,7 @@ async def UNBLOCK(message,message2):
             serverinfo[message.server].blocked.remove(unblocked.id)
             await client.send_message(message.channel, msg)
 command["!NEWPLAYLIST"]=MUSC("!NEWPLAYLIST","Creates a new music playlist of a given name\n**Usage**\n`!NEWPLAYLIST|name`",NEWPLAYLIST)
-command["!APPENDPLAYLIST"]=MUSC("!APPENDPLAYLIST","Adds a song corresponding to either entered query or link to a playlist of given name.\n**Usage**\n`!APPENDPLAYLIST|name|query or link`",APPENDPLAYLIST)
+command["!APPENDPLAYLIST"]=MUSC("!APPENDPLAYLIST","Adds a song corresponding to either entered query or link to a playlist of given name.\n**Usage**\n`!APPENDPLAYLIST|playlist name|query or link`",APPENDPLAYLIST)
 command["!DELETEPLAYLIST"]=MUSC("!DELETEPLAYLIST","Deletes the music playlist of a given name\n**Usage**\n`!DELETEPLAYLIST|name`",DELETEPLAYLIST)
 command["!PLAYLISTS"]=MUSC("!PLAYLISTS","Displays a list of all playlists in the server\n**Usage**\n`!PLAYLISTS`",PLAYLISTS)
 command["!IQ"]=MISC("!IQ","IQ stands for Interstellar Quote. This command will send a random Interstellar quote\n**Usage**\n`!IQ`",IQ)

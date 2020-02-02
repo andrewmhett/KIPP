@@ -1455,7 +1455,7 @@ async def APPENDPLAYLIST(message,message2):
                 soup=BeautifulSoup(page,features='html.parser')
                 for link in soup.find_all("a", {"dir":"ltr"}):
                     if "watch" in link['href']:
-                        arr.append("https://www.youtube.com"+link['href'])
+                        arr.append("https://www.youtube.com"+link['href'].split("&index")[0])
                         counter+=1
             else:
                 single=True

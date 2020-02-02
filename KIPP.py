@@ -1424,18 +1424,18 @@ async def PLAYLISTS(message,message2):
     for playlist in serverinfo[message.server].search_server_configs("PLAYLIST"):
         playlist_dict[playlist[0].split(":")[1]]=len(playlist[1:])
     embed=discord.Embed(title="Playlists")
-    val=""
-    for key in list(playlist_dict.keys()):
-        try:
+    try:
+        val=""
+        for key in list(playlist_dict.keys()):
             val=val+"`"+key+"`\n"
-        except Exception as e:
-            await client.send_message(message.channel,e)
-    embed.add_field(name="Name",value=val)
-    val=""
-    for value in list(playlist_dict.values()):
-        val=val+"`"+value+"`\n"
-    embed.add_field(name="# Songs",value=val,inline=True)
-    await client.send_message(message.channel,embed=embed)
+        embed.add_field(name="Name",value=val)
+        val=""
+        for value in list(playlist_dict.values()):
+            val=val+"`"+value+"`\n"
+        embed.add_field(name="# Songs",value=val,inline=True)
+        await client.send_message(message.channel,embed=embed)
+    except Exception as e:
+        await client.send_message(message.channel, e)
 async def INVITE(message,message2):
     if await VerifyOwnerMeema(message):
         unbanuser = str(message.content).split('|')[1]

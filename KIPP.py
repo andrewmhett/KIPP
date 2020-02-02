@@ -1452,7 +1452,7 @@ async def APPENDPLAYLIST(message,message2):
             counter=0
             if "list" in music4:
                 from bs4 import BeautifulSoup
-                page=requests.get(music4)
+                page=urllib.request.urlopen(music4)
                 soup=BeautifulSoup(page)
                 for i in soup.find_all('link'):
                     if "watch" in i['href']:

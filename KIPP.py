@@ -1422,7 +1422,7 @@ async def APPENDPLAYLIST(message,message2):
 async def PLAYLISTS(message,message2):
     playlist_dict={}
     for playlist in serverinfo[message.server].search_server_configs("PLAYLIST"):
-        playlist_dict[playlist[0].split(":")[1:]]=len(playlist[1:])
+        playlist_dict[playlist[0].split(":")[1]]=len(playlist[1:])
     await client.send_message(message.channel,playlist_dict)
     embed=discord.Embed(title="Playlists")
     val=""

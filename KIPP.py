@@ -1044,7 +1044,7 @@ async def MUSIC(message,message2):
         currentlyplaying=serverinfo[message.server].mHandler.is_playing
     if (currentlyplaying == False) or (currentlyplaying == True and message.author.voice.voice_channel == message.server.get_member(KIPP_ID).voice.voice_channel):
         try:
-            if message2.split("|")[1].startswith("PLAYLIST:")==False and serverinfo[message.server].playlist==None:
+            if message2.split("|")[1].startswith("PLAYLIST:")==False:
                 if (message2.split('!MUSIC')[1]).startswith('|') == True:
                     if serverinfo[message.server].loading == False:
                         serverinfo[message.server].loading = True
@@ -1088,6 +1088,7 @@ async def MUSIC(message,message2):
                                             channel = message.author.voice.voice_channel
                                             user = message.server.get_member(KIPP_ID)
                                             await client.move_member(user, channel)
+                                        if serverinfo[message.server].playlist != None:
                                         add_to_queue(message.server, music4)
                                         if serverinfo[message.server].mHandler != None:
                                             if len(serverinfo[message.server].queue)>1:
@@ -1112,9 +1113,6 @@ async def MUSIC(message,message2):
                     await client.send_message(message.channel, "Please use the correct syntax. Use !music|youtubelink or !music|youtubesearch to use the music command.")
                     serverinfo[message.server].loading = False
             else:
-                if serverinfo[message.server].playlist!=None:
-                    await client.send_message(message.channel,"You cannot queue music while a playlist is playing. To stop the playlist, use **!REMOVESONG|1** in order to remove it from the queue.")
-                    return
                 if serverinfo[message.server].search_server_configs(message2.split("|")[1]) != None:
                     if len(serverinfo[message.server].search_server_configs(message2.split("|")[1])[0][1:])>0:
                         users = []

@@ -1135,6 +1135,10 @@ async def MUSIC(message,message2):
                             await client.move_member(user, channel)
                         serverinfo[message.server].musicchannel=message.channel
                         serverinfo[message.server].queue.append("PLAYLIST: {0}".format(message2.split("PLAYLIST:")[1]))
+                    else:
+                        await client.send_message(message.channel, "There are no songs in the playlist named `{0}`. You may append songs to this playlist with **!APPENDPLAYLIST**.".format(message2.split("|")[1]))
+                else:
+                    await client.send_message(message.channel, "There is no playlist named `{0}`. Use **!PLAYLISTS** to see a list of all playlists in this server.".format(message2.split("|")[1]))
         except Exception as err:
             serverinfo[message.server].loading = False
             await client.send_message(message.channel, err)
@@ -1481,6 +1485,8 @@ async def APPENDPLAYLIST(message,message2):
                 await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))
             else:
                 await client.send_message(message.channel,"Successfully added `{0}` songs to playlist `{1}`.".format(counter,name))
+    else:
+        await client.send_message(messag.channel,"There is no playlist named `{0}`. Please check **!PLAYLISTS** for a list of all playlists in this server.".format(name))
 async def PLAYLISTS(message,message2):
     playlist_dict={}
     if serverinfo[message.server].search_server_configs("PLAYLIST") != None:
@@ -1526,7 +1532,7 @@ async def UNBLOCK(message,message2):
             serverinfo[message.server].blocked.remove(unblocked.id)
             await client.send_message(message.channel, msg)
 command["!NEWPLAYLIST"]=MUSC("!NEWPLAYLIST","Creates a new music playlist of a given name\n**Usage**\n`!NEWPLAYLIST|name`",NEWPLAYLIST)
-command["!APPENDPLAYLIST"]=MUSC("!APPENDPLAYLIST","Adds a song corresponding to either entered query, link to a song, or link to a youtube playlist.\n**Usage**\n`!APPENDPLAYLIST|playlist name|query or link`",APPENDPLAYLIST)
+command["!APPENDPLAYLIST"]=MUSC("!APPENDPLAYLIST","Adds a song corresponding to either entered query, link to a song (YouTube or Soundcloud), or link to a youtube playlist.\n**Usage**\n`!APPENDPLAYLIST|playlist name|query or link`",APPENDPLAYLIST)
 command["!DELETEPLAYLIST"]=MUSC("!DELETEPLAYLIST","Deletes the music playlist of a given name\n**Usage**\n`!DELETEPLAYLIST|name`",DELETEPLAYLIST)
 command["!PLAYLISTS"]=MUSC("!PLAYLISTS","Displays a list of all playlists in the server\n**Usage**\n`!PLAYLISTS`",PLAYLISTS)
 command["!IQ"]=MISC("!IQ","IQ stands for Interstellar Quote. This command will send a random Interstellar quote\n**Usage**\n`!IQ`",IQ)

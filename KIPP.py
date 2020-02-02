@@ -62,6 +62,7 @@ class Server:
         self.end_time=datetime.now()
         self.loading=False
         self.jointime=datetime.now()
+        self.playlist=None
     def add_server_config(self,data):
         arr=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
         if arr==None:

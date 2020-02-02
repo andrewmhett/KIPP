@@ -1424,6 +1424,7 @@ async def PLAYLISTS(message,message2):
     for playlist in serverinfo[message.server].search_server_configs("PLAYLIST"):
         playlist_dict[playlist[0].split(":")[1]]=len(playlist[1:])
     embed=discord.Embed(title="Playlists")
+    await client.send_message(message.channel,"good")
     val=""
     for key in list(playlist_dict.keys()):
         await client.send_message(message.channel, val)

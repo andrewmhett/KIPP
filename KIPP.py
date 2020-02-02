@@ -1425,13 +1425,13 @@ async def PLAYLISTS(message,message2):
         playlist_dict[playlist[0].split(":")[1]]=len(playlist[1:])
     embed=discord.Embed(title="Playlists")
     val=""
-    for i in range(len(list(playlist_dict))-1):
+    for key in list(playlist_dict.keys()):
         await client.send_message(message.channel, val)
-        val=val+"`"+list(playlist_dict.keys())[i]+"`\n"
+        val=val+"`"+key+"`\n"
     embed.add_field(name="Name",value=val)
     val=""
-    for i in range(len(list(playlist_dict))-1):
-        val=val+"`"+list(playlist_dict.values())[i]+"`\n"
+    for value in list(playlist_dict.values()):
+        val=val+"`"+value+"`\n"
     embed.add_field(name="# Songs",value=val,inline=True)
     await client.send_message(message.channel,embed=embed)
 async def INVITE(message,message2):

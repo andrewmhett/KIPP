@@ -66,9 +66,10 @@ class Server:
         self.playlistindex=0
     def pick_playlist_song(self):
         i=self.playlistindex
-        while i == self.playlistindex:
-            i=SystemRandom().randrange(0,len(self.search_server_configs("PLAYLIST:{0}".format(self.playlist))[0][1:]))
-        self.playlistindex=i
+        if len(self.search_server_configs("PLAYLIST:{0}".format(self.playlist))[0][1:])>1:
+            while i == self.playlistindex:
+                i=SystemRandom().randrange(0,len(self.search_server_configs("PLAYLIST:{0}".format(self.playlist))[0][1:]))
+            self.playlistindex=i
         song=self.search_server_configs("PLAYLIST:{0}".format(self.playlist))[0][1:][i]
         return song
     def add_server_config(self,data):
@@ -1520,7 +1521,7 @@ async def UNBLOCK(message,message2):
             serverinfo[message.server].blocked.remove(unblocked.id)
             await client.send_message(message.channel, msg)
 command["!NEWPLAYLIST"]=MUSC("!NEWPLAYLIST","Creates a new music playlist of a given name\n**Usage**\n`!NEWPLAYLIST|name`",NEWPLAYLIST)
-command["!APPENDPLAYLIST"]=MUSC("!APPENDPLAYLIST","Adds a song corresponding to either entered query or link to a playlist of given name.\n**Usage**\n`!APPENDPLAYLIST|playlist name|query or link`",APPENDPLAYLIST)
+command["!APPENDPLAYLIST"]=MUSC("!APPENDPLAYLIST","Adds a song corresponding to either entered query, link to a song, or link to a youtube playlist.\n**Usage**\n`!APPENDPLAYLIST|playlist name|query or link`",APPENDPLAYLIST)
 command["!DELETEPLAYLIST"]=MUSC("!DELETEPLAYLIST","Deletes the music playlist of a given name\n**Usage**\n`!DELETEPLAYLIST|name`",DELETEPLAYLIST)
 command["!PLAYLISTS"]=MUSC("!PLAYLISTS","Displays a list of all playlists in the server\n**Usage**\n`!PLAYLISTS`",PLAYLISTS)
 command["!IQ"]=MISC("!IQ","IQ stands for Interstellar Quote. This command will send a random Interstellar quote\n**Usage**\n`!IQ`",IQ)
@@ -1559,7 +1560,7 @@ command["!EXEC"]=Command("!EXEC","This command can be used by LockdownDoom in or
 command["!SEARCHLOG"]=MISC("!SEARCHLOG","This command will return all messages (or to a given limit) sent in the current server containing a query\n**Usage**\n`!SEARCHLOG|query|result limit`",SEARCHLOG)
 command["!CLEAR"]=MISC("!CLEAR","This command will clear the last 100 messages sent in the channel\n**Usage**\n`!CLEAR`",CLEAR)
 command["!ADDKIPP"]=MISC("!ADDKIPP","This command returns a link that anyone can use to add KIPP to another server\n**Usage**\n`!ADDKIPP`",ADDKIPP)
-command["!MUSIC"]=MUSC("!MUSIC","This command will cause KIPP to play music from youtube in your VC based on your entered link or query\n**Usage**\n`!MUSIC|query or link`",MUSIC)
+command["!MUSIC"]=MUSC("!MUSIC","This command will cause KIPP to play music from youtube or spotify in your VC based on your entered link or query\n**Usage**\n`!MUSIC|query or link`",MUSIC)
 command["!MONO"]=MUSC("!MONO","This command will change KIPP's audio to mono\n**Usage**\n`!MONO`",MONO)
 command["!STEREO"]=MUSC("!STEREO","This command will change KIPP's audio to stereo\n**Usage**\n`!STEREO`",STEREO)
 command["!SETVOL"]=MUSC("!SETVOL","This command will change KIPPs colume to the specified volume\n**Usage**\n`!SETVOL|volume [0-100]`",SETVOL)

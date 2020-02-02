@@ -1423,12 +1423,9 @@ async def PLAYLISTS(message,message2):
     playlist_dict={}
     for playlist in serverinfo[message.server].search_server_configs("PLAYLIST"):
         playlist_dict[playlist[0].split(":")[1]]=len(playlist[1:])
-    desc="Name     # Songs"
-    for key in list(playlist_dict.keys()):
-        try:    
-            desc=desc+"\n`{0}`".format(str(key))+" "*(15-(len(str(key))+len(str(playlist_dict[key]))))+"`"+str(playlist_dict[key])+"`"
-        except Exception as e:
-            await client.send_message(message.channel,e)
+    desc="Name..........# Songs"
+    for key in list(playlist_dict.keys()):   
+        desc=desc+"\n`{0}`".format(str(key))+"."*(15-(len(str(key))+len(str(playlist_dict[key]))))+"`"+str(playlist_dict[key])+"`"
     embed=discord.Embed(title="Playlists",description=desc)
     await client.send_message(message.channel,embed=embed)
 async def INVITE(message,message2):

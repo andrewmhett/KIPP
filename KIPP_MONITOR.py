@@ -7,7 +7,7 @@ import aiohttp
 import logging
 import threading
 def WebMonitor():
-    os.system('python3.6 "/home/pi/Desktop/KIPPSTUFF/Web Server/Webserver.py"')
+    os.system('sudo python3.6 "/home/pi/Desktop/KIPPSTUFF/Web Server/Webserver.py"')
 t1=threading.Thread(target=WebMonitor)
 t1.start()
 KIPP_RESET_ERRORS = [ConnectionResetError,
@@ -22,7 +22,7 @@ except FileNotFoundError:
     logging.log(50,"KIPP backup file not found.")
 try:
     logging.log(50,"Checking for package updates")
-    os.system('sudo /home/pi/Desktop/KIPPSTUFF/REQUIREMENTUPDATES.sh')
+    #os.system('sudo /home/pi/Desktop/KIPPSTUFF/REQUIREMENTUPDATES.sh')
 except FileNotFoundError:
     logging.log(50,"KIPP package updater not found.")
 while True:

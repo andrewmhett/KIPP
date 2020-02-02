@@ -1088,7 +1088,16 @@ async def MUSIC(message,message2):
                                             channel = message.author.voice.voice_channel
                                             user = message.server.get_member(KIPP_ID)
                                             await client.move_member(user, channel)
-                                        add_to_queue(message.server, music4)
+                                        if serverinfo[message.server].playlist != None:
+                                            mem=""
+                                            for song in serverinfo[message.server].queue:
+                                                if len(song)>2:
+                                                    mem=song
+                                                    serverinfo[message.server].queue.remove(song)
+                                            add_to_queue(message.server, music4)
+                                            serverinfo[message.server].queue.append(mem)
+                                        else:
+                                            add_to_queue(message.server, music4)
                                         if serverinfo[message.server].mHandler != None:
                                             if len(serverinfo[message.server].queue)>1:
                                                 await client.send_message(message.channel, "Song added to queue. #"+str(len(serverinfo[message.server].queue)-1))

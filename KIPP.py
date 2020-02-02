@@ -1428,10 +1428,10 @@ async def PLAYLISTS(message,message2):
         val=""
         for key in list(playlist_dict.keys()):
             val=val+"`"+str(key)+"`\n"
-        embed.add_field(name="Name",value=val)
+        embed.add_field(name="Name",value=val,inline=True)
         val=""
         for value in list(playlist_dict.values()):
-            val=val+"`"+str(value)+"`\n"
+            val=val+"   `"+str(value)+"`\n"
         embed.add_field(name="# Songs",value=val,inline=True)
         await client.send_message(message.channel,embed=embed)
     except Exception as e:

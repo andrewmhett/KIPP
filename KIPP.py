@@ -1096,8 +1096,8 @@ async def MUSIC(message,message2):
                     await client.send_message(message.channel,"You cannot play regular music while a playlist is playing. To stop the playlist, use **!ENDPLAYLIST**.")
                     return
                 if serverinfo[message.server].search_server_configs(message2.split("|")[1]) != None:
-                    if len(serverinfo[message.server].search_server_configs(message2.split("|")[1]))[0][1:])>0:
-                        serverinfo[msesage.server].playlist=message2.split("|")[1].split("PLAYLIST:")[1]
+                    if len(serverinfo[message.server].search_server_configs(message2.split("|")[1])[0][1:])>0:
+                        serverinfo[message.server].playlist=message2.split("|")[1].split("PLAYLIST:")[1]
                         serverinfo[message.server].queue=["PLAYLIST: {0}".format(serverinfo[message.server].playlist)]
         except Exception as err:
             serverinfo[message.server].loading = False

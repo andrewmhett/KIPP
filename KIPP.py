@@ -365,7 +365,7 @@ def add_to_queue(server, url):
     if "youtube.com" in url:
         youtube = etree.HTML(urllib.request.urlopen(url).read())
         name=youtube.xpath("//span[@id='eow-title']/@title")
-    else if "soundcloud.com" in url:
+    elif "soundcloud.com" in url:
         from bs4 import BeautifulSoup
         page=requests.get(url).text
         soup=BeautifulSoup(page,features='html.parser')

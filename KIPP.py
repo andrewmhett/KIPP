@@ -19,22 +19,6 @@ CREATOR_ID="289920025077219328"
 KIPP_ID="386352783550447628"
 MSG_COUNTER=0
 START_TIME=datetime.now()
-CREATOR_ONLY_COMMANDS = ["EXECUTE ORDER 66",
-                         "!NICKNAME",
-                         "!EXEC",
-                         "!EVAL",
-                         "!INVITE",
-                         "!NAMEALL",
-                         "!IMPEACHMEEMA"]
-OWNER_ONLY_COMMANDS = ["!BLOCK",
-                       "!BLOCKEDLIST",
-                       "!ADDROLE",
-                       "!REMOVEROLE",
-                       "!BAN",
-                       "!UNBAN",
-                       "!UNBLOCK",
-                       "!WCHANNEL",
-                       "!TWITCHCHANNEL"]
 commands=[]
 command={}
 client = discord.Client()
@@ -1439,6 +1423,7 @@ async def PLAYLISTS(message,message2):
     playlist_dict={}
     for playlist in search_server_configs("PLAYLIST"):
         playlist_dict[playlist[0]]=len(playlist[1:])
+    await client.send_message(message.channel,playlist_dict)
     embed=discord.Embed(title="Playlists")
     val=""
     for i in range(len(list(playlist_dict))):

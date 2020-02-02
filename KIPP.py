@@ -1024,7 +1024,7 @@ async def MUSIC(message,message2):
         currentlyplaying=serverinfo[message.server].mHandler.is_playing
     if (currentlyplaying == False) or (currentlyplaying == True and message.author.voice.voice_channel == message.server.get_member(KIPP_ID).voice.voice_channel):
         try:
-            if message2.startswith("PLAYLIST:")==False and serverinfo[message.server].playlist==None:
+            if message2.split("|")[1].startswith("PLAYLIST:")==False and serverinfo[message.server].playlist==None:
                 if (message2.split('!MUSIC')[1]).startswith('|') == True:
                     if serverinfo[message.server].loading == False:
                         serverinfo[message.server].loading = True
@@ -1092,13 +1092,13 @@ async def MUSIC(message,message2):
                     await client.send_message(message.channel, "Please use the correct syntax. Use !music|youtubelink or !music|youtubesearch to use the music command.")
                     serverinfo[message.server].loading = False
             else:
-                if message2.startswith("PLAYLIST:")==False and serverinfo[message.server].playlist!=None:
+                if message2.split("|")[1].startswith("PLAYLIST:")==False and serverinfo[message.server].playlist!=None:
                     await client.send_message(message.channel,"You cannot play regular music while a playlist is playing. To stop the playlist, use **!ENDPLAYLIST**.")
                     return
-                if serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(message2.split("|")[1].split("PLAYLIST:")[1])) != None:
+                if serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(message2.split("PLAYLIST:")[1])) != None:
                     if len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(message2.split("|")[1].split("PLAYLIST:")[1]))[1:])>0:
                         serverinfo[msesage.server].playlist=message2.split("|")[1].split("PLAYLIST:")[1]
-                        serverinfo[messag.server].queue=["PLAYLIST: {0}".format(serverinfo[message.server].playlist)]
+                        serverinfo[messagr.server].queue=["PLAYLIST: {0}".format(serverinfo[message.server].playlist)]
         except Exception as err:
             serverinfo[message.server].loading = False
             await client.send_message(message.channel, err)

@@ -1421,18 +1421,22 @@ async def APPENDPLAYLIST(message,message2):
             await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))
 async def PLAYLISTS(message,message2):
     playlist_dict={}
-    for playlist in serverinfo[message.server].search_server_configs("PLAYLIST"):
-        playlist_dict[playlist[0].split(":")[1]]=len(playlist[1:])
-    embed=discord.Embed(title="Playlists",color=EMBEDCOLOR)
-    val=""
-    for key in list(playlist_dict.keys()):
-        val=val+"`"+str(key)+"`\n"
-    embed.add_field(name="Name",value=val)
-    val=""
-    for value in list(playlist_dict.values()):
-        val=val+"`"+str(value)+"`\n"
-    embed.add_field(name="# Songs",value=val,inline=True)
-    await client.send_message(message.channel,embed=embed)
+    if len(serverinfo[message.server].search_server_configs("PLAYLIST"))>0:
+        for playlist in serverinfo[message.server].search_server_configs("PLAYLIST"):
+            playlist_dict[playlist[0].split(":")[1]]=len(playlist[1:])
+        embed=discord.Embed(title="Playlists",color=EMBEDCOLOR)
+        val=""
+        for key in list(playlist_dict.keys()):
+            val=val+"`"+str(key)+"`\n"
+        embed.add_field(name="Name",value=val)
+        val=""
+        for value in list(playlist_dict.values()):
+            val=val+"`"+str(value)+"`\n"
+        embed.add_field(name="# Songs",value=val,inline=True)
+        await client.send_message(message.channel,embed=embed)
+    else:
+        embed=discord.Embed(title="Playlists",color=EMBEDCOLOR,description="There are no playlists in this server")
+        await client.send_message(message.channel,embed=embed)
 async def INVITE(message,message2):
     if await VerifyOwnerMeema(message):
         unbanuser = str(message.content).split('|')[1]

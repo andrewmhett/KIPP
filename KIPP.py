@@ -1743,20 +1743,20 @@ while True:
             for user in server.get_member(KIPP_ID).voice.voice_channel.voice_members:
                 if user.bot == False:
                     users.append(user)
-            if int(len(users))<2:
+            if len(users)==0:
                 currentlyplaying=False
                 if serverinfo[server].mHandler != None:
                     currentlyplaying=serverinfo[server].mHandler.is_playing
-                if currentlyplaying == True:
-                    if serverinfo[server].paused == False:
+                if currentlyplaying:
+                    if serverinfo[server].mHandler.paused == False:
                         await client.send_message(serverinfo[server].musictextchannel, "Nobody is listening to KIPP. Pausing music...")
                         serverinfo[server].mHandler.player.pause()
                         serverinfo[server].mHandler.paused = True
                         serverinfo[server].mHandler.pausedatetime=datetime.now()
                         serverinfo[server].everyoneleft = True
-            if (after.voice.voice_channel == server.get_member(KIPP_ID).voice.voice_channel) and serverinfo[server].everyoneleft == True:
+            if (after.voice.voice_channel == server.get_member(KIPP_ID).voice.voice_channel) and serverinfo[server].everyoneleft:
                 serverinfo[server].everyoneleft = False
-                await client.send_message(serverinfo[server].musictextchannel, "The music that was playing (**"+str(serverinfo[server].playing)+"**) was paused because nobody was listening. Use **!resume** to resume the music.")
+                await client.send_message(serverinfo[server].musictextchannel, "The music that was playing (**"+str(serverinfo[server].mHandler.title)+"**) was paused because nobody was listening. Use **!resume** to resume the music.")
         except AttributeError:
             pass
     @client.event
@@ -1765,13 +1765,11 @@ while True:
         for channel in server.channels:
             if channel.name=='general':
                 general=True
-                for channel in server.channels:
-                    if channel.name=='general':
-                        try:
-                            await client.send_message(channel, "Hello, and thank you for using KIPP. To get started, type **!help** for all of the commands.")
-                            break
-                        except discord.DiscordException:
-                            pass
+                try:
+                    await client.send_message(channel, "Hello, and thank you for using KIPP. To get started, type **!help** for all of the commands.")
+                    break
+                except discord.DiscordException:
+                    pass
         if general == False:
             for channel in server.channels:
                 try:

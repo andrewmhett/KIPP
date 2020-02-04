@@ -349,10 +349,14 @@ def READ_DATA_IN(path, condition=lambda x: True, attr_condition=lambda x: True):
     with open(path) as fl:
         for row in csv.reader(fl):
             if condition(row):
-                if arr==None:
-                    arr=[]
                 for attr in row:
                     if attr_condition(attr):
+                        arr=[]
+                        break
+        for row in csv.reader(fl):
+            if condition(row):
+                for attr in row:
+                    if attr_condition(attr):            
                         arr.append(row)
                         break
         fl.close()
@@ -1458,8 +1462,11 @@ async def APPENDPLAYLIST(message,message2):
                     serverinfo[message.server].loading = False
                     return
             serverinfo[message.server].loading = False
-            if len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0])>1:
-                arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0][1:]
+            if len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))>0:
+                if len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0])>1:
+                    arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0][1:]
+                else:
+                    arr=[]
             else:
                 arr=[]
             if "user" in music4:

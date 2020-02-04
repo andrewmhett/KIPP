@@ -1444,6 +1444,9 @@ async def APPENDPLAYLIST(message,message2):
             await client.send_message(message.channel,"Processing...")
             serverinfo[message.server].loading = True
             music4=str(message.content).split("|")[2]
+            if "list" in music4 && "watch" in music4:
+                await client.send_message(message.channel,"Invalid link.")
+                return
             if "&index" in music4:
                 music4 = music4.split('&index')
                 music4 = music4[0]
@@ -1462,11 +1465,8 @@ async def APPENDPLAYLIST(message,message2):
                     serverinfo[message.server].loading = False
                     return
             serverinfo[message.server].loading = False
-            if len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name)))>0:
-                if len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0])>1:
-                    arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0][1:]
-                else:
-                    arr=[]
+            if len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0])>1:
+                arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0][1:]
             else:
                 arr=[]
             if "user" in music4:

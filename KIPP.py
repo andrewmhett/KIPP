@@ -344,15 +344,9 @@ def READ_DATA_IN(path, condition=lambda x: True, attr_condition=lambda x: True):
     except Exception:
          with open(path,'w+') as f:
              f.close()
-    arr=None
+    arr=[]
     found=False
     with open(path) as fl:
-        for row in csv.reader(fl):
-            if condition(row):
-                for attr in row:
-                    if attr_condition(attr):
-                        arr=[]
-                        break
         for row in csv.reader(fl):
             if condition(row):
                 for attr in row:
@@ -360,6 +354,8 @@ def READ_DATA_IN(path, condition=lambda x: True, attr_condition=lambda x: True):
                         arr.append(row)
                         break
         fl.close()
+    if len(arr)==0:
+        arr=None
     return arr
 def GET_ITEM_INFO(item):
     price=item.split(": ")[1].split("KC")[0]
@@ -1465,9 +1461,7 @@ async def APPENDPLAYLIST(message,message2):
                     serverinfo[message.server].loading = False
                     return
             serverinfo[message.server].loading = False
-            if len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name)))==0:
-                arr=[]
-            elif len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0])>1:
+            if len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0])>1:
                 arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0][1:]
             else:
                 arr=[]
@@ -1489,6 +1483,15 @@ async def APPENDPLAYLIST(message,message2):
             line=["PLAYLIST:{0}".format(name)]
             for item in arr:
                 line.append(item)
+            name=""
+            if "youtube.com" in url:
+                youtube = etree.HTML(urllib.request.urlopen(url).read())
+                song=youtube.xpath("//span[@id='eow-title']/@title")
+            elif "soundcloud.com" in url:
+                from bs4 import BeautifulSoup
+                page=requests.get(url).text
+                soup=BeautifulSoup(page,features='html.parser')
+                song=soup.find('meta',{'property':'og:title'})['content']
             serverinfo[message.server].change_server_config("PLAYLIST:{0}".format(name),line)
             if single:
                 await client.send_message(message.channel,"Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))

@@ -1483,7 +1483,7 @@ async def APPENDPLAYLIST(message,message2):
             line=["PLAYLIST:{0}".format(name)]
             for item in arr:
                 line.append(item)
-            name=""
+            song=""
             url=music4
             if "youtube.com" in url:
                 youtube = etree.HTML(urllib.request.urlopen(url).read())

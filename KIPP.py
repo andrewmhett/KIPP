@@ -1462,7 +1462,7 @@ async def APPENDPLAYLIST(message,message2):
                     serverinfo[message.server].loading = False
                     return
             serverinfo[message.server].loading = False
-            if len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))>0:
+            if len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name)))>0:
                 if len(serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0])>1:
                     arr=serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name))[0][1:]
                 else:

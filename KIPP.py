@@ -1075,7 +1075,7 @@ async def MUSIC(message,message2):
                             if notsearched == False:
                                 if ((music3[0]).upper() == "!MUSIC"):
                                     #if (music4.startswith("https://www.youtube.com") or music4.startswith("https://youtu.be") or music4.startswith("http://www.youtube.com")):
-                                    if "user" not in music4:
+                                    if ("user" not in music4 and "youtube.com" in music4) or ("soundcloud.com" in music4):
                                         serverinfo[message.server].musiccolor=playerinfo[message.author].hrolecolor
                                         users = []
                                         for user in message.author.voice.voice_channel.voice_members:

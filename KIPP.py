@@ -139,7 +139,7 @@ class Profile:
         return int(subprocess.Popen(["./KIPPCOINS_IO","r",self.user.id],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])
     def GIVE_KIPPCOINS(self, KC):
        balance=int(subprocess.Popen(["./KIPPCOINS_IO","r",self.user.id],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])+KC
-       subprocess.Popen(["./KIPPCOINS_IO","w",self.user.id,balance])
+       subprocess.Popen(["./KIPPCOINS_IO","w",str(self.user.id),str(balance)])
 class Command():
     def __init__(self,n,h,e):
         global commands

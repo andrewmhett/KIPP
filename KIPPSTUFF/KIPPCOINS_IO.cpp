@@ -54,7 +54,7 @@ void read_balance(long long id){
 			cout << account.second << endl;
 		}
 	}else{
-		cout << id << ": " <<  accounts[id] << endl;
+		cout << accounts[id] << endl;
 	}
 }
 int main(int argc, const char * argv[]){

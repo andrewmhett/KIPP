@@ -29,12 +29,6 @@ ytdl_format_options = {
     'format': 'bestaudio/best',
     'download': False
 }
-storeitems=[
-"2x income multiplier: 50KC",
-"4x income multiplier: 1000KC",
-"10x income multiplier: 10000KC",
-"100x income multiplier: 75000KC"
-]
 EMBEDCOLOR=0x36393E
 class Server:
     def __init__(self,server):
@@ -176,10 +170,6 @@ class music_handler():
         self.desc = ("["+self.title+"]("+self.link+")\n**Progress:**: `0:00 / "+self.length+"`\n**Volume:** "+str(int(self.player.volume*100)))
         self.em = discord.Embed(description=self.desc,colour=EMBEDCOLOR)
         self.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
-        #video_id = music4.split("watch?v=")[1]
-        #thumbnail = "https://img.youtube.com/vi/"+video_id+"/0.jpg"
-        #self.em.set_thumbnail(url=thumbnail)
-        #self.thumbnail = thumbnail
         self.footer=profooter
         self.em.set_footer(text=profooter)
         self.is_playing=True
@@ -1590,12 +1580,8 @@ while True:
     @client.event
     async def on_ready():
         await client.change_presence(game=discord.Game(name="3.1.24 Simulator",type=1,url="https://twitch.tv/kipp4780"))
-        #s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-        #s.connect(("8.8.8.8",80))
-        #await client.send_message(await client.get_user_info(CREATOR_ID),"Status Panel available at: {0}".format("http://"+s.getsockname()[0]+":5000/"))
         loop = asyncio.get_event_loop()
         loop.create_task(background_loop())
-        #loop.create_task(schedule_handler())
         logging.log(5,"KIPP started.")
         for server in client.servers:
             serverinfo[server] = Server(server)

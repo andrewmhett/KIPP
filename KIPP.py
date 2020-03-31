@@ -11,6 +11,7 @@ import sys
 import logging
 import os
 import threading
+import subprocess
 sys.path.append('./KIPPSTUFF')
 from ESSENTIAL_PACKAGES import *
 import RPi_I2C_driver

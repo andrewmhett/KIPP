@@ -135,12 +135,7 @@ class Profile:
                     f.close()
             fl.close()
     def GET_KIPPCOINS(self):
-        with open('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS') as fl:
-            reader=csv.reader(fl)
-            for row in reader:
-                if row[0] == str(self.user.id):
-                    return row[1]
-            fl.close()
+        return int(subprocess.Popen(["./KIPPCOINS_IO","r",self.user.id],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])
     def HAS_ITEM(self,item):
         with open('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS') as fl:
             reader=csv.reader(fl)
@@ -152,18 +147,8 @@ class Profile:
                         return False
             fl.close()
     def GIVE_KIPPCOINS(self, KC):
-        readarray=READ_DATA_IN('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS')
-        if readarray==None:
-            readarray=[]
-        for row in readarray:
-             if row[0] == str(self.user.id):
-                orig=int(row[1])
-                row[1] = orig+int(KC)
-        with open('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS','w') as f:
-            writer=csv.writer(f)
-            for row in readarray:
-                writer.writerow(row)
-            f.close()
+       balance=int(subprocess.Popen(["./KIPPCOINS_IO","r",self.user.id],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])+KC
+       subprocess.Popen(["./KIPPCOINS_IO","w",self.user.id,balance])
     def GIVE_ITEM(self, item):
         readarray=READ_DATA_IN('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS',condition=lambda x: True if x[0] == str(self.user.id) else False)
         if readarray==None:

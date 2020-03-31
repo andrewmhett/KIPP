@@ -2,7 +2,6 @@
 #include <fstream>
 #include <map>
 #include <vector>
-#include <string>
 
 using namespace std;
 
@@ -17,7 +16,7 @@ struct Account{
 
 void map_data(){
 	ifstream input;
-	input.open("KIPPCOINS.bin", ios::binary);		
+	input.open("./KIPPSTUFF/KIPPCOINS.bin", ios::binary);		
 	vector<Account> accounts_v;
 	while (!input.eof()){
 		Account read_struct;
@@ -32,7 +31,7 @@ void map_data(){
 }
 void write_data(){
 	ofstream output;
-	output.open("KIPPCOINS.bin", ios::binary);
+	output.open("./KIPPSTUFF/KIPPCOINS.bin", ios::binary);
 	for (map<long long, unsigned int>::iterator it = accounts.begin(); it != accounts.end(); it++){
 		Account write_struct;
 		pair<long long, unsigned int> account = *it;
@@ -46,7 +45,7 @@ void edit_balance(long long id, int balance){
 	accounts[id] = balance;
 	cout << id << ": " << balance << endl;
 }
-void read_balance(long long id){
+unsigned int read_balance(long long id){
 	if (id==0){
 		for (map<long long, unsigned int>::iterator it = accounts.begin(); it != accounts.end(); it++){
 			pair<long long, unsigned int> account = *it;

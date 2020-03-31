@@ -119,22 +119,6 @@ class Profile:
         self.user = user
         self.instore=False
         self.storepage=None
-        with open('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS') as fl:
-            reader=csv.reader(fl)
-            infile=False
-            readarray=[]
-            for row in reader:
-                readarray.append(row)
-                if(row[0] == self.user.id):
-                    infile=True
-            if infile==False:
-                readarray.append((str(self.user.id),0))
-                with open('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS','w') as f:
-                    writer=csv.writer(f)
-                    for row in readarray:
-                        writer.writerow(row)
-                    f.close()
-            fl.close()
     def GET_KIPPCOINS(self):
         return int(subprocess.Popen(["./KIPPCOINS_IO","r",self.user.id],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])
     def GIVE_KIPPCOINS(self, KC):
@@ -339,22 +323,6 @@ def add_to_queue(server, url):
         soup=BeautifulSoup(page,features='html.parser')
         name=soup.find('meta',{'property':'og:title'})['content']
     serverinfo[server].queue.append([name,url])
-def add_chat_log(message):
-    if message.author.bot:
-        return
-    if str(message.channel).upper().startswith('DIRECT MESSAGE') == False:
-        arr=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/ChatLogs/{0}")
-        if arr == None:
-            arr=[]
-        arr.append([str(datetime.today().date()),message.author.id,str(message.content)])
-        with open('/home/pi/Desktop/KIPPSTUFF/ChatLogs/{0}'.format(message.server.id),'w') as f:
-            writer=csv.writer(f)
-            for row in arr:
-                writer.writerow(row)
-            f.close()
-def search_chat_log(message,query):
-    arr=READ_DATA_IN('/home/pi/Desktop/KIPPSTUFF/ChatLogs/{0}'.format(message.server.id),attr_condition=lambda x: True if query.upper() in str(x).upper() else False)
-    return arr
 class Event:
     def __init__(self,time,date,name,message):
         self.time=time
@@ -859,40 +827,6 @@ async def EXEC(message,message2):
                 raise
             else:
                 await client.send_message(message.channel,err)
-async def SEARCHLOG(message,message2):
-    results=[]
-    await client.send_message(message.channel, "Searching server chat logs for messages related to **{0}**...".format(str(message.content).split("|")[1]))
-    try:
-        q=message.server.get_member_named(str(message.content).split('|')[1])
-        results=search_chat_log(message,q.id)
-    except Exception:
-        results = search_chat_log(message,str(message.content).split('|')[1])
-    msgs=""
-    try:
-        limit=int(message2.split('|')[2])
-    except Exception:
-        limit=0
-    i=-2
-    if limit != 0:
-        results=results[-limit:]
-    try:
-        try:
-            for msg in results:
-                if i<limit-1:
-                    if limit!=0:
-                        i=i+1
-                    usr=message.server.get_member(msg[1])
-                    if usr==None:
-                        usr=await client.get_user_info(msg[1])
-                    msgs=msgs+"\n{0} by {1}: {2}".format(msg[0],str(usr),msg[2])
-            await client.send_message(message.channel,"Search results for query: **{0}**\n{1}".format(str(message.content).split('|')[1],msgs))
-        except TypeError:
-            await client.send_message(message.channel, "No results for query: **{0}**".format(str(message.content).split('|')[1]))
-    except discord.errors.HTTPException as e:
-        await client.send_message(message.channel, "Too many results to display in message. Consider adding a limit to the number of results.")
-        print(e)
-    if len(results)==0:
-        await client.send_message(message.channel, "No results for query: **{0}**".format(str(message.content).split('|')[1]))
 async def CLEAR(message,message2):
     mgs = []
     async for x in client.logs_from(message.channel, limit = 100):
@@ -1279,16 +1213,6 @@ async def WCHANNEL(message,message2):
         else:
             serverinfo[message.server].add_server_config(["WELCOME_CHANNEL",message.channel.id])
             await client.send_message(message.channel,"Set this text channel as the welcome channel. All joining users will be welcomed here.")
-    ##                    if message2 == "!TWITCHCHANNEL":
-    ##                        if serverinfo[message.server].search_server_configs("TWITCH_CHANNEL") != None:
-    ##                            if serverinfo[message.server].search_server_configs("TWITCH_CHANNEL")[1] == message.channel.id:
-    ##                                await client.send_message(message.channel,"This channel already is the Twitch announcement channel.")
-    ##                            else:
-    ##                                serverinfo[message.server].change_server_config("TWITCH_CHANNEL",["TWITCH_CHANNEL",message.channel.id])
-    ##                                await client.send_message(message.channel,"Changed the Twitch announce channel to this text channel.")
-    ##                        else:
-    ##                            serverinfo[message.server].add_server_config(["TWITCH_CHANNEL",message.channel.id])
-    ##                            await client.send_message(message.channel,"Set this text channel as the Twitch announcement channel. When a member of the server starts streaming, it will be announced here.")
 async def NEWPLAYLIST(message,message2):
     name=message2.split("|")[1]
     if serverinfo[message.server].search_server_configs("PLAYLIST:{0}".format(name)) == None:
@@ -1447,7 +1371,6 @@ command["!MATH"]=MISC("!MATH","This command will return the answer to any basic 
 command["!MFIX"]=MUSC("!MFIX","This command will reset KIPP's voice client and related variables in order to fix most problems with music\n**Usage**\n`!MFIX`",MFIX)
 command["!EVAL"]=Command("!EVAL","This command can be used by LockdownDoom in order to observe what a code block returns\n**Usage**\n`!EVAL|code`",EVAL)
 command["!EXEC"]=Command("!EXEC","This command can be used by LockdownDoom in order to run a code block\n**Usage**\n`!EXEC|code`",EXEC)
-command["!SEARCHLOG"]=MISC("!SEARCHLOG","This command will return all messages (or to a given limit) sent in the current server containing a query\n**Usage**\n`!SEARCHLOG|query|result limit`",SEARCHLOG)
 command["!CLEAR"]=MISC("!CLEAR","This command will clear the last 100 messages sent in the channel\n**Usage**\n`!CLEAR`",CLEAR)
 command["!ADDKIPP"]=MISC("!ADDKIPP","This command returns a link that anyone can use to add KIPP to another server\n**Usage**\n`!ADDKIPP`",ADDKIPP)
 command["!MUSIC"]=MUSC("!MUSIC","This command will cause KIPP to play music from youtube or spotify in your VC based on your entered link or query\n**Usage**\n`!MUSIC|query or link`",MUSIC)
@@ -1471,7 +1394,6 @@ command["!WCHANNEL"]=OWON("!WCHANNEL","This command will set the current text ch
 command["!INVITE"]=OWON("!INVITE","This command will DM an invite to the user with the specified user id\n**Usage**\n`!INVITE|user id`",INVITE)
 command["!UNBLOCK"]=OWON("!UNBLOCK","This command will unblock the specified user\n**Usage**\n`!UNBLOCK|user`",UNBLOCK)
 command["!SKIP"]=MUSC("!SKIP","This command will skip the current song, and play the next song in queue.\n**Usage**\n`!SKIP`",SKIP)
-#command["!EVENT"]=MISC("!EVENT","This command will send you a prompt to create a scheduled event.\n**Usage**\n`!EVENT`",EVENT)
 command["!LCD"]=MISC("!LCD","This command may be used by LockdownDoom in order to activate KIPP's LCD.\n**Usage**\n`!LCD`",LCD)
 async def background_loop():
     import datetime
@@ -1718,12 +1640,6 @@ while True:
         if message.server != None or str(message.channel).upper=="DIRECT MESSAGE":
             if message.author.id in serverinfo[message.server].blocked:
                 await client.delete_message(message)
-        if str(message.content).upper().startswith("!SEARCHLOG|")==False and str(message.author) != "KIPP#4780":
-            add_chat_log(message)
-        try:
-            playerinfo[message.author].user
-        except KeyError:
-            playerinfo[message.author] = Profile(message.author)
         if str(message.channel).upper().startswith('DIRECT MESSAGE') == False:
             serverinfo[message.server].recentchannel = message.channel
         readarray=[]

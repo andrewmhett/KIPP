@@ -11,7 +11,6 @@ import sys
 import logging
 import os
 import threading
-import subprocess
 sys.path.append('./KIPPSTUFF')
 from ESSENTIAL_PACKAGES import *
 import RPi_I2C_driver
@@ -137,28 +136,9 @@ class Profile:
             fl.close()
     def GET_KIPPCOINS(self):
         return int(subprocess.Popen(["./KIPPCOINS_IO","r",self.user.id],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])
-    def HAS_ITEM(self,item):
-        with open('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS') as fl:
-            reader=csv.reader(fl)
-            for row in reader:
-                if str(row[0]) == str(self.user.id):
-                    if item in row:
-                        return True
-                    else:
-                        return False
-            fl.close()
     def GIVE_KIPPCOINS(self, KC):
        balance=int(subprocess.Popen(["./KIPPCOINS_IO","r",self.user.id],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])+KC
        subprocess.Popen(["./KIPPCOINS_IO","w",self.user.id,balance])
-    def GIVE_ITEM(self, item):
-        readarray=READ_DATA_IN('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS',condition=lambda x: True if x[0] == str(self.user.id) else False)
-        if readarray==None:
-            readarray=[]
-        with open('/home/pi/Desktop/KIPPSTUFF/KIPPCOINS','w') as f:
-            writer=csv.writer(f)
-            for row in readarray:
-                writer.writerow(row)
-            f.close()
 class Command():
     def __init__(self,n,h,e):
         global commands
@@ -699,89 +679,13 @@ async def GIF(message,message2):
         except Exception:
             cont=cont+1
 async def MINE(message,message2):
-    mult = 1
-    if playerinfo[message.author].HAS_ITEM("2x income multiplier") == True:
-        mult = mult*2
-    if playerinfo[message.author].HAS_ITEM("4x income multiplier") == True:
-        mult = mult*4
-    if playerinfo[message.author].HAS_ITEM("10x income multiplier") == True:
-        mult = mult*10
-    if playerinfo[message.author].HAS_ITEM("100x income multiplier") == True:
-        mult = mult*100
-    playerinfo[message.author].GIVE_KIPPCOINS(mult)
+    playerinfo[message.author].GIVE_KIPPCOINS(1)
 async def USERINFO(message,message2):
     description = "**Mutual servers with KIPP:** "+str(playerinfo[message.author].numkippservers)+"\n**Currently Playing:** "+str(playerinfo[message.author].game)+"\n**Highest role in Server:** "+str(playerinfo[message.author].highestrole)+"\n**Nickname in Server:** "+playerinfo[message.author].nickname+"\n**KIPPCOINS:** "+str(playerinfo[message.author].GET_KIPPCOINS())
     em = discord.Embed(description=description,colour=EMBEDCOLOR)
     em.set_author(name=str(message.author)+"'s User Info", icon_url=message.author.avatar_url)
     em.set_footer(text=profooter)
     await client.send_message(message.channel, embed=em)
-async def STORE(message,message2):
-    if playerinfo[message.author].instore ==True:
-        playerinfo[message.author].instore = True
-        em = discord.Embed(title="Store",description="Store closed",colour=EMBEDCOLOR)
-        em.set_footer(text=profooter)
-        await client.edit_message(playerinfo[message.author].storepage,embed=em)
-    in_budget=[]
-    out_budget=[]
-    items=[]
-    itemnum=1
-    for item in storeitems:
-        items.append(GET_ITEM_INFO(item))
-    for item in items:
-        name,price=item
-        if int(price) <= int(playerinfo[message.author].GET_KIPPCOINS()):
-            if playerinfo[message.author].HAS_ITEM(name) == False:
-                in_budget.append([item,itemnum])
-        else:
-            if playerinfo[message.author].HAS_ITEM(name) == False:
-                out_budget.append([item,itemnum])
-        itemnum=itemnum+1
-    desc=""
-    if len(in_budget)>0:
-        desc="**IN BUDGET:**\n"
-        for item in in_budget:
-            print(item)
-            desc=desc+"`#{0}` **{1}**  `{2} KC`\n".format(item[1],item[0][0],item[0][1])
-    if len(out_budget)>0:
-        if len(desc) == 0:
-            desc="**OUT OF BUDGET:**\n"
-        else:
-            desc=desc+"\n**OUT OF BUDGET:**\n"
-        for item in out_budget:
-            desc=desc+"`#{0}` **{1}**  `{2} KC`\n".format(item[1],item[0][0],item[0][1])
-    if len(out_budget)>0 or len(in_budget)>0:
-        desc=desc+"\nUse **!buy|item_number** to buy an item\nUse **!Close** to exit the store"
-        emb = discord.Embed(title="Store",description="**YOUR KC** `{0}`\n\n".format(playerinfo[message.author].GET_KIPPCOINS())+desc,colour=EMBEDCOLOR)
-    else:
-        desc="You have all of the items currently in the store. More items will be added soon."
-        emb = discord.Embed(title="Store",description=desc,colour=EMBEDCOLOR)
-    emb.set_footer(text=profooter)
-    playerinfo[message.author].storepage = await client.send_message(message.channel, embed=emb)
-    playerinfo[message.author].instore=True
-async def BUY(message,message2):
-    if playerinfo[message.author].instore==True:
-        items=[]
-        for item in storeitems:
-            items.append(GET_ITEM_INFO(item))
-        itemnum=1
-        try:
-            for item in items:
-                name,price=item
-                if itemnum == int(message2.split('|')[1]):
-                    if int(price) <= int(playerinfo[message.author].GET_KIPPCOINS()):
-                        if playerinfo[message.author].HAS_ITEM(name) == False:
-                            playerinfo[message.author].GIVE_KIPPCOINS(int(price)*-1)
-                            em=discord.Embed(title="Store",description="Transaction Complete.\nYou now have **{0}** KIPPCOINS".format(playerinfo[message.author].GET_KIPPCOINS()),colour=EMBEDCOLOR)
-                            await client.edit_message(playerinfo[message.author].storepage,embed=em)
-                            playerinfo[message.author].GIVE_ITEM(name)
-                            playerinfo[message.author].instore=False
-                itemnum=itemnum+1
-        except Exception:
-            await client.send_message(message.channel,"Make sure that you type **!Buy|item_number** to purchase an item. The number is listed to the left of the item's name.")
-            playerinfo[message.author].instore=False
-            em = discord.Embed(title="Store",description="Store closed",colour=EMBEDCOLOR)
-            em.set_footer(text=profooter)
-            await client.edit_message(playerinfo[message.author].storepage,embed=em)
 async def TRANSFER(message,message2):
     try:
         patron=message.author
@@ -800,27 +704,6 @@ async def TRANSFER(message,message2):
         await client.send_message(message.channel,embed=emb)
     else:
         await client.send_message(message.channel,"The amount entered was either higher than the amount of KIPPCOINS you have, or was negative.")
-async def CLOSE(message,message2):
-    if playerinfo[message.author].instore == True:
-        em = discord.Embed(title="Store",description="Store closed",colour=EMBEDCOLOR)
-        em.set_footer(text=profooter)
-        await client.edit_message(playerinfo[message.author].storepage,embed=em)
-        playerinfo[message.author].instore=False
-async def INVENTORY(message,message2):
-    desc=""
-    for item in storeitems:
-        if playerinfo[message.author].HAS_ITEM(GET_ITEM_INFO(item)[0]):
-            desc=desc+"\n**"+GET_ITEM_INFO(item)[0]+"**"
-    if playerinfo[message.author].HAS_ITEM("|LEI| KIPP year I plaque"):
-        desc=desc+"\n**KIPP year I plaque**\n\
----------------\n\
--**KIPP year I**-\n\
----------------"
-    if len(desc)==0:
-        desc = "You don't have any items. You can purchase items by buying with KIPPCOINS in **!Store**."
-    emb = discord.Embed(title="Inventory",description=desc,colour=EMBEDCOLOR)
-    emb.set_footer(text=profooter)
-    await client.send_message(message.channel,embed=emb)
 async def GAMBLEGAME(message,message2):
     if message2.split('|')[1] == "SOLO":
         playerinfo[message.author].solo = True

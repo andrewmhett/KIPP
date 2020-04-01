@@ -12,7 +12,7 @@ import logging
 import os
 import threading
 import subprocess
-sys.path.append('./KIPPSTUFF')
+sys.path.append('/home/pi/Desktop/KIPPSTUFF')
 from ESSENTIAL_PACKAGES import *
 import RPi_I2C_driver
 import RPi.GPIO as GPIO

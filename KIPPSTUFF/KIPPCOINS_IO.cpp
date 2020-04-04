@@ -18,7 +18,9 @@ void map_data(){
 	ifstream input;
 	input.open("./KIPPSTUFF/KIPPCOINS.bin", ios::binary);		
 	vector<Account> accounts_v;
-	while (!input.eof()){
+	char char_buf;
+	while (input >> char_buf){
+		input.putback(char_buf);
 		Account read_struct;
 		input.read(reinterpret_cast<char*>(&read_struct),sizeof(Account));
 		accounts_v.push_back(read_struct);
@@ -45,7 +47,7 @@ void edit_balance(long long id, int balance){
 	accounts[id] = balance;
 	cout << id << ": " << balance << endl;
 }
-unsigned int read_balance(long long id){
+void read_balance(long long id){
 	if (id==0){
 		for (map<long long, unsigned int>::iterator it = accounts.begin(); it != accounts.end(); it++){
 			pair<long long, unsigned int> account = *it;

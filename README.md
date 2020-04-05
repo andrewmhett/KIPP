@@ -7,12 +7,12 @@ KIPP is currently in development. KIPP's development started in December, 2018; 
 ###### Python 3.x required
 ###### Raspberry Pi required
 #### Step 1: Cloning KIPP
-In order to run KIPP, KIPP's program and its dependencies must be on your computer. Cloning this repository onto a Raspberry Pi is very simple, and can be done through this command in a terminal. For this set of instructions, we're going to clone KIPP onto the Raspberry Pi's desktop.
+In order to run KIPP, KIPP's program and its dependencies must be on your computer. Cloning this repository onto a Raspberry Pi is very simple, and can be done through this command in a terminal. For this set of instructions, we're going to clone KIPP into the Raspberry Pi's home directory.
 ```
-cd /home/pi/Desktop
+cd /home/pi
 git clone https://github.com/LockdownDoom/KIPP
 ```
-This will clone this repository into a directory named `KIPP` on the desktop.
+This will clone this repository into a directory named `KIPP` in `/home/pi`.
 #### Step 2: Running KIPP
 KIPP automatically checks for the status of his dependencies during start-up, so there is no need to install these manually. To run KIPP, simply open a terminal and use this command.
 ```

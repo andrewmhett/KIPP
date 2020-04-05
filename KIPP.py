@@ -670,8 +670,7 @@ async def STATUS(message,message2):
     p=Popen('/home/pi/KIPP/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
     stdout=p.communicate()[0].decode()
     p.kill()
-    if "m" in stdout.split("ago")[0].split(";")[1] or "s" in stdout.split("ago")[0].split(";")[1]:
-        await client.send_message(message.channel,"```"+stdout.split('ago')[0]+"ago```")
+    await client.send_message(message.channel,"```"+stdout.split('ago')[0]+"ago```")
 async def MATH(message,message2):
     mathP = str(message.content)
     mathP2 = mathP.split('|')

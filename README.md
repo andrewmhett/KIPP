@@ -16,7 +16,7 @@ This will clone this repository into a directory named `KIPP` on the desktop.
 #### Step 2: Running KIPP
 KIPP automatically checks for the status of his dependencies during start-up, so there is no need to install these manually. To run KIPP, simply open a terminal and use this command.
 ```
-cd /home/pi/Desktop
+cd /home/pi/KIPP
 python3 ./KIPP/KIPP_MONITOR.py
 ```
 This will start up and run KIPP. This monitor program will restart KIPP if any unexpected network/server errors occur or if KIPP crashes.
@@ -25,9 +25,9 @@ The previous steps are all that is necessary to get KIPP running, but this step 
 First, you must create the `KIPP.service` file in the `/lib/systemd/system` directory of your Raspberry Pi.
 ```
 cd /lib/systemd/system/
-sudo nano KIPP.service
+sudo vim KIPP.service
 ```
-This will open a nano editor for a file named `KIPP.service`. Now, edit the contents of this file so that they match this:
+This will open a vim window for a file named `KIPP.service`. Now, edit the contents of this file so that they match this:
 ```
 [Unit]
 Description=KIPP Daemon
@@ -35,14 +35,13 @@ After=multi-user.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /home/pi/Desktop/KIPP_MONITOR.py
+ExecStart=/usr/bin/python3 /home/pi/KIPP/KIPP_MONITOR.py
 Restart=on-abort
 RestartSec=0
 
 [Install]
 WantedBy=multi-user.target
 ```
-After finishing this, simply hit ctrl+X then Y and enter.
 The `KIPP.service` file will now be run as a daemon that will start and run KIPP non-stop. Of course, if you want to stop KIPP's daemon, simply go to a terminal and type:
 ```
 sudo systemctl stop KIPP.service

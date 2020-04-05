@@ -114,10 +114,10 @@ class Profile:
         self.instore=False
         self.storepage=None
     def GET_KIPPCOINS(self):
-        return int(subprocess.Popen(["./KIPPCOINS_IO","r",self.user.id],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])
+        return int(subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","r",self.user.id],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])
     def GIVE_KIPPCOINS(self, KC):
-       balance=int(subprocess.Popen(["./KIPPCOINS_IO","r",self.user.id],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])+KC
-       subprocess.Popen(["./KIPPCOINS_IO","w",str(self.user.id),str(balance)])
+       balance=int(subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","r",self.user.id],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])+KC
+       subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","w",str(self.user.id),str(balance)])
 class Command():
     def __init__(self,n,h,e):
         global commands
@@ -642,7 +642,7 @@ async def MINE(message,message2):
 async def USERINFO(message,message2):
     description = "**Mutual servers with KIPP:** "+str(playerinfo[message.author].numkippservers)+"\n**Currently Playing:** "+str(playerinfo[message.author].game)+"\n**Highest role in Server:** "+str(playerinfo[message.author].highestrole)+"\n**Nickname in Server:** "+playerinfo[message.author].nickname+"\n**KIPPCOINS:** "+str(playerinfo[message.author].GET_KIPPCOINS())
     em = discord.Embed(description=description,colour=EMBEDCOLOR)
-    em.set_author(name=str(message.author)+"'s User Info", icon_url=message.author.avatar_url)
+    em.set_author(name=str(message.author), icon_url=message.author.avatar_url)
     em.set_footer(text=profooter)
     await client.send_message(message.channel, embed=em)
 async def TRANSFER(message,message2):
@@ -769,7 +769,7 @@ async def STATUS(message,message2):
     stdout=p.communicate()[0].decode()
     p.kill()
     if "m" in stdout.split("ago")[0].split(";")[1] or "s" in stdout.split("ago")[0].split(";")[1]:
-        await client.send_message(message.channel,"```"+stdout.decode().split('ago')[0]+"ago```")
+        await client.send_message(message.channel,"```"+stdout.split('ago')[0]+"ago```")
 async def MATH(message,message2):
     mathP = str(message.content)
     mathP2 = mathP.split('|')
@@ -1356,7 +1356,7 @@ command["!CANCEL"]=Command("!CANCEL","Explained in GambleGame\n**Usage**\n`!CANC
 command["!DECLINE"]=Command("!DECLINE","Explained in GambleGame\n**Usage**\n`!DECLINE`",DECLINE)
 command["!ACCEPT"]=Command("!ACCEPT","Explained in GambleGame\n**Usage**\n`!ACCEPT`",ACCEPT)
 command["!BET"]=Command("!BET","Explained in Solo/Non-Solo GambleGame\n**Usage**\n`!BET`",BET)
-command["!STATUS"]=Command("!STATUS","Shows KIPP's Daemon's current status\n**Usage**\n`Currently unavailable`",STATUS)
+command["!STATUS"]=MISC("!STATUS","Shows KIPP's Daemon's current status\n**Usage**\n`!STATUS`",STATUS)
 command["!MATH"]=MISC("!MATH","This command will return the answer to any basic math problem given\n**Usage**\n`!MATH|problem`",MATH)
 command["!MFIX"]=MUSC("!MFIX","This command will reset KIPP's voice client and related variables in order to fix most problems with music\n**Usage**\n`!MFIX`",MFIX)
 command["!EVAL"]=Command("!EVAL","This command can be used by LockdownDoom in order to observe what a code block returns\n**Usage**\n`!EVAL|code`",EVAL)

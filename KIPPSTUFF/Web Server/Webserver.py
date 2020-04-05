@@ -5,7 +5,7 @@ app=flask.Flask(__name__)
 #counter=0
 #oldcount=0
 from subprocess import Popen, PIPE
-p=Popen('/home/pi/Desktop/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
+p=Popen('/home/pi/KIPP/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
 stdout=p.communicate()[0].decode()
 p.kill()
 status=stdout.split('ago')[0]+"ago"
@@ -35,7 +35,7 @@ def eventStream():
             if ti[0:2]=="00":
                 ti="12:"+ti.split(":")[1]
             yield "event:time_event\ndata:{}\n\n".format(ti)
-        p=Popen('/home/pi/Desktop/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
+        p=Popen('/home/pi/KIPP/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
         stdout=p.communicate()[0].decode()
         p.kill()
         if (stdout.split('ago')[0]+"ago" != status):

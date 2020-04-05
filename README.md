@@ -46,7 +46,7 @@ After creating the `KIPP.service` file, you may choose to have KIPP's daemon run
 ```
 sudo systemctl enable KIPP.service
 ```
-The `KIPP.service` file will now be run as a daemon that will start and run KIPP non-stop. Of course, if you want to stop KIPP's daemon, simply go to a terminal and type:
+If you want to stop KIPP's daemon, simply go to a terminal and type:
 ```
 sudo systemctl stop KIPP.service
 ```

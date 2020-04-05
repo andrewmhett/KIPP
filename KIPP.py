@@ -12,7 +12,7 @@ import logging
 import os
 import threading
 import subprocess
-sys.path.append('/home/pi/Desktop/KIPPSTUFF')
+sys.path.append('/home/pi/KIPP/KIPPSTUFF')
 from ESSENTIAL_PACKAGES import *
 import RPi_I2C_driver
 import RPi.GPIO as GPIO
@@ -68,17 +68,17 @@ class Server:
         song=self.search_server_configs("PLAYLIST:{0}".format(self.playlist))[0][1:][i]
         return song
     def add_server_config(self,data):
-        arr=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
+        arr=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
         if arr==None:
             arr=[]
         arr.append(data)
-        with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w') as f:
+        with open('/home/pi/KIPP/KIPP/ServerConfigs/{0}'.format(self.server.id),'w') as f:
             writer=csv.writer(f)
             for row in arr:
                 writer.writerow(row)
             f.close()
     def change_server_config(self,data,newdata):
-        arr=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
+        arr=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
         if arr==None:
             arr=[]
         cntr=0
@@ -87,13 +87,13 @@ class Server:
                 arr[cntr] = newdata
                 break
             cntr=cntr+1
-        with open('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w') as f:
+        with open('/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w') as f:
             writer=csv.writer(f)
             for row in arr:
                 writer.writerow(row)
             f.close()
     def search_server_configs(self,query):
-        data=READ_DATA_IN('/home/pi/Desktop/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),condition=lambda x: True if query in str(x) else False)
+        data=READ_DATA_IN('/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),condition=lambda x: True if query in str(x) else False)
         return data
 class Profile:
     def __init__(self,user):
@@ -375,13 +375,13 @@ async def EVENT(message,message2):
                         await client.add_reaction(m1,"\U0001F44D")
                         e=Event(time,date,name,m1)
                         serverinfo[message.server].events.append(e)
-                        readarray=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/EVENTS")
+                        readarray=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/EVENTS")
                         if readarray == None:
                             readarray=[]
                         e.id=int(readarray[0][0])+1
                         readarray[0]=[e.id]
                         readarray.append([e.id,e.name,e.date,e.time,e.members])
-                        with open('/home/pi/Desktop/KIPPSTUFF/EVENTS','w') as f:
+                        with open('/home/pi/KIPP/KIPPSTUFF/EVENTS','w') as f:
                             writer=csv.writer(f)
                             for row in readarray:
                                 writer.writerow(row)
@@ -486,7 +486,7 @@ async def LCD(message,message2):
         GPIO.cleanup()
 async def CODE(message,message2):
     from subprocess import Popen, PIPE
-    p=Popen('/home/pi/Desktop/KIPPSTUFF/NewestCommit.sh',stdout=PIPE,stderr=PIPE)
+    p=Popen('/home/pi/KIPP/KIPPSTUFF/NewestCommit.sh',stdout=PIPE,stderr=PIPE)
     stdout=p.communicate()[0]
     p.kill()
     try:
@@ -543,13 +543,13 @@ async def GRAPH(message,message2):
     with open ('graph.png','rb') as f:
         await client.send_file(message.channel, f)
 async def FATE(message,message2):
-    imgs=os.listdir("/home/pi/Desktop/KIPPSTUFF/FATE")
+    imgs=os.listdir("/home/pi//KIPPSTUFF/FATE")
     arrlen = int(len(imgs))
     picNum = SystemRandom().randrange(0,arrlen)
     yakub=False
     if "YAKUB" in imgs[picNum].upper():
         yakub=True
-    with open("/home/pi/Desktop/KIPPSTUFF/FATE/"+imgs[picNum], 'rb') as f:
+    with open("/home/pi/KIPP/KIPPSTUFF/FATE/"+imgs[picNum], 'rb') as f:
         await client.send_file(message.channel, f)
         f.close()
     if yakub==True:
@@ -765,7 +765,7 @@ async def BET(message,message2):
             await client.delete_message(message)
 async def STATUS(message,message2):
     from subprocess import Popen, PIPE
-    p=Popen('/home/pi/Desktop/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
+    p=Popen('/home/pi/KIPP/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
     stdout=p.communicate()[0].decode()
     p.kill()
     if "m" in stdout.split("ago")[0].split(";")[1] or "s" in stdout.split("ago")[0].split(";")[1]:
@@ -1411,7 +1411,7 @@ async def background_loop():
 async def schedule_handler():
     import datetime
     while True:
-        readarray=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/EVENTS")
+        readarray=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/EVENTS")
         if readarray==None:
             readarray=[]
         for row in readarray:
@@ -1430,7 +1430,7 @@ async def schedule_handler():
                                 await client.send_message(await client.get_user_info(ID),"`{0}`, scheduled for `{1}`, is starting now!".format(row[1],t1))
                         I=row[0]
                         readarray.remove(row)
-                        with open('/home/pi/Desktop/KIPPSTUFF/EVENTS','w') as f:
+                        with open('/home/pi/KIPP/KIPPSTUFF/EVENTS','w') as f:
                             writer=csv.writer(f)
                             for row in readarray:
                                 writer.writerow(row)
@@ -1498,13 +1498,13 @@ while True:
                     if str(user.id) != KIPP_ID:
                         event.members.append(str(user))
                         event.ids.append(str(user.id))
-                        readarray=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/EVENTS")
+                        readarray=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/EVENTS")
                         if readarray==None:
                             readarray=[]
                         for row in readarray:
                             if row[0]==str(event.id) and len(row)>1:
                                 row[4:]=event.ids 
-                        with open('/home/pi/Desktop/KIPPSTUFF/EVENTS','w') as f:
+                        with open('/home/pi/KIPP/KIPPSTUFF/EVENTS','w') as f:
                             writer=csv.writer(f)
                             for row in readarray:
                                 writer.writerow(row)
@@ -1516,11 +1516,11 @@ while True:
                 if reaction.emoji=="\U0001F44D":
                     event.members.remove(str(user))
                     event.ids.remove(user.id)
-                    readarray=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/EVENTS")
+                    readarray=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/EVENTS")
                     for row in readarray:
                         if row[0]==str(event.id) and len(row)>1:
                             row[4:]=event.ids
-                    with open('/home/pi/Desktop/KIPPSTUFF/EVENTS','w') as f:
+                    with open('/home/pi/KIPP/KIPPSTUFF/EVENTS','w') as f:
                         writer=csv.writer(f)
                         for row in readarray:
                             writer.writerow(row)
@@ -1629,7 +1629,7 @@ while True:
         if str(message.channel).upper().startswith('DIRECT MESSAGE') == False:
             serverinfo[message.server].recentchannel = message.channel
         readarray=[]
-        readarray=READ_DATA_IN("/home/pi/Desktop/KIPPSTUFF/KIPPCOINS")
+        readarray=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/KIPPCOINS")
         for server in client.servers:
             if str(server.id) == "451227721545285649":
                 if serverinfo[server].election == True:

@@ -1,4 +1,4 @@
 #!/bin/sh
-cd /home/pi/Desktop
+cd /home/pi/KIPP
 git init
 git show

@@ -7,7 +7,7 @@ import aiohttp
 import logging
 import threading
 def WebMonitor():
-    os.system('sudo python3.6 "/home/pi/Desktop/KIPPSTUFF/Web Server/Webserver.py"')
+    os.system('sudo python3.6 "/home/pi/KIPP/KIPPSTUFF/Web Server/Webserver.py"')
 t1=threading.Thread(target=WebMonitor)
 t1.start()
 KIPP_RESET_ERRORS = [ConnectionResetError,
@@ -17,7 +17,7 @@ KIPP_RESET_ERRORS = [ConnectionResetError,
                      websockets.exceptions.InvalidStatusCode]
 try:
     logging.log(50,"Backing KIPP up to GitHub...")
-    os.system('sudo /home/pi/Desktop/KIPPSTUFF/BackupKIPP.sh')
+    os.system('sudo /home/pi/KIPP/KIPPSTUFF/BackupKIPP.sh')
 except FileNotFoundError:
     logging.log(50,"KIPP backup file not found.")
 try:
@@ -28,7 +28,7 @@ except FileNotFoundError:
 while True:
     logging.log(50,"KIPP starting...")
     try:
-        os.system("sudo python3.6 /home/pi/Desktop/KIPP.py")
+        os.system("sudo python3.6 /home/pi/KIPP/KIPP.py")
     except Exception as e:
         if type(e) in KIPP_RESET_ERRORS:
             pass

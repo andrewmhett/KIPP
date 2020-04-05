@@ -253,18 +253,10 @@ async def slide_lcd_text(rows,lcd):
         lcd.lcd_display_string(text2+(" "*(16-len(text2))),2)
         await asyncio.sleep(0.01)
 async def VerifyOwnerMeema(message):
-    if str(message.server.id) == "451227721545285649":
-        role = discord.utils.get(message.server.roles, name="meema")
-        if role in message.author.roles:
-            return True
     if message.author == message.server.owner or str(message.author.id) == CREATOR_ID:
         return True
-    if str(message.server.id) == "451227721545285649":
-        await client.send_message(message.channel, "{0} is a Meema-Only command".format(str(message.content).split('|')[0].upper()))
-        return False
-    elif str(message.server.id) != "451227721545285649":
-        await client.send_message(message.channel, "{0} is a Creator-Only command".format(str(message.content).split('|')[0].upper()))
-        return False
+    await client.send_message(message.channel, "{0} is a Creator-Only command".format(str(message.content).split('|')[0].upper()))
+    return False
 async def VerifyMusicUser(message):
     currentlyplaying=False
     if serverinfo[message.server].mHandler != None:
@@ -327,80 +319,6 @@ class Event:
             pass
         self.id=0
         self.ids=[]
-async def EVENT(message,message2):
-    def check(message):
-        return message.channel.type==discord.ChannelType.private
-    await client.send_message(message.author,"What is the name of the event?")
-    name=await client.wait_for_message(timeout=60,author=message.author,check=check)
-    if name != None:
-        name=str(name.content)
-        await client.send_message(message.author,"What is the date of the event? (MM/DD/YYYY)")
-        date=await client.wait_for_message(timeout=60,author=message.author,check=check)
-        if date != None:
-            date=str(date.content)
-            await client.send_message(message.author,"What is the time of the event? (HH:MM AM/PM)")
-            time=await client.wait_for_message(timeout=60,author=message.author,check=check)
-            if time != None:
-                time=str(time.content)
-                if "PM" in time.upper():
-                    time=str(int(time.upper().replace("PM",'').split(":")[0])+12)+":"+time.upper().replace("PM",'').split(":")[1]
-                else:
-                    time=str(int(time.upper().replace("AM",'').split(":")[0]))+":"+time.upper().replace("AM",'').split(":")[1]
-                    if "12:" in time.upper():
-                        time="00:"+time.split(":")[1]
-                e=Event(time,date,name,message)
-                import datetime
-                try:
-                    emonth=int(e.date.split("/")[0])
-                    eday=int(e.date.split("/")[1])
-                    eyear=int(e.date.split("/")[2])
-                    month_=int(datetime.date.today().month)
-                    day_=int(datetime.date.today().day)
-                    year_=int(datetime.date.today().year)
-                    etime=(int(e.time.split(":")[0])*60)+int(e.time.split(":")[1])
-                    time_=(int(str(datetime.datetime.now()).split(":")[0].split(" ")[1])*60)+int(str(datetime.datetime.now()).split(":")[1])
-                    if (emonth>month_ or eday>day_ or eyear>year_) or (eday==day_ and emonth==month_ and eyear==year_ and etime>time_):
-                    #if int(e.date.split("/")[0])>=datetime.date.today().month and int(e.date.split("/")[1])>=datetime.date.today().day and int(e.date.split("/")[2])>=datetime.date.today().year:
-                        #if int(e.date.split("/")[1])>=datetime.date.today().day or int(e.time.split(":")[0])>=int(str(datetime.datetime.now()).split(":")[0].split(" ")[1]) or (int(e.time.split(":")[0])>=int(str(datetime.datetime.now()).split(":")[0].split(" ")[1]) and int(e.time.split(":")[1])>=int(str(datetime.datetime.now()).split(":")[1])):
-                        event=e
-                        if int(event.time.split(":")[0])<=12:
-                            t1=time+" AM"
-                            if int(event.time.split(":")[0])==0:
-                                t1="12:"+event.time.split(":")[1]+" AM"
-                        else:
-                            t1=str(int(event.time.split(":")[0])-12)+":"+event.time.split(":")[1]+" PM"
-                        em = discord.Embed(title=event.name,description="**Date: {0}**\n**Time: {1}**\nReact with :thumbsup: in order to sign up.".format("`"+event.date+"`","`"+t1+"`"),colour=EMBEDCOLOR)
-                        em.add_field(name="Signed Up",value="No one is currently signed up for this event.")
-                        m1 = await client.send_message(message.channel, embed=em)
-                        await client.add_reaction(m1,"\U0001F44D")
-                        e=Event(time,date,name,m1)
-                        serverinfo[message.server].events.append(e)
-                        readarray=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/EVENTS")
-                        if readarray == None:
-                            readarray=[]
-                        e.id=int(readarray[0][0])+1
-                        readarray[0]=[e.id]
-                        readarray.append([e.id,e.name,e.date,e.time,e.members])
-                        with open('/home/pi/KIPP/KIPPSTUFF/EVENTS','w') as f:
-                            writer=csv.writer(f)
-                            for row in readarray:
-                                writer.writerow(row)
-                            f.close()
-                        #else:
-                            #print("1")
-                            #await client.send_message(message.author,"Some of your inputs were invalid.")
-                    else:
-                        print("2")
-                        await client.send_message(message.author,"Some of your inputs were invalid.")
-                except ValueError:
-                    print("3")
-                    await client.send_message(message.author,"Some of your inputs were invalid")
-            else:
-                await client.send_message(message.author,"Your event request timed out.")
-        else:
-            await client.send_message(message.author,"Your event request timed out.")
-    else:
-        await client.send_message(message.author,"Your event request timed out.")
 async def IQ(message,message2):
     arrlen = int(len(InterstellarQuotes))
     quoteNum = SystemRandom().randrange(0,arrlen)
@@ -573,22 +491,6 @@ async def CATORDOG(message,message2):
     else:
         prediction = results.predictions[0]
         await client.send_message(message.channel,"\t" + prediction.tag_name + ": {0:.2f}%".format(prediction.probability * 100))
-async def D2(message,message2):
-    try:
-        platform = str(message.content).split('|')[1].upper()
-        headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-        if platform == 'XBOX':
-            platform='xbl'
-            user=str(message.content).split('|')[2]
-        if platform=='PC':
-            platform='pc'
-            user=str(message.content).split('|')[2].replace('#','-')
-        url="https://destinytracker.com/d2/profile/{0}/{1}".format(platform,user)
-        resp = requests.get(url, headers=headers)
-        emb=discord.Embed(title = (message2.split('|')[2]+"'s D2 Stats"),description="**Casual KD:** "+str(resp.content).split(r'"casual":[{"label":"KD","field":"KD","category":"Performance","ValueInt":null,"ValueDec":')[1].split(',')[0]+"\n**Competitive KD:** "+str(resp.content).split(r'[{"label":"KD","field":"KD","category":"Performance","ValueInt":null,"ValueDec":')[1].split(',')[0],colour=EMBEDCOLOR)
-        await client.send_message(message.channel, embed=emb)
-    except IndexError:
-        await client.send_message(message.channel, "Sorry, I could not find any data on the given user.")
 async def IMAGE(message,message2):
     await client.send_message(message.channel, "Processing image request...")
     url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(message2.split('|')[1].replace(' ','+').replace("'","%27"),message2.split('|')[1].replace(' ','+').replace("'","%27"))
@@ -1344,7 +1246,6 @@ command["!EV"]=SCIN("!EV","EV stands for Escape Velocity. This command will calc
 command["!GRAPH"]=MISC("!GRAPH","This command will create a graph of a given function\n**Usage**\n`!GRAPH|function`",GRAPH)
 command["!FATE"]=MISC("!FATE","This command will send a random fate image, with a small chance of getting Yakub\n**Usage**\n`!FATE`",FATE)
 command["!CORETEMP"]=MISC("!CORETEMP","This command will return KIPP's Raspberry Pi's core temperature\n**Usage**\n`!CORETEMP`",CORETEMP)
-command["!D2"]=MISC("!D2","This command will return Destiny 2 on a given user, on a given platform\n**Usage**\n`!D2|platform (XBOX or PC)|user`",D2)
 command["!IMAGE"]=MISC("!IMAGE","This command will return an image of the given search query\n**Usage**\n`!IMAGE|search`",IMAGE)
 command["!GIF"]=MISC("!GIF","This command will return a gif of the given search query\n**Usage**\n`!GIF|search`",GIF)
 command["!MINE"]=KIPC("!MINE","This command stacks all of your KIPPCOIN multipliers and adds that amount of KIPPCOINS to your account. This command will not return any message\n**Usage**\n`!MINE`",MINE)
@@ -1408,76 +1309,6 @@ async def background_loop():
                         except Exception as e:
                             print ("Voice client timeout, can't disconnect")
         await asyncio.sleep(1)
-async def schedule_handler():
-    import datetime
-    while True:
-        readarray=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/EVENTS")
-        if readarray==None:
-            readarray=[]
-        for row in readarray:
-            if len(row)>1:
-                e=Event(row[3],row[2],row[1],None)
-                if int(e.date.split("/")[0])==datetime.date.today().month and int(e.date.split("/")[1])==datetime.date.today().day and int(e.date.split("/")[2])==datetime.date.today().year:
-                    if int(e.time.split(":")[0])==int(str(datetime.datetime.now()).split(":")[0].split(" ")[1]) and int(e.time.split(":")[1])==int(str(datetime.datetime.now()).split(":")[1]):
-                        if int(row[3].split(":")[0])<=12:
-                            t1=(str(row[3].split(":")[0])+":"+row[3].split(":")[1]+" AM").replace("  "," ")
-                            if int(row[3].split(":")[0])==0:
-                                t1=("12:"+row[3].split(":")[1]+" AM").replace("  "," ")
-                        else:
-                            t1=(str(int(row[3].split(":")[0])-12)+":"+row[3].split(":")[1]+" PM").replace("  "," ")
-                        for ID in row[4:]:
-                            if len(ID)>0:
-                                await client.send_message(await client.get_user_info(ID),"`{0}`, scheduled for `{1}`, is starting now!".format(row[1],t1))
-                        I=row[0]
-                        readarray.remove(row)
-                        with open('/home/pi/KIPP/KIPPSTUFF/EVENTS','w') as f:
-                            writer=csv.writer(f)
-                            for row in readarray:
-                                writer.writerow(row)
-                            f.close()
-                        for server in client.servers:
-                            for event in serverinfo[server].events:
-                                if int(event.id) == int(I):
-                                    em = discord.Embed(title=event.name,description="This event is no longer open to subscription.",colour=EMBEDCOLOR)
-                                    await client.edit_message(event.message,embed=em)
-                                    serverinfo[server].events.remove(event)
-                    for server in client.servers:
-                        for P in serverinfo[server].events:
-                            if int(P.id)==int(row[0]):
-                                etime=(int(e.time.split(":")[0])*60)+int(e.time.split(":")[1])
-                                time_=(int(str(datetime.datetime.now()).split(":")[0].split(" ")[1])*60)+int(str(datetime.datetime.now()).split(":")[1])
-                                if time_==etime-10:
-                                    if P.ten==False:
-                                        P.ten=True
-                                        if int(row[3].split(":")[0])<=12:
-                                            t1=(str(row[3].split(":")[0])+":"+row[3].split(":")[1]+" AM").replace("  "," ")
-                                            if int(row[3].split(":")[0])==0:
-                                                t1=("12:"+row[3].split(":")[1]+" AM").replace("  "," ")
-                                        else:
-                                            t1=(str(int(row[3].split(":")[0])-12)+":"+row[3].split(":")[1]+" PM").replace("  "," ")
-                                        for ID in row[4:]:
-                                            if len(ID)>0:
-                                                await client.send_message(await client.get_user_info(ID),"`{0}`, scheduled for `{1}`, will start in `10` minutes.".format(row[1],t1))
-            for server in client.servers:
-                if len(serverinfo[server].events)>0:
-                    for event in serverinfo[server].events:
-                        if int(event.time.split(":")[0])<=12:
-                            t1=(str(event.time.split(":")[0])+":"+event.time.split(":")[1]+" AM").replace("  "," ")
-                            if int(event.time.split(":")[0])==0:
-                                t1="12:"+event.time.split(":")[1]+" AM"
-                        else:
-                            t1=str(int(event.time.split(":")[0])-12)+":"+event.time.split(":")[1]+" PM"
-                        em = discord.Embed(title=event.name,description="**Date: {0}**\n**Time: {1}**\nReact with :thumbsup: in order to sign up.".format("`"+event.date+"`","`"+t1+"`"),colour=EMBEDCOLOR)
-                        if len(event.members)>0:
-                            em.add_field(name="Signed Up",value="`"+"\n".join(event.members)+"`")#,inline=True)
-                        else:
-                            em.add_field(name="Signed Up",value="No one is currently signed up for this event.")#,inline=True)
-                        try:
-                            await client.edit_message(event.message,embed=em)
-                        except discord.DiscordException:
-                            event.message=await client.send_message(event.channel,embed=em)
-                        await client.edit_message(event.message,embed=em)
-        await asyncio.sleep(1)
 #discord.opus.load_opus('/usr/lib/arm-linux-gnueabihf/libopus.so.0.5.3')
 InterstellarQuotes = ["'Do not go gentle into that good night'\n**Professor Brand**", "'Come on, TARS!'\n**Cooper**", "'Cooper, this is no time for caution!'\n**TARS**", "'You tell that to Doyle.'\n**Cooper**", "'Newton's third law. You gotta leave something behind.'\n**Cooper**", "'Step back, professor, step back!'\n**TARS**","'No, it's necessary.'\n**Cooper**"]
 playingName = 'Type !help'
@@ -1489,42 +1320,6 @@ playerinfo = {}
 serverinfo = {}
 print("KIPP starting up...")
 while True:
-    @client.event
-    async def on_reaction_add(reaction,user):
-        server=reaction.message.server
-        for event in serverinfo[server].events:
-            if reaction.message.id==event.message.id:
-                if reaction.emoji=="\U0001F44D":
-                    if str(user.id) != KIPP_ID:
-                        event.members.append(str(user))
-                        event.ids.append(str(user.id))
-                        readarray=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/EVENTS")
-                        if readarray==None:
-                            readarray=[]
-                        for row in readarray:
-                            if row[0]==str(event.id) and len(row)>1:
-                                row[4:]=event.ids 
-                        with open('/home/pi/KIPP/KIPPSTUFF/EVENTS','w') as f:
-                            writer=csv.writer(f)
-                            for row in readarray:
-                                writer.writerow(row)
-                            f.close()
-    @client.event
-    async def on_reaction_remove(reaction,user):
-        for event in serverinfo[reaction.message.server].events:
-            if str(user) in event.members:
-                if reaction.emoji=="\U0001F44D":
-                    event.members.remove(str(user))
-                    event.ids.remove(user.id)
-                    readarray=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/EVENTS")
-                    for row in readarray:
-                        if row[0]==str(event.id) and len(row)>1:
-                            row[4:]=event.ids
-                    with open('/home/pi/KIPP/KIPPSTUFF/EVENTS','w') as f:
-                        writer=csv.writer(f)
-                        for row in readarray:
-                            writer.writerow(row)
-                        f.close()
     @client.event
     async def on_voice_state_update(before, after):
         server = after.server
@@ -1587,13 +1382,6 @@ while True:
             serverinfo[server] = Server(server)
             for member in server.members:
                 playerinfo[member] = Profile(member)
-            for role in server.roles:
-                if str(role) == "Rainbow Six Siege":
-                    serverinfo[server].r6role=role
-                if str(role) == "Minecraft":
-                    serverinfo[server].mcrole=role
-                if str(role) == "Destiny 2":
-                    serverinfo[server].d2role=role
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(4,GPIO.OUT)
         GPIO.output(4,GPIO.HIGH)

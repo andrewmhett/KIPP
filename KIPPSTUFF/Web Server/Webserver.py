@@ -66,4 +66,4 @@ def CountDown():
 @app.route('/stream')
 def stream():
     return flask.Response(eventStream(),mimetype="text/event-stream")
-app.run(host='0.0.0.0')
+app.run(host='0.0.0.0', port=80)

@@ -34,7 +34,7 @@ void map_data(){
 void write_data(){
 	ofstream output;
 	output.open("/home/pi/KIPP/KIPPSTUFF/KIPPCOINS.bin", ios::binary);
-	for (map<long long, unsigned int>::iterator it = accounts.begin(); it != accounts.end(); it++){
+	for (map<long long, unsigned int>::iterator it = accounts.begin(); it != accounts.end(); ++it){
 		Account write_struct;
 		pair<long long, unsigned int> account = *it;
 		write_struct.id=account.first;
@@ -49,7 +49,7 @@ void edit_balance(long long id, int balance){
 }
 void read_balance(long long id){
 	if (id==0){
-		for (map<long long, unsigned int>::iterator it = accounts.begin(); it != accounts.end(); it++){
+		for (map<long long, unsigned int>::iterator it = accounts.begin(); it != accounts.end(); ++it){
 			pair<long long, unsigned int> account = *it;
 			cout << account.first << ": " << flush;
 			cout << account.second << endl;

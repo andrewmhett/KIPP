@@ -18,6 +18,8 @@ from math import *
 import aiohttp
 import socket
 from lxml import etree
+import logging
+logging.getLogger().setLevel(logging.INFO)
 EMBEDCOLOR=0x36393E
 try:
 	from Token import TOKEN

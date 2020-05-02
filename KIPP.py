@@ -245,13 +245,6 @@ class music_handler():
                 else:
                     await client.edit_message(self.message,embed=self.em)
             await asyncio.sleep(2)
-async def slide_lcd_text(rows,lcd):
-    for i in range(0,16):
-        text1=rows[0][i:]
-        text2=rows[1][i:]
-        lcd.lcd_display_string(text1+(" "*(16-len(text1))),1)
-        lcd.lcd_display_string(text2+(" "*(16-len(text2))),2)
-        await asyncio.sleep(0.01)
 async def VerifyOwnerMeema(message):
     if message.author == message.server.owner or str(message.author.id) == CREATOR_ID:
         return True
@@ -377,31 +370,6 @@ async def PLAY(message,message2):
             playerinfo[playerinfo[message.author].challenger].betting=False
             playerinfo[message.author].betting=False
             playerinfo[message.author].challenger=None
-async def LCD(message,message2):
-    global MSG_COUNTER
-    if message.author.id == CREATOR_ID:
-        await client.send_message(message.channel,"Displaying statistics on LCD now...")
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(4,GPIO.OUT)
-        GPIO.output(4,GPIO.HIGH)
-        lcd=RPi_I2C_driver.lcd()
-        text1=str(datetime.now()-START_TIME).split('.')[0]
-        text1=(int((16-len(text1))/2)*" ")+text1
-        text2="MESSAGES: {0}".format(str(MSG_COUNTER))
-        tmp = open('/sys/class/thermal/thermal_zone0/temp')
-        cpu = tmp.read()
-        tmp.close()
-        text3="TEMP: "+('{:.2f}'.format( float(cpu)/1000 ) + ' C')
-        lcd.lcd_display_string("  TIME ELAPSED  ",1)
-        lcd.lcd_display_string(text1, 2)
-        await asyncio.sleep(3)
-        await slide_lcd_text(["  TIME ELAPSED  ",text1],lcd=lcd)
-        lcd.lcd_display_string(text2,1)
-        lcd.lcd_display_string(text3, 2)
-        await asyncio.sleep(3)
-        await slide_lcd_text([text2,text3],lcd)
-        GPIO.output(4,GPIO.LOW)
-        GPIO.cleanup()
 async def CODE(message,message2):
     from subprocess import Popen, PIPE
     p=Popen('/home/pi/KIPP/KIPPSTUFF/NewestCommit.sh',stdout=PIPE,stderr=PIPE)
@@ -1284,7 +1252,6 @@ command["!WCHANNEL"]=OWON("!WCHANNEL","This command will set the current text ch
 command["!INVITE"]=OWON("!INVITE","This command will DM an invite to the user with the specified user id\n**Usage**\n`!INVITE|user id`",INVITE)
 command["!UNBLOCK"]=OWON("!UNBLOCK","This command will unblock the specified user\n**Usage**\n`!UNBLOCK|user`",UNBLOCK)
 command["!SKIP"]=MUSC("!SKIP","This command will skip the current song, and play the next song in queue.\n**Usage**\n`!SKIP`",SKIP)
-command["!LCD"]=MISC("!LCD","This command may be used by LockdownDoom in order to activate KIPP's LCD.\n**Usage**\n`!LCD`",LCD)
 async def background_loop():
     import datetime
     while True:
@@ -1381,18 +1348,6 @@ while True:
             serverinfo[server] = Server(server)
             for member in server.members:
                 playerinfo[member] = Profile(member)
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(4,GPIO.OUT)
-        GPIO.output(4,GPIO.HIGH)
-        lcd=RPi_I2C_driver.lcd()
-        text1="------KIPP------"
-        text2="     ONLINE     "
-        lcd.lcd_display_string(text1, 1)
-        lcd.lcd_display_string(text2, 2)
-        await asyncio.sleep(3)
-        await slide_lcd_text([text1,text2],lcd=lcd)
-        GPIO.output(4,GPIO.LOW)
-        GPIO.cleanup()
     @client.event
     async def on_join(member):
         server = member.server

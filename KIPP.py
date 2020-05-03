@@ -246,6 +246,9 @@ class music_handler():
                 self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'**Volume:** '+str(int(self.player.volume*100))+'%'+'\n**Progress:** `'+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+'`'+pauseStr+'\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
             self.em.set_footer(text=self.footer)
             self.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
+            if self.player.is_live and self.starttime = datetime.date(1970,1,1):
+                self.server.voice_client.stop()
+                self.is_playing=False
             if (self.is_playing == False or c.seconds >= self.duration) and self.player.is_live == False:
                 self.server.voice_client.stop()
                 em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Song Ended**", colour=EMBEDCOLOR)
@@ -832,7 +835,7 @@ async def SKIP(message,message2):
         if not serverinfo[message.guild].mHandler.player.is_live:
             serverinfo[message.guild].mHandler.starttime=serverinfo[message.guild].mHandler.starttime-d.timedelta(seconds=serverinfo[message.guild].mHandler.duration)
         else:
-            serverinfo[message.guild].mHandler.starttime=serverinfo[message.guild].mHandler.starttime = 
+            serverinfo[message.guild].mHandler.starttime=serverinfo[message.guild].mHandler.starttime = datetime.date(1970,1,1)
         if len(serverinfo[message.guild].queue)==1:
             await message.channel.send( "There are no more songs in the queue. Current song ended.")
 async def REMOVESONG(message,message2):

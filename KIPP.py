@@ -1146,7 +1146,7 @@ async def APPENDPLAYLIST(message,message2):
             url=music4
             if "youtube.com" in url:
                 youtube = etree.HTML(urllib.request.urlopen(url).read())
-                song=youtube.xpath("//span[@id='eow-title']/@title")[0]
+                song=youtube.xpath("//span[@id='eow-title']/@title")
             elif "soundcloud.com" in url:
                 from bs4 import BeautifulSoup
                 page=requests.get(url).text

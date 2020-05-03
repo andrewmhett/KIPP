@@ -266,12 +266,10 @@ class music_handler():
                     try:
                         await self.message.edit(embed=self.em)
                     except:
-                        self.message=None
-                if self.message==None:
-                    self.message=await self.channel.send(embed=self.em)
+                        self.message=await self.channel.send(embed=self.em)
                 else:
-                    await self.message.edit(embed=self.em)
-            await asyncio.sleep(1)
+                    self.message = await self.channel.send(embed=self.em)
+            await asyncio.sleep(2)
 async def VerifyOwnerMeema(message):
     if message.author == message.guild.owner or message.author.id == CREATOR_ID:
         return True

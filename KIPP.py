@@ -14,8 +14,6 @@ import threading
 import subprocess
 sys.path.append('/home/pi/KIPP/KIPPSTUFF')
 from ESSENTIAL_PACKAGES import *
-import RPi_I2C_driver
-import RPi.GPIO as GPIO
 import youtube_dl
 CREATOR_ID=289920025077219328
 KIPP_ID=386352783550447628
@@ -28,7 +26,6 @@ profooter=""
 last_ping=t.time()
 ytdl_format_options = {
     'format': 'bestaudio/best',
-    'download': False
 }
 EMBEDCOLOR=0x36393E
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
@@ -38,22 +35,18 @@ ffmpeg_options = {
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=1.0):
         super().__init__(source, volume)
-
         self.data = data
         self.title = data.get('title')
         self.duration = data.get('duration')
         self.is_live = False
-
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
         loop = loop 
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
         cls.url=url
-
         if 'entries' in data:
             # take first item from a playlist
             data = data['entries'][0]
-
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 class Server:
@@ -1351,7 +1344,7 @@ while True:
             serverinfo[server] = Server(server)
     @client.event
     async def on_ready():
-        await client.change_presence(activity=discord.Game(name="3.1.24 Simulator",type=1,url="https://twitch.tv/kipp4780"))
+        await client.change_presence(activity=discord.Streaming(platform="Twitch",name="3.1.24 Simulator",twitch_name="KIPP4780",url="https://twitch.tv/kipp4780"))
         loop = asyncio.get_event_loop()
         loop.create_task(background_loop())
         logging.log(5,"KIPP started.")

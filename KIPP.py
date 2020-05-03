@@ -261,6 +261,7 @@ class music_handler():
                 self.is_playing=False
                 serverinfo[self.server].mHandler=None
                 serverinfo[self.server].end_time=datetime.datetime.now()
+                os.system("sudo rm *.webm")
             else:
                 if self.message != None:
                     try:

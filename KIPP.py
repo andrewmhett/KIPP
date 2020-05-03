@@ -38,6 +38,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.data = data
         self.title = data.get('title')
         self.duration = data.get('duration')
+        self.is_live = False
         if self.duration == 0:
             self.is_live = True
     @classmethod
@@ -46,7 +47,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
         cls.url=url
         if 'entries' in data:
-            # take first item from a playlist
             data = data['entries'][0]
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
@@ -227,8 +227,8 @@ class music_handler():
                 if len(str(self.seconddelta)) == 1:
                     self.seconddelta='0'+str(self.seconddelta)
                 self.hours=int(int(self.minutedelta)/60)
-                percent=int(18*(((int(self.hours)*3600)+(int(self.minutedelta)*60)+int(self.seconddelta))/int(self.duration)))+1
                 if self.player.is_live == False:
+                    percent=int(18*(((int(self.hours)*3600)+(int(self.minutedelta)*60)+int(self.seconddelta))/int(self.duration)))+1
                     self.bar=("▣"*percent)+"▢"*(18-percent)
                 else:
                     self.bar="▣"*18
@@ -824,13 +824,15 @@ async def MUSIC(message,message2):
     elif (currentlyplaying == True) and (message.author.voice.channel != message.guild.get_member(KIPP_ID).voice.channel):
         await message.channel.send( "There is a song currently playing in another voice channel ("+str(message.guild.get_member(KIPP_ID).voice.channel)+"). Join that voice channel in order to change the music, or you can wait for that music to end, and run this command again.")
 async def SKIP(message,message2):
-    player = serverinfo[message.guild].mHandler.player
     if await VerifyMusicUser(message):
         import datetime as d
         if serverinfo[message.guild].mHandler.paused == True:
-            player.resume()
+            message.guild.voice_client.resume()
             serverinfo[message.guild].mHandler.paused = False
-        serverinfo[message.guild].mHandler.starttime=serverinfo[message.guild].mHandler.starttime-d.timedelta(seconds=serverinfo[message.guild].mHandler.duration)
+        if not serverinfo[message.guild].mHandler.player.is_live:
+            serverinfo[message.guild].mHandler.starttime=serverinfo[message.guild].mHandler.starttime-d.timedelta(seconds=serverinfo[message.guild].mHandler.duration)
+        else:
+            serverinfo[message.guild].mHandler.starttime=serverinfo[message.guild].mHandler.starttime = 
         if len(serverinfo[message.guild].queue)==1:
             await message.channel.send( "There are no more songs in the queue. Current song ended.")
 async def REMOVESONG(message,message2):

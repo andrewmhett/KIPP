@@ -251,7 +251,8 @@ class music_handler():
                 self.server.voice_client.stop()
                 self.is_playing=False
                 self.streamskip=False
-            if self.is_playing == False or c.seconds >= self.duration:
+                self.player.is_live=False
+            if (self.is_playing == False or c.seconds >= self.duration) and self.player.is_live == False:
                 self.server.voice_client.stop()
                 em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Song Ended**", colour=EMBEDCOLOR)
                 em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")

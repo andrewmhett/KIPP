@@ -796,7 +796,7 @@ async def MUSIC(message,message2):
                             await message.channel.send( "You are not in a voice channel. Get in one for KIPP to play music.")
                             serverinfo[message.guild].loading = False
                     else:
-                        await client.delete_message(message)
+                        await message.delete()
                 else:
                     await message.channel.send( "Please use the correct syntax. Use !music|youtubelink or !music|youtubesearch to use the music command.")
                     serverinfo[message.guild].loading = False

@@ -261,7 +261,6 @@ class music_handler():
                 self.is_playing=False
                 serverinfo[self.server].mHandler=None
                 serverinfo[self.server].end_time=datetime.datetime.now()
-                os.system("sudo rm *.webm")
             else:
                 if self.message != None:
                     try:
@@ -1275,7 +1274,7 @@ async def background_loop():
                     music=serverinfo[server].pick_playlist_song()
                     if serverinfo[server].playlist != None:
                         serverinfo[server].queue.append(serverinfo[server].queue[0])
-                player = await YTDLSource.from_url(music, loop=asyncio.get_event_loop()) 
+                player = await YTDLSource.from_url(music, loop=asyncio.get_event_loop(),stream=True) 
                 serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
                 c=datetime.datetime.now()-serverinfo[server].end_time

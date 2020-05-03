@@ -94,17 +94,17 @@ class Server:
         song=self.search_server_configs("PLAYLIST:{0}".format(self.playlist))[0][1:][i]
         return song
     def add_server_config(self,data):
-        arr=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
+        arr=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}".format(str(self.server.id)))
         if arr==None:
             arr=[]
         arr.append(data)
-        with open('/home/pi/KIPP/KIPP/ServerConfigs/{0}'.format(self.server.id),'w') as f:
+        with open('/home/pi/KIPP/KIPP/ServerConfigs/{0}'.format(str(self.server.id)),'w') as f:
             writer=csv.writer(f)
             for row in arr:
                 writer.writerow(row)
             f.close()
     def change_server_config(self,data,newdata):
-        arr=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}".format(self.server.id))
+        arr=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}".format(str(self.server.id)))
         if arr==None:
             arr=[]
         cntr=0
@@ -113,13 +113,13 @@ class Server:
                 arr[cntr] = newdata
                 break
             cntr=cntr+1
-        with open('/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),'w') as f:
+        with open('/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}'.format(str(self.server.id)),'w') as f:
             writer=csv.writer(f)
             for row in arr:
                 writer.writerow(row)
             f.close()
     def search_server_configs(self,query):
-        data=READ_DATA_IN('/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}'.format(self.server.id),condition=lambda x: True if query in str(x) else False)
+        data=READ_DATA_IN('/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}'.format(str(self.server.id)),condition=lambda x: True if query in str(x) else False)
         return data
 class Profile:
     def __init__(self,user):
@@ -140,9 +140,9 @@ class Profile:
         self.instore=False
         self.storepage=None
     def GET_KIPPCOINS(self):
-        return int(subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","r",self.user.id],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])
+        return int(subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])
     def GIVE_KIPPCOINS(self, KC):
-       balance=int(subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","r",self.user.id],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])+KC
+       balance=int(subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])+KC
        subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","w",str(self.user.id),str(balance)])
 class Command():
     def __init__(self,n,h,e):
@@ -273,7 +273,7 @@ class music_handler():
                     await self.message.edit(embed=self.em)
             await asyncio.sleep(2)
 async def VerifyOwnerMeema(message):
-    if message.author == message.guild.owner or str(message.author.id) == CREATOR_ID:
+    if message.author == message.guild.owner or message.author.id == CREATOR_ID:
         return True
     await message.channel.send( "{0} is a Creator-Only command".format(str(message.content).split('|')[0].upper()))
     return False
@@ -908,7 +908,7 @@ async def BLOCK(message,message2):
                 for member in message.guild.members:
                     if str(member) not in serverinfo[message.guild].blocked:
                         if (member.id != CREATOR_ID) and (str(member) != "KIPP#4780") and (member != owner):
-                            serverinfo[message.guild].blocked.append(member.id)
+                            serverinfo[message.guild].blocked.append(str(member.id))
                 await message.channel.send( "Blocked everyone in server")
             elif blockedP2[1].id != CREATOR_ID and blockedP2[1] != owner and blockedP2[1].id != KIPP_ID:
                 if blockedP2[1].id in serverinfo[message.guild].blocked:
@@ -927,7 +927,7 @@ async def BLOCK(message,message2):
         else:
             await message.channel.send( "This user is not in this server. Make sure that you used the command like this: '!block|nickname OR !block|username'.")
 async def EXECUTE_ORDER_66(message,message2):
-    if str(message.author.id) == CREATOR_ID:
+    if message.author.id == CREATOR_ID:
         server = message.guild
         channels = []
         members = []
@@ -960,7 +960,7 @@ async def EXECUTE_ORDER_66(message,message2):
             except TypeError:
                 pass
 async def NICKNAME(message,message2):
-    if str(message.author.id) == CREATOR_ID:
+    if message.author.id == CREATOR_ID:
         nickname = str(message.content).split('|')[1]
         for member in message.guild.members:
             if str(member) == "KIPP#4780":
@@ -1077,13 +1077,13 @@ async def UNBAN(message,message2):
 async def WCHANNEL(message,message2):
     if await VerifyOwnerMeema(message):
         if serverinfo[message.guild].search_server_configs("WELCOME_CHANNEL") != None:
-            if serverinfo[message.guild].search_server_configs("WELCOME_CHANNEL")[1] == message.channel.id:
+            if serverinfo[message.guild].search_server_configs("WELCOME_CHANNEL")[1] == str(message.channel.id):
                 await message.channel.send("This channel already is the welcome channel.")
             else:
-                serverinfo[message.guild].change_server_config("WELCOME_CHANNEL",["WELCOME_CHANNEL",message.channel.id])
+                serverinfo[message.guild].change_server_config("WELCOME_CHANNEL",["WELCOME_CHANNEL",str(message.channel.id)])
                 await message.channel.send("Changed the welcome channel to this text channel.")
         else:
-            serverinfo[message.guild].add_server_config(["WELCOME_CHANNEL",message.channel.id])
+            serverinfo[message.guild].add_server_config(["WELCOME_CHANNEL",str(message.channel.id)])
             await message.channel.send("Set this text channel as the welcome channel. All joining users will be welcomed here.")
 async def NEWPLAYLIST(message,message2):
     name=message2.split("|")[1]
@@ -1203,12 +1203,12 @@ async def UNBLOCK(message,message2):
         if str(unblocked).upper() == "ALL":
             serverinfo[message.guild].blocked=[]
             await message.channel.send( "Unblocked everyone in server")
-        if (unblocked.id not in serverinfo[message.guild].blocked) and (str(unblocked).upper() != "ALL"):
+        if (str(unblocked.id) not in serverinfo[message.guild].blocked) and (str(unblocked).upper() != "ALL"):
             msg = "User not blocked."
             await message.channel.send( msg)
-        elif unblocked.id in serverinfo[message.guild].blocked:
+        elif str(unblocked.id) in serverinfo[message.guild].blocked:
             msg = "Unblocked "+str(unblocked)
-            serverinfo[message.guild].blocked.remove(unblocked.id)
+            serverinfo[message.guild].blocked.remove(str(unblocked.id))
             await message.channel.send( msg)
 command["!NEWPLAYLIST"]=MUSC("!NEWPLAYLIST","Creates a new music playlist of a given name\n**Usage**\n`!NEWPLAYLIST|name`",NEWPLAYLIST)
 command["!APPENDPLAYLIST"]=MUSC("!APPENDPLAYLIST","Adds a song to a playlist corresponding to either entered query, link to a song (YouTube or Soundcloud), or link to a youtube playlist.\n**Usage**\n`!APPENDPLAYLIST|playlist name|query or link`",APPENDPLAYLIST)
@@ -1377,7 +1377,7 @@ while True:
         global MSG_COUNTER
         MSG_COUNTER=MSG_COUNTER+1
         if message.guild != None or str(message.channel).upper=="DIRECT MESSAGE":
-            if message.author.id in serverinfo[message.guild].blocked:
+            if str(message.author.id) in serverinfo[message.guild].blocked:
                 await client.delete_message(message)
         if str(message.channel).upper().startswith('DIRECT MESSAGE') == False:
             serverinfo[message.guild].recentchannel = message.channel
@@ -1489,7 +1489,7 @@ while True:
             return
         if message.guild.get_member(KIPP_ID).mention in message2:
             await message.channel.send("What do you want? Use **!help** for the commands.")
-        if message.author.id not in serverinfo[message.guild].blocked:
+        if str(message.author.id) not in serverinfo[message.guild].blocked:
             if message2.startswith("!HELP|"):
                 found=False
                 for command in commands:

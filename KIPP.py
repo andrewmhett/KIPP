@@ -38,7 +38,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.data = data
         self.title = data.get('title')
         self.duration = data.get('duration')
-        self.is_live = False
+        if self.duration == 0:
+            self.is_live = True
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
         loop = loop 

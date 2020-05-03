@@ -91,7 +91,7 @@ class Server:
         if arr==None:
             arr=[]
         arr.append(data)
-        with open('/home/pi/KIPP/KIPP/ServerConfigs/{0}'.format(str(self.server.id)),'w') as f:
+        with open('/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}'.format(str(self.server.id)),'w') as f:
             writer=csv.writer(f)
             for row in arr:
                 writer.writerow(row)

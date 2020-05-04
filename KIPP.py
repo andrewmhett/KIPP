@@ -43,6 +43,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
             self.is_live = True
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
+        if cls.is_live:
+            stream=True
         loop = loop 
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
         cls.url=url
@@ -1352,7 +1354,7 @@ while True:
             serverinfo[server] = Server(server)
     @client.event
     async def on_ready():
-        await client.change_presence(activity=discord.Streaming(platform="Twitch",name="3.1.24 Simulator POG",game="3.1.24 Simulator",twitch_name="KIPP4780",url="https://twitch.tv/kipp4780"))
+        await client.change_presence(activity=discord.Streaming(platform="Twitch",name="3.1.24 Simulator",twitch_name="KIPP4780",url="https://twitch.tv/kipp4780"))
         loop = asyncio.get_event_loop()
         loop.create_task(background_loop())
         logging.log(5,"KIPP started.")

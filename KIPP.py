@@ -44,7 +44,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
         loop = loop 
-        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url))
         if data.get('duration')==0:
             stream=True
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
@@ -74,8 +74,6 @@ class Server:
         self.voters=[]
         self.messagesent=[]
         self.oldtime=0
-        self.r6role=None
-        self.d2role=None
         self.events=[]
         self.end_time=datetime.now()
         self.loading=False

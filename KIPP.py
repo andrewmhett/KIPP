@@ -33,20 +33,20 @@ ffmpeg_options = {
     'options': '-vn'
 }
 class YTDLSource(discord.PCMVolumeTransformer):
-    self.is_live=False
     def __init__(self, source, *, data, volume=1.0):
         super().__init__(source, volume)
         self.data = data
         self.title = data.get('title')
         self.duration = data.get('duration')
+        self.is_live=False
         if self.duration == 0:
             self.is_live = True
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
-        if cls.is_live:
-            stream=True
         loop = loop 
-        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
+        if data.get('duration')==0:
+            stream=True
         cls.url=url
         if 'entries' in data:
             data = data['entries'][0]

@@ -196,6 +196,7 @@ class music_handler():
         self.is_playing=True
         self.pausedatetime=None
         self.pausetime=None
+        self.pausetimeout=False
         client.loop.create_task(self.update_loop())
     async def update_loop(self):
         while self.is_playing:
@@ -255,7 +256,10 @@ class music_handler():
                 self.player.is_live=False
             if (self.is_playing == False or c.seconds >= self.duration) and self.player.is_live == False:
                 self.server.voice_client.stop()
-                em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Song Ended**", colour=EMBEDCOLOR)
+                if not self.pausetimeout:
+                    em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Song Ended**", colour=EMBEDCOLOR)
+                else:
+                    em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Pause Timeout**", colour=EMBEDCOLOR)
                 em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
                 await self.message.edit(embed=em)
                 serverinfo[self.server].queue.remove(serverinfo[self.server].queue[0])
@@ -263,6 +267,9 @@ class music_handler():
                 serverinfo[self.server].mHandler=None
                 serverinfo[self.server].end_time=datetime.datetime.now()
                 os.system("sudo rm *.*")
+            elif self.paused and self.server.voice_client == None:
+                self.is_playing=False
+                self.pausetimeout=True
             else:
                 if self.message != None:
                     try:

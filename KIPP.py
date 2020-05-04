@@ -1274,8 +1274,7 @@ async def background_loop():
                     serverinfo[server].playlist=serverinfo[server].queue[0].split("PLAYLIST:")[1][1:]
                     music=serverinfo[server].pick_playlist_song()
                     if serverinfo[server].playlist != None:
-                        if serverinfo[server].playlist == serverinfo[server].queue[0]:
-                            serverinfo[server].queue.append(serverinfo[server].queue[0])
+                        serverinfo[server].queue.append(serverinfo[server].queue[0])
                 player = await YTDLSource.from_url(music, loop=asyncio.get_event_loop()) 
                 serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:

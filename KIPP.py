@@ -758,6 +758,7 @@ async def MUSIC(message,message2):
                                     with urllib.request.urlopen(req) as html:
                                         searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.read().decode())
                                     cycles=-1
+                                    valid=False
                                     while not valid and cycles < len(searchresults):
                                         cycles+=1
                                         music4 = ("http://www.youtube.com/watch?v=" + searchresults[cycles])

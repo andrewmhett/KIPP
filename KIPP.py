@@ -47,7 +47,10 @@ class YTDLSource(discord.PCMVolumeTransformer):
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url))
         if data.get('duration')==0:
             stream=True
-        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+        try:
+            data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+        except youtube_dl.utils.DownloadError:
+            data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
         cls.url=url
         if 'entries' in data:
             data = data['entries'][0]

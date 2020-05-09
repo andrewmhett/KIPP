@@ -1286,7 +1286,7 @@ async def background_loop():
                 try:
                     player = await YTDLSource.from_url(music, loop=asyncio.get_event_loop()) 
                 except youtube_dl.utils.DownloadError:
-                    player = away YTDLSource.from_url(music, loop=asyncio.get_event_loop(), stream=True)
+                    player = await YTDLSource.from_url(music, loop=asyncio.get_event_loop(), stream=True)
                 serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
                 c=datetime.datetime.now()-serverinfo[server].end_time

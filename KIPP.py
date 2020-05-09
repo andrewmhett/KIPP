@@ -757,7 +757,17 @@ async def MUSIC(message,message2):
                                     req = urllib.request.Request("http://www.youtube.com/results?" + query_string)
                                     with urllib.request.urlopen(req) as html:
                                         searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.read().decode())
-                                    music4 = ("http://www.youtube.com/watch?v=" + searchresults[0])
+                                    cycles=-1
+                                    while not valid and cycles < 100:
+                                        cycles+=1
+                                        music4 = ("http://www.youtube.com/watch?v=" + searchresults[cycles])
+                                        page=requests.get(music4).text()
+                                        from bs4 import BeautifulSoup
+                                        soup=BeautifulSoup(page,features='html.parser')
+                                        if '<meta content="False" itemprop="paid"' in soup.prettify():
+                                            valid=True
+                                    if cycles=100:
+                                        raise IndexError
                                 except IndexError:
                                     await message.channel.send( ("Could not find '"+music4+"' on YouTube."))
                                     serverinfo[message.guild].loading = False

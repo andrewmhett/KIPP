@@ -762,7 +762,7 @@ async def MUSIC(message,message2):
                                     while not valid and cycles < len(searchresults):
                                         cycles+=1
                                         music4 = ("http://www.youtube.com/watch?v=" + searchresults[cycles])
-                                        page=requests.get(music4).text()
+                                        page=requests.get(music4).text
                                         from bs4 import BeautifulSoup
                                         soup=BeautifulSoup(page,features='html.parser')
                                         if '<meta content="False" itemprop="paid"' in soup.prettify():

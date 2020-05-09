@@ -266,7 +266,7 @@ class music_handler():
                 self.is_playing=False
                 serverinfo[self.server].mHandler=None
                 serverinfo[self.server].end_time=datetime.datetime.now()
-                #os.system("sudo rm *.*")
+                os.system("sudo rm *.*")
             elif self.paused and self.server.voice_client == None:
                 self.is_playing=False
                 self.pausetimeout=True

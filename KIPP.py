@@ -47,10 +47,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url))
         if data.get('duration')==0:
             stream=True
-        try:
-            data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
-        except youtube_dl.utils.DownloadError:
-            data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
         cls.url=url
         if 'entries' in data:
             data = data['entries'][0]
@@ -269,7 +266,7 @@ class music_handler():
                 self.is_playing=False
                 serverinfo[self.server].mHandler=None
                 serverinfo[self.server].end_time=datetime.datetime.now()
-                os.system("sudo rm *.*")
+                #os.system("sudo rm *.*")
             elif self.paused and self.server.voice_client == None:
                 self.is_playing=False
                 self.pausetimeout=True
@@ -1286,7 +1283,10 @@ async def background_loop():
                     music=serverinfo[server].pick_playlist_song()
                     if serverinfo[server].playlist != None:
                         serverinfo[server].queue.append(serverinfo[server].queue[0])
-                player = await YTDLSource.from_url(music, loop=asyncio.get_event_loop()) 
+                try:
+                    player = await YTDLSource.from_url(music, loop=asyncio.get_event_loop()) 
+                except youtube_dl.utils.DownloadError:
+                    player = away YTDLSource.from_url(music, loop=asyncio.get_event_loop(), stream=True)
                 serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
                 c=datetime.datetime.now()-serverinfo[server].end_time

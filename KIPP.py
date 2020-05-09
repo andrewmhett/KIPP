@@ -766,7 +766,7 @@ async def MUSIC(message,message2):
                                         soup=BeautifulSoup(page,features='html.parser')
                                         if '<meta content="False" itemprop="paid"' in soup.prettify():
                                             valid=True
-                                    if cycles=len(searchresults):
+                                    if cycles==len(searchresults):
                                         raise IndexError
                                 except IndexError:
                                     await message.channel.send( ("Could not find '"+music4+"' on YouTube."))

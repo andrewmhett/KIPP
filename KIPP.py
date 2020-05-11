@@ -413,6 +413,10 @@ async def CODE(message,message2):
         await message.channel.send("{0} My code is backed up on GitHub here: https://github.com/LockdownDoom/KIPP/blob/master/KIPP.py\nAlso, my code has been reviewed by Codacy here: https://app.codacy.com/project/LockdownDoom/KIPP/dashboard?branchId=10423847".format('Newest commit:\n```\n'+stdout.decode()[64:]+'\n```\n'))
     except discord.DiscordException:
         await message.channel.send("{0} My code is backed up on GitHub here: https://github.com/LockdownDoom/KIPP/blob/master/KIPP.py\nAlso, my code has been reviewed by Codacy here: https://app.codacy.com/project/LockdownDoom/KIPP/dashboard?branchId=10423847".format('Newest commit:\nThe newest commit is too large to be displayed here.'))
+async def SPEEDTEST(message,message2):
+    await message.channel.send("Running Ookla speedtest...")
+    out = subprocess.Popen(["speedtest"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])
+    await message.channel.send("```\n"+out+"\n```")
 async def GA(message,message2):
     mass = str(message.content).split('|')[1].replace('^', '**')
     dist = str(message.content).split('|')[2].replace('^', '**')
@@ -1231,6 +1235,7 @@ async def UNBLOCK(message,message2):
             msg = "Unblocked "+str(unblocked)
             serverinfo[message.guild].blocked.remove(str(unblocked.id))
             await message.channel.send( msg)
+command["!SPEEDTEST"]=MISC("!SPEEDTEST","Runs Ookla speedtest and outputs the results\n**Usage**\n`!SPEEDTEST`",SPEEDTEST)
 command["!NEWPLAYLIST"]=MUSC("!NEWPLAYLIST","Creates a new music playlist of a given name\n**Usage**\n`!NEWPLAYLIST|name`",NEWPLAYLIST)
 command["!APPENDPLAYLIST"]=MUSC("!APPENDPLAYLIST","Adds a song to a playlist corresponding to either entered query, link to a song (YouTube or Soundcloud), or link to a youtube playlist.\n**Usage**\n`!APPENDPLAYLIST|playlist name|query or link`",APPENDPLAYLIST)
 command["!DELETEPLAYLIST"]=MUSC("!DELETEPLAYLIST","Deletes the music playlist of a given name\n**Usage**\n`!DELETEPLAYLIST|name`",DELETEPLAYLIST)

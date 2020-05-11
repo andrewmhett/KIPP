@@ -415,9 +415,9 @@ async def CODE(message,message2):
         await message.channel.send("{0} My code is backed up on GitHub here: https://github.com/LockdownDoom/KIPP/blob/master/KIPP.py\nAlso, my code has been reviewed by Codacy here: https://app.codacy.com/project/LockdownDoom/KIPP/dashboard?branchId=10423847".format('Newest commit:\nThe newest commit is too large to be displayed here.'))
 async def SPEEDTEST(message,message2):
     await message.channel.send("Running Ookla speedtest... (this may take a moment)")
-    out = subprocess.Popen("speedtest",stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0]
+    out = subprocess.Popen("./KIPPSTUFF/speedtest.sh",stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0]
     await message.channel.send("done.")
-    log.info(out)
+    print(out)
     await message.channel.send("```\n"+out+"\n```")
 async def GA(message,message2):
     mass = str(message.content).split('|')[1].replace('^', '**')

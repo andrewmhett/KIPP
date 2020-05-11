@@ -1,0 +1,1 @@
+speedtest --accept-license

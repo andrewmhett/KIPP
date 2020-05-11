@@ -416,7 +416,7 @@ async def CODE(message,message2):
 async def SPEEDTEST(message,message2):
     if await VerifyOwnerMeema(message):
         await message.channel.send("Running Ookla speedtest... (this may take a moment)")
-        out = subprocess.Popen("./KIPPSTUFF/speedtest.sh",stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode()
+        out = subprocess.Popen("/home/pi/KIPP/KIPPSTUFF/speedtest.sh",stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode()
         await message.channel.send("```\n"+out+"\n```")
 async def GA(message,message2):
     mass = str(message.content).split('|')[1].replace('^', '**')

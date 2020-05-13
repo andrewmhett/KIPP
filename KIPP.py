@@ -1229,10 +1229,10 @@ async def UNBLOCK(message,message2):
         if str(unblocked).upper() == "ALL":
             serverinfo[message.guild].blocked=[]
             await message.channel.send( "Unblocked everyone in server")
-        if (str(unblocked.id) not in serverinfo[message.guild].blocked) and (str(unblocked).upper() != "ALL"):
+        if (unblocked.id not in serverinfo[message.guild].blocked) and (str(unblocked).upper() != "ALL"):
             msg = "User not blocked."
             await message.channel.send( msg)
-        elif str(unblocked.id) in serverinfo[message.guild].blocked:
+        elif unblocked.id in serverinfo[message.guild].blocked:
             msg = "Unblocked "+str(unblocked)
             serverinfo[message.guild].blocked.remove(str(unblocked.id))
             await message.channel.send( msg)

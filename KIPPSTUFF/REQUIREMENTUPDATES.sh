@@ -1,2 +1,2 @@
 #!/bin/sh
-sudo pip3 install -U -r /home/pi/Desktop/KIPPSTUFF/requirements.txt
+sudo pip3 install -U -r /home/pi/KIPP/KIPPSTUFF/requirements.txt

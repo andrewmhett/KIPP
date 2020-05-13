@@ -45,7 +45,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
     async def from_url(cls, url, *, loop=None, stream=False):
         loop = loop 
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url))
-        if data.get('duration')==0:
+        if data.get('duration')==0 or data.get('duration')>3600:
             stream=True
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
         cls.url=url

@@ -168,7 +168,6 @@ class music_handler():
         self.duration=player.duration
         self.title=player.title
         self.link=player.url
-        self.streamskip=False
         if self.player.is_live == False:
             mins=int(self.duration/60)
             seconds=int(self.duration-(mins*60))
@@ -198,6 +197,11 @@ class music_handler():
         self.pausetime=None
         self.pausetimeout=False
         client.loop.create_task(self.update_loop())
+    def skip(self):
+        self.server.voice_client.stop()
+        self.is_playing=False
+        self.skip=False
+        self.player.is_live=False
     async def update_loop(self):
         while self.is_playing:
             if self.server.voice_client.is_playing():
@@ -249,11 +253,6 @@ class music_handler():
                 self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'**Volume:** '+str(int(self.player.volume*100))+'%'+'\n**Progress:** `'+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+'`'+pauseStr+'\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
             self.em.set_footer(text=self.footer)
             self.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
-            if self.player.is_live and self.streamskip:
-                self.server.voice_client.stop()
-                self.is_playing=False
-                self.streamskip=False
-                self.player.is_live=False
             if (self.is_playing == False or c.seconds >= self.duration) and self.player.is_live == False:
                 self.server.voice_client.stop()
                 if not self.pausetimeout:
@@ -860,9 +859,7 @@ async def SKIP(message,message2):
             message.guild.voice_client.resume()
             serverinfo[message.guild].mHandler.paused = False
         if not serverinfo[message.guild].mHandler.player.is_live:
-            serverinfo[message.guild].mHandler.starttime=serverinfo[message.guild].mHandler.starttime-d.timedelta(seconds=serverinfo[message.guild].mHandler.duration)
-        else:
-            serverinfo[message.guild].mHandler.streamskip=True
+            serverinfo[message.guild].mHandler.skip()
         if len(serverinfo[message.guild].queue)==1:
             await message.channel.send( "There are no more songs in the queue. Current song ended.")
 async def REMOVESONG(message,message2):

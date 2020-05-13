@@ -199,8 +199,6 @@ class music_handler():
         client.loop.create_task(self.update_loop())
     def skip(self):
         self.server.voice_client.stop()
-        self.is_playing=False
-        self.skip=False
         self.player.is_live=False
     async def update_loop(self):
         while self.is_playing:

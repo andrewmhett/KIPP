@@ -1406,6 +1406,7 @@ while True:
         if message.guild != None or str(message.channel).upper=="DIRECT MESSAGE":
             if str(message.author.id) in serverinfo[message.guild].blocked:
                 await client.delete_message(message)
+                return
         if str(message.channel).upper().startswith('DIRECT MESSAGE') == False:
             serverinfo[message.guild].recentchannel = message.channel
         readarray=[]

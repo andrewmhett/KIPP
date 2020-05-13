@@ -275,7 +275,7 @@ class music_handler():
                 else:
                     self.message = await self.channel.send(embed=self.em)
             await asyncio.sleep(2)
-async def VerifyOwnerMeema(message):
+async def VerifyOwner(message):
     if message.author == message.guild.owner or message.author.id == CREATOR_ID:
         return True
     await message.channel.send( "{0} is a Creator-Only command".format(str(message.content).split('|')[0].upper()))
@@ -286,12 +286,12 @@ async def VerifyMusicUser(message):
         currentlyplaying=serverinfo[message.guild].mHandler.is_playing
     if currentlyplaying == True:
         if str(message.author.voice.channel) != str(message.guild.get_member(KIPP_ID).voice.channel):
-            await message.channel.send( "Please join the channel where the music is playing ("+str(message.guild.get_member(KIPP_ID).voice.channel)+") in order to use these commands:\n**!CLEARQUEUE**\n**!SKIP**\n**!SETVOL**\n**!PAUSE**\n**!RESUME**")
+            await message.channel.send( "Please join the channel where the music is playing ("+str(message.guild.get_member(KIPP_ID).voice.channel)+") in order to use music commands")
             return False
         else:
             return True
     else:
-        await message.channel.send( "Please start some music in order to use these commands:\n**!CLEARQUEUE**\n**!SKIP**\n**!GETVOL**\n**!SETVOL**\n**!PAUSE**\n**!RESUME**")
+        await message.channel.send( "Please start some music in order to use music commands")
         return False
 def READ_DATA_IN(path, condition=lambda x: True, attr_condition=lambda x: True):
     try:
@@ -410,7 +410,7 @@ async def CODE(message,message2):
     except discord.DiscordException:
         await message.channel.send("{0} My code is backed up on GitHub here: https://github.com/LockdownDoom/KIPP/blob/master/KIPP.py\nAlso, my code has been reviewed by Codacy here: https://app.codacy.com/project/LockdownDoom/KIPP/dashboard?branchId=10423847".format('Newest commit:\nThe newest commit is too large to be displayed here.'))
 async def SPEEDTEST(message,message2):
-    if await VerifyOwnerMeema(message):
+    if await VerifyOwner(message):
         await message.channel.send("Running Ookla speedtest... (this may take a moment)")
         out = subprocess.Popen("/home/pi/KIPP/KIPPSTUFF/speedtest.sh",stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode()
         await message.channel.send("```\n"+out+"\n```")
@@ -759,18 +759,6 @@ async def MUSIC(message,message2):
                                     with urllib.request.urlopen(req) as html:
                                         searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.read().decode())
                                     music4 = ("http://www.youtube.com/watch?v="+searchresults[0])
-                                    #cycles=-1
-                                    #valid=False
-                                    #while not valid and cycles < len(searchresults):
-                                        #cycles+=1
-                                        #music4 = ("http://www.youtube.com/watch?v=" + searchresults[cycles])
-                                        #page=requests.get(music4).text
-                                        #from bs4 import BeautifulSoup
-                                        #soup=BeautifulSoup(page,features='html.parser')
-                                        #if '<meta content="False" itemprop="paid"' in soup.prettify():
-                                            #valid=True
-                                    #if cycles==len(searchresults):
-                                        #raise IndexError
                                 except IndexError:
                                     await message.channel.send( ("Could not find '"+music4+"' on YouTube."))
                                     serverinfo[message.guild].loading = False
@@ -778,7 +766,6 @@ async def MUSIC(message,message2):
                             server = message.guild
                             if notsearched == False:
                                 if ((music3[0]).upper() == "!MUSIC"):
-                                    #if (music4.startswith("https://www.youtube.com") or music4.startswith("https://youtu.be") or music4.startswith("http://www.youtube.com")):
                                     if ("user" not in music4 and "youtube.com" in music4) or ("soundcloud.com" in music4):
                                         serverinfo[message.guild].musiccolor=playerinfo[message.author].hrolecolor
                                         users = []
@@ -811,10 +798,6 @@ async def MUSIC(message,message2):
                                     else:
                                         await message.channel.send( "Please do not try to play an entire youtube channel. Get one specific song you would like to hear, and play that.")
                                         serverinfo[message.guild].loading = False
-                                    #else:
-                                        #msg = "The music must come from YouTube"
-                                        #await message.channel.send( msg)
-                                        #serverinfo[message.guild].loading = False
                         else:
                             await message.channel.send( "You are not in a voice channel. Get in one for KIPP to play music.")
                             serverinfo[message.guild].loading = False
@@ -917,7 +900,7 @@ async def RESUME(message,message2):
         else:
             await message.channel.send( "There is currently music playing. To pause the music, use the **!pause** command.")
 async def BLOCK(message,message2):
-    if await VerifyOwnerMeema(message):
+    if await VerifyOwner(message):
         owner = message.guild.owner
         blockedP = str(message.content)
         blockedP2 = blockedP.split('|')
@@ -990,7 +973,7 @@ async def NICKNAME(message,message2):
                 except discord.DiscordException:
                     await message.channel.send( "KIPP does not have permission to change his nickname.")
 async def NAMEALL(message,message2):
-    if await VerifyOwnerMeema(message):
+    if await VerifyOwner(message):
         try:
             uchanged = 0
             for member in message.guild.members:
@@ -1022,7 +1005,7 @@ async def BLOCKEDLIST(message,message2):
     else:
         await message.channel.send( "There are no users currently blocked in this server. To block a user, use the **!block** command.")
 async def ADDROLE(message,message2):
-    if await VerifyOwnerMeema(message):
+    if await VerifyOwner(message):
         user = str(message.content).split('|')[2]
         rolechange = str(message.content).split('|')[1]
         user = message.guild.get_member_named(user)
@@ -1040,7 +1023,7 @@ async def AVATAR(message,message2):
     member = message.guild.get_member_named(member)
     await message.channel.send( str(member)+"'s icon URL is: "+str(member.avatar_url))
 async def REMOVEROLE(message,message2):
-    if await VerifyOwnerMeema(message):
+    if await VerifyOwner(message):
         user1 = str(message.content).split('|')[2]
         rolechange = str(message.content).split('|')[1]
         user = message.guild.get_member_named(user1)
@@ -1054,7 +1037,7 @@ async def REMOVEROLE(message,message2):
         else:
             await message.channel.send( "This role doesn't exist. Check the capital letters in the role, and make sure they are the same as what you enter.")
 async def BAN(message,message2):
-    if await VerifyOwnerMeema(message):
+    if await VerifyOwner(message):
         banuser = str(message.content).split('|')[1]
         banuser = message.guild.get_member_named(banuser)
         try:
@@ -1066,7 +1049,7 @@ async def BAN(message,message2):
         except AttributeError:
             await message.channel.send( "This user is already banned, or this user is not in the server. Make sure that you used the command like this: '!ban|nickname OR !ban|username'.")
 async def UNBAN(message,message2):
-    if await VerifyOwnerMeema(message):
+    if await VerifyOwner(message):
         if '#' in message2:
             unbanuser = str(message.content).split('|')[1]
             banned = await client.get_bans(message.guild)
@@ -1095,7 +1078,7 @@ async def UNBAN(message,message2):
         else:
             await message.channel.send( "Make sure you use '!unban|username#tag'.")
 async def WCHANNEL(message,message2):
-    if await VerifyOwnerMeema(message):
+    if await VerifyOwner(message):
         if serverinfo[message.guild].search_server_configs("WELCOME_CHANNEL") != None:
             if serverinfo[message.guild].search_server_configs("WELCOME_CHANNEL")[1] == str(message.channel.id):
                 await message.channel.send("This channel already is the welcome channel.")
@@ -1205,7 +1188,7 @@ async def PLAYLISTS(message,message2):
         embed=discord.Embed(title="Playlists",color=EMBEDCOLOR,description="There are no playlists in this server")
         await message.channel.send(embed=embed)
 async def INVITE(message,message2):
-    if await VerifyOwnerMeema(message):
+    if await VerifyOwner(message):
         unbanuser = str(message.content).split('|')[1]
         unbanuser = await client.get_user_info(unbanuser)
         try:
@@ -1215,7 +1198,7 @@ async def INVITE(message,message2):
         except discord.DiscordException:
             await message.channel.send( "Failed to invite "+str(unbanuser)+" to the server.")
 async def UNBLOCK(message,message2):
-    if await VerifyOwnerMeema(message):
+    if await VerifyOwner(message):
         unblocked1 = str(message.content).split('|')
         unblocked = unblocked1[1]
         if unblocked.upper() != "ALL":

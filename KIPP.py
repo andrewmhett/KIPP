@@ -1020,7 +1020,7 @@ async def BLOCKEDLIST(message,message2):
                 names.append("**"+str(message.guild.get_member(i))+"**")
             except discord.DiscordException:
                 try:
-                    names.append("**"+str(await client.get_user_info(i))+"**")
+                    names.append("**"+str(await client.get_user_info(i)+"**"))
                 except Exception:
                     print("Couldn't find user.")
         blocked=", ".join(names)
@@ -1404,27 +1404,13 @@ while True:
         global MSG_COUNTER
         MSG_COUNTER=MSG_COUNTER+1
         if message.guild != None or str(message.channel).upper=="DIRECT MESSAGE":
-            if str(message.author.id) in serverinfo[message.guild].blocked:
+            if message.author.id in serverinfo[message.guild].blocked:
                 await client.delete_message(message)
                 return
         if str(message.channel).upper().startswith('DIRECT MESSAGE') == False:
             serverinfo[message.guild].recentchannel = message.channel
         readarray=[]
         readarray=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/KIPPCOINS")
-        for server in client.guilds:
-            if str(server.id) == "451227721545285649":
-                if serverinfo[server].election == True:
-                    if str(message.channel).upper().startswith('DIRECT MESSAGE'):
-                        if message.author in serverinfo[server].voters:
-                            if message.content == "1" or message.content == "2":
-                                serverinfo[server].voters.remove(message.author)
-                                if message.content=="1":
-                                    can = serverinfo[server].can1
-                                    serverinfo[server].can1votes=serverinfo[server].can1votes+1
-                                else:
-                                    can = serverinfo[server].can2
-                                    serverinfo[server].can2votes=serverinfo[server].can2votes+1
-                                await message.author.send("Thank you for voting. You have voted for **{0}**.".format(str(can)))
         if str(message.guild) != "None":
             user = message.guild.get_member(KIPP_ID)
             playerinfo[message.author].game = str(message.author.activity)
@@ -1517,58 +1503,57 @@ while True:
             return
         if message.guild.get_member(KIPP_ID).mention in message2:
             await message.channel.send("What do you want? Use **!help** for the commands.")
-        if str(message.author.id) not in serverinfo[message.guild].blocked:
-            if message2.startswith("!HELP|"):
-                found=False
-                for command in commands:
-                    if "!" in message2.split("|")[1]:
-                        if command.Name==message2.split("|")[1]:
-                            emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
-                            emb.set_footer(text=profooter)
-                            await message.channel.send( embed=emb)
-                            found=True
-                    else:
-                        if command.Name=="!"+message2.split("|")[1]:
-                            emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
-                            emb.set_footer(text=profooter)
-                            await message.channel.send( embed=emb)
-                            found=True
-                if found==False:
-                    await message.channel.send("Sorry, but I couldn't find a registered command with that name.")
+        if message2.startswith("!HELP|"):
+            found=False
+            for command in commands:
+                if "!" in message2.split("|")[1]:
+                    if command.Name==message2.split("|")[1]:
+                        emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
+                        emb.set_footer(text=profooter)
+                        await message.channel.send( embed=emb)
+                        found=True
+                else:
+                    if command.Name=="!"+message2.split("|")[1]:
+                        emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
+                        emb.set_footer(text=profooter)
+                        await message.channel.send( embed=emb)
+                        found=True
+            if found==False:
+                await message.channel.send("Sorry, but I couldn't find a registered command with that name.")
+        else:
+            if "|" in message2:
+                c=message2.split("|")[0]
             else:
-                if "|" in message2:
-                    c=message2.split("|")[0]
-                else:
-                    c=message2
-                for command in commands:
-                    if command.Name == c:
-                        await command.Execute[0](message,message2)
-            if message2 == ('!HELP'):
-                misc=[]
-                musc=[]
-                sc=[]
-                kc=[]
-                oo=[]
-                for c in commands:
-                    if isinstance(c,MISC):
-                        misc.append(c.Name)
-                    elif isinstance(c,MUSC):
-                        musc.append(c.Name)
-                    elif isinstance(c,SCIN):
-                        sc.append(c.Name)
-                    elif isinstance(c,KIPC):
-                        kc.append(c.Name)
-                    elif isinstance(c,OWON):
-                        oo.append(c.Name)
-                em = discord.Embed(title='Help',description="**Use !Help|command for command-specific information**",colour=EMBEDCOLOR)
-                em.add_field(name="Miscellaneous",value="```"+"\n".join(misc)+"```")
-                em.add_field(name="Music",value="```"+"\n".join(musc)+"```")
-                em.add_field(name="Scientific",value="```"+"\n".join(sc)+"```")
-                if str(message.guild.id) == '451227721545285649':
-                    em.add_field(name="Meema Only",value="```"+"\n".join(oo)+"```")
-                else:
-                    em.add_field(name="Owner Only",value="```"+"\n".join(oo)+"```")
-                em.add_field(name="KIPPCOINS",value="```"+"\n".join(kc)+"```")
-                em.set_footer(text=profooter)
-                await message.channel.send(embed=em)
+                c=message2
+            for command in commands:
+                if command.Name == c:
+                    await command.Execute[0](message,message2)
+        if message2 == ('!HELP'):
+            misc=[]
+            musc=[]
+            sc=[]
+            kc=[]
+            oo=[]
+            for c in commands:
+                if isinstance(c,MISC):
+                    misc.append(c.Name)
+                elif isinstance(c,MUSC):
+                    musc.append(c.Name)
+                elif isinstance(c,SCIN):
+                    sc.append(c.Name)
+                elif isinstance(c,KIPC):
+                    kc.append(c.Name)
+                elif isinstance(c,OWON):
+                    oo.append(c.Name)
+            em = discord.Embed(title='Help',description="**Use !Help|command for command-specific information**",colour=EMBEDCOLOR)
+            em.add_field(name="Miscellaneous",value="```"+"\n".join(misc)+"```")
+            em.add_field(name="Music",value="```"+"\n".join(musc)+"```")
+            em.add_field(name="Scientific",value="```"+"\n".join(sc)+"```")
+            if str(message.guild.id) == '451227721545285649':
+                em.add_field(name="Meema Only",value="```"+"\n".join(oo)+"```")
+            else:
+                em.add_field(name="Owner Only",value="```"+"\n".join(oo)+"```")
+            em.add_field(name="KIPPCOINS",value="```"+"\n".join(kc)+"```")
+            em.set_footer(text=profooter)
+            await message.channel.send(embed=em)
     client.loop.run_until_complete(client.start(TOKEN))

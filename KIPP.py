@@ -1234,7 +1234,7 @@ async def UNBLOCK(message,message2):
             await message.channel.send( msg)
         elif unblocked.id in serverinfo[message.guild].blocked:
             msg = "Unblocked "+str(unblocked)
-            serverinfo[message.guild].blocked.remove(str(unblocked.id))
+            serverinfo[message.guild].blocked.remove(unblocked.id)
             await message.channel.send( msg)
 command["!SPEEDTEST"]=MISC("!SPEEDTEST","Runs Ookla speedtest and outputs the results\n**Usage**\n`!SPEEDTEST`",SPEEDTEST)
 command["!NEWPLAYLIST"]=MUSC("!NEWPLAYLIST","Creates a new music playlist of a given name\n**Usage**\n`!NEWPLAYLIST|name`",NEWPLAYLIST)

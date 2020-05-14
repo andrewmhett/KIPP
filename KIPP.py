@@ -260,7 +260,7 @@ class music_handler():
                 if self.message != None:
                     try:
                         await self.message.edit(embed=self.em)
-                    except:
+                    except Exception as e:
                         self.message=await self.channel.send(embed=self.em)
                 else:
                     self.message = await self.channel.send(embed=self.em)

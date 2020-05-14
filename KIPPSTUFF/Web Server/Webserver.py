@@ -62,4 +62,6 @@ def CountDown():
 @app.route('/stream')
 def stream():
     return flask.Response(eventStream(),mimetype="text/event-stream")
-app.run(host='0.0.0.0', port=80)
+import socket
+ip = socket.gethostbyname(socket.gethostname())
+app.run(host=ip, port=80)

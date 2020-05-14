@@ -30,6 +30,7 @@ while True:
     try:
         os.system("sudo python3.6 /home/pi/KIPP/KIPP.py")
     except Exception as e:
-        if type(e) in KIPP_RESET_ERRORS:
-            pass
+        #if type(e) in KIPP_RESET_ERRORS:
+            #pass
+        logging.log(50, "ERROR: {0}".format(e))
     logging.log(50,"KIPP restarting...")

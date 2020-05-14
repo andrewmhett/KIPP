@@ -10,6 +10,7 @@ stdout=p.communicate()[0].decode()
 p.kill()
 status=stdout.split('ago')[0]+"ago"
 import datetime
+time=datetime.datetime.now().strftime("%H:%M")
 def get_time():
     time=datetime.datetime.now().strftime("%H:%M")
     if int(time[0:2])>12:
@@ -24,12 +25,13 @@ oldcpu = tmp.read()
 tmp.close()
 oldcpu=str(int(oldcpu)/1000)
 def eventStream():
-    global time
     global status
     global ti
+    global time
     while True:
         if datetime.datetime.now().strftime("%H:%M") != time:
             ti=get_time()
+            time=datetime.datetime.now().strftime("%H:%M")
             yield "event:time_event\ndata:{}\n\n".format(ti)
         p=Popen('/home/pi/KIPP/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
         stdout=p.communicate()[0].decode()
@@ -49,16 +51,6 @@ def home():
     global oldcpu
     ti=get_time()
     return flask.render_template('index.html',time=ti,cpu=oldcpu)
-@app.route('/CountUp')
-def CountUp():
-    global counter
-    counter+=1
-    return "done"
-@app.route('/CountDown')
-def CountDown():
-    global counter
-    counter-=1
-    return "done"
 @app.route('/stream')
 def stream():
     return flask.Response(eventStream(),mimetype="text/event-stream")

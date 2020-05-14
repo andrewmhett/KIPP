@@ -26,7 +26,6 @@ tmp.close()
 oldcpu=str(int(oldcpu)/1000)
 def eventStream():
     global status
-    global ti
     global time
     while True:
         if datetime.datetime.now().strftime("%H:%M") != time:

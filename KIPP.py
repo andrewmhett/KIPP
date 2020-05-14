@@ -124,7 +124,7 @@ class Profile:
     def GIVE_KIPPCOINS(self, KC):
         balance=int(subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])+KC
         subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","w",str(self.user.id),str(balance)])
-class Command():
+class Command:
     def __init__(self,n,h,e):
         global commands
         self.Help=h,
@@ -148,7 +148,31 @@ def reset_gamblegame(user):
     playerinfo[playerinfo[user].challenger].betting=False
     playerinfo[user].betting=False
     playerinfo[user].challenger=None
-class music_handler():
+async def join_voice_channel(message):
+    users = []
+    for user in message.author.voice.channel.members:
+        users.append(user)
+    if message.guild.voice_client == None:
+        channel = message.author.voice.channel
+        await channel.connect()
+        serverinfo[message.guild].jointime=datetime.now()
+    if message.guild.get_member(KIPP_ID) not in users:
+        channel = message.author.voice.channel
+        user = message.guild.get_member(KIPP_ID)
+        await user.edit(voice_channel=channel)
+def search_music(query):
+    music=None
+    if ((music4.startswith("https://www.youtube.com") == False) and (music4.startswith("https://youtu.be") == False) and (music4.startswith("http://www.youtube.com") == False) and "//soundcloud.com" not in music4):
+        try:
+            query_string = urllib.parse.urlencode({"search_query" : music4})
+            req = urllib.request.Request("http://www.youtube.com/results?" + query_string)
+            with urllib.request.urlopen(req) as html:
+                searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.read().decode())
+            music="http://www.youtube.com/watch?v="+searchresults[0]
+        except IndexError:
+            logging.log(50,"Not found")
+    return music
+class music_handler:
     def __init__(self,server,player,channel):
         self.server=server
         self.channel=channel
@@ -732,33 +756,19 @@ async def MUSIC(message,message2):
                             music4 = music4.split('youtu.be/')[1]
                             music4 = "https://www.youtube.com/watch?v="+music4
                         if str(message.author.voice.channel) != "None":
-                            if ((music4.startswith("https://www.youtube.com") == False) and (music4.startswith("https://youtu.be") == False) and (music4.startswith("http://www.youtube.com") == False) and "//soundcloud.com" not in music4):
-                                try:
-                                    query_string = urllib.parse.urlencode({"search_query" : music4})
-                                    req = urllib.request.Request("http://www.youtube.com/results?" + query_string)
-                                    with urllib.request.urlopen(req) as html:
-                                        searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.read().decode())
-                                    music4 = ("http://www.youtube.com/watch?v="+searchresults[0])
-                                except IndexError:
-                                    await message.channel.send( ("Could not find '"+music4+"' on YouTube."))
-                                    serverinfo[message.guild].loading = False
-                                    notsearched = True
+                            query=music4
+                            music4=search_music(music4)
+                            serverinfo[message.guild].loading = False
+                            notsearched=False
+                            if music4==None:
+                                notsearched=True
+                                await message.chanel.send("Could not find music matching query `{0}`".format(query))
                             server = message.guild
                             if notsearched == False:
                                 if ((music3[0]).upper() == "!MUSIC"):
                                     if ("user" not in music4 and "youtube.com" in music4) or ("soundcloud.com" in music4):
                                         serverinfo[message.guild].musiccolor=playerinfo[message.author].hrolecolor
-                                        users = []
-                                        for user in message.author.voice.channel.members:
-                                            users.append(user)
-                                        if message.guild.voice_client == None:
-                                            channel = message.author.voice.channel
-                                            await channel.connect()
-                                            serverinfo[message.guild].jointime=datetime.now()
-                                        if message.guild.get_member(KIPP_ID) not in users:
-                                            channel = message.author.voice.channel
-                                            user = message.guild.get_member(KIPP_ID)
-                                            await user.edit(voice_channel=channel)
+                                        await join_voice_channel(message)
                                         if serverinfo[message.guild].playlist != None:
                                             serverinfo[message.guild].queue=serverinfo[message.guild].queue[:-1]
                                             add_to_queue(message.guild, music4)
@@ -789,17 +799,7 @@ async def MUSIC(message,message2):
             else:
                 if serverinfo[message.guild].search_server_configs(message2.split("|")[1]) != None:
                     if len(serverinfo[message.guild].search_server_configs(message2.split("|")[1])[0][1:])>0:
-                        users = []
-                        for user in message.author.voice.channel.members:
-                            users.append(user)
-                        if message.guild.voice_client == None:
-                            channel = message.author.voice.channel
-                            await channel.connect()
-                            serverinfo[message.guild].jointime=datetime.now()
-                        if message.guild.get_member(KIPP_ID) not in users:
-                            channel = message.author.voice.channel
-                            user = message.guild.get_member(KIPP_ID)
-                            await user.edit(voice_channel=channel)
+                        await join_voice_channel(message)
                         serverinfo[message.guild].musicchannel=message.channel
                         serverinfo[message.guild].queue.append("PLAYLIST: {0}".format(message2.split("PLAYLIST:")[1]))
                     else:
@@ -1097,18 +1097,12 @@ async def APPENDPLAYLIST(message,message2):
                 music4 = music4[0]
             if music4.startswith("https://youtu.be"):
                 music4 = music4.split('youtu.be/')[1]
-                music4 = "https://www.youtube.com/watch?v="+music4
-            if "user" not in music4 and "list" not in music4 and ((music4.startswith("https://www.youtube.com") == False) and (music4.startswith("https://youtu.be") == False) and (music4.startswith("http://www.youtube.com") == False)):
-                try:
-                    query_string = urllib.parse.urlencode({"search_query" : music4})
-                    req = urllib.request.Request("http://www.youtube.com/results?" + query_string)
-                    with urllib.request.urlopen(req) as html:
-                        searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.read().decode())
-                    music4 = ("http://www.youtube.com/watch?v=" + searchresults[0])
-                except IndexError:
-                    await message.channel.send( ("Could not find '"+music4+"' on YouTube."))
-                    serverinfo[message.guild].loading = False
-                    return
+                music4 = "https://www.youtube.com/watch?v="+music4   
+            query=music4
+            music4=search_music(music4)
+            if music4 == None:
+                await message.channel.send("Could not find song with query `{0}`".format(query))
+                return
             serverinfo[message.guild].loading = False
             if len(serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(name))[0])>1:
                 arr=serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(name))[0][1:]

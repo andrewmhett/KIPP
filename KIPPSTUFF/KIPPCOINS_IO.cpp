@@ -26,7 +26,7 @@ void map_data(){
 		accounts_v.push_back(read_struct);
 	}
 	input.close();
-	for(vector<Account>::iterator it = accounts_v.begin(); it != accounts_v.end(); it++){
+	for(vector<Account>::iterator it = accounts_v.begin(); it != accounts_v.end(); ++it){
 		Account account = *it;
 		accounts[account.id] = account.balance;
 	}

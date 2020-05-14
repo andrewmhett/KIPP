@@ -10,13 +10,15 @@ stdout=p.communicate()[0].decode()
 p.kill()
 status=stdout.split('ago')[0]+"ago"
 import datetime
-time=datetime.datetime.now().strftime("%H:%M")
-if int(time[0:2])>12:
-    ti=str(int(time[0:2])-12)+time[2:]+" PM"
-else:
-    ti=time+" AM"
-if ti[0:2]=="00":
-    ti="12:"+ti.split(":")[1]
+def get_time():
+    time=datetime.datetime.now().strftime("%H:%M")
+    if int(time[0:2])>12:
+        ti=str(int(time[0:2])-12)+time[2:]+" PM"
+    else:
+        ti=time+" AM"
+    if ti[0:2]=="00":
+        ti="12:"+ti.split(":")[1]
+    return ti
 tmp = open('/sys/class/thermal/thermal_zone0/temp')
 oldcpu = tmp.read()
 tmp.close()
@@ -27,13 +29,7 @@ def eventStream():
     global ti
     while True:
         if datetime.datetime.now().strftime("%H:%M") != time:
-            time=datetime.datetime.now().strftime("%H:%M")
-            if int(time[0:2])>12:
-                ti=str(int(time[0:2])-12)+time[2:]+" PM"
-            else:
-                ti=time+" AM"
-            if ti[0:2]=="00":
-                ti="12:"+ti.split(":")[1]
+            ti=get_time()
             yield "event:time_event\ndata:{}\n\n".format(ti)
         p=Popen('/home/pi/KIPP/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
         stdout=p.communicate()[0].decode()

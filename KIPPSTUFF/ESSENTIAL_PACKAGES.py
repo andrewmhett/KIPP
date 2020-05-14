@@ -19,8 +19,8 @@ import aiohttp
 import socket
 from lxml import etree
 import logging
+import youtube_dl
 logging.getLogger().setLevel(logging.INFO)
-EMBEDCOLOR=0x36393E
 try:
 	from Token import TOKEN
 except:

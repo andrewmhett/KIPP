@@ -14,7 +14,6 @@ import threading
 import subprocess
 sys.path.append('/home/pi/KIPP/KIPPSTUFF')
 from ESSENTIAL_PACKAGES import *
-import youtube_dl
 CREATOR_ID=289920025077219328
 KIPP_ID=386352783550447628
 MSG_COUNTER=0
@@ -61,19 +60,8 @@ class Server:
         self.gamgamestarter = None
         self.gamgameopp = None
         self.recentchannel=None
-        self.musiccolor=None
         self.queue = []
-        self.election=False
-        self.sElectiontime = None
-        self.electionmessage = None
-        self.can1=None
-        self.can2=None
-        self.can1votes=0
-        self.can2votes=0
-        self.voters=[]
-        self.messagesent=[]
         self.oldtime=0
-        self.events=[]
         self.end_time=datetime.now()
         self.loading=False
         self.jointime=datetime.now()
@@ -131,13 +119,11 @@ class Profile:
         self.hrolecolor = None
         self.streaming = False
         self.user = user
-        self.instore=False
-        self.storepage=None
     def GET_KIPPCOINS(self):
         return int(subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])
     def GIVE_KIPPCOINS(self, KC):
-       balance=int(subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])+KC
-       subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","w",str(self.user.id),str(balance)])
+        balance=int(subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])+KC
+        subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","w",str(self.user.id),str(balance)])
 class Command():
     def __init__(self,n,h,e):
         global commands
@@ -155,6 +141,13 @@ class MUSC(Command):
     pass
 class SCIN(Command):
     pass
+def reset_gamblegame(self,user):
+    playerinfo[user].gamblemessage=None
+    playerinfo[playerinfo[user].challenger].gamblemessage=None
+    playerinfo[playerinfo[user].challenger].challenger=None
+    playerinfo[playerinfo[user].challenger].betting=False
+    playerinfo[user].betting=False
+    playerinfo[user].challenger=None
 class music_handler():
     def __init__(self,server,player,channel):
         self.server=server
@@ -171,6 +164,7 @@ class music_handler():
             mins=int(self.duration/60)
             seconds=int(self.duration-(mins*60))
             hours=int(mins/60)
+            self.hours=hours
             if hours > 0:
                 mins=mins-(hours*60)
                 if len(str(mins))==1:
@@ -194,7 +188,6 @@ class music_handler():
         self.is_playing=True
         self.pausedatetime=None
         self.pausetime=None
-        self.pausetimeout=False
         client.loop.create_task(self.update_loop())
     def skip(self):
         self.server.voice_client.stop()
@@ -252,10 +245,7 @@ class music_handler():
             self.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
             if (self.is_playing == False or c.seconds >= self.duration) and self.player.is_live == False:
                 self.server.voice_client.stop()
-                if not self.pausetimeout:
-                    em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Song Ended**", colour=EMBEDCOLOR)
-                else:
-                    em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Pause Timeout**", colour=EMBEDCOLOR)
+                em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Song Ended**", colour=EMBEDCOLOR)
                 em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
                 await self.message.edit(embed=em)
                 serverinfo[self.server].queue.remove(serverinfo[self.server].queue[0])
@@ -359,12 +349,7 @@ async def EXIT(message,message2):
         emb=discord.Embed(title="GambleGame",description="GAME ENDED",colour=EMBEDCOLOR)
         emb.set_footer(text=profooter)
         await playerinfo[message.author].gamblemessage.edit(embed=emb)
-        playerinfo[message.author].gamblemessage=None
-        playerinfo[playerinfo[message.author].challenger].gamblemessage=None
-        playerinfo[playerinfo[message.author].challenger].challenger=None
-        playerinfo[playerinfo[message.author].challenger].betting=False
-        playerinfo[message.author].betting=False
-        playerinfo[message.author].challenger=None
+        reset_gamblegame(message.author)
 async def PLAY(message,message2):
     if playerinfo[message.author].solo == True and playerinfo[message.author].bet != None:
         rand=SystemRandom().randrange(1,4)
@@ -394,12 +379,7 @@ async def PLAY(message,message2):
             await playerinfo[message.author].gamblemessage.edit(embed=emb)
             playerinfo[winner].GIVE_KIPPCOINS(int(playerinfo[message.author].bet))
             playerinfo[playerinfo[winner].challenger].GIVE_KIPPCOINS(-1*int(playerinfo[message.author].bet))
-            playerinfo[message.author].gamblemessage=None
-            playerinfo[playerinfo[message.author].challenger].gamblemessage=None
-            playerinfo[playerinfo[message.author].challenger].challenger=None
-            playerinfo[playerinfo[message.author].challenger].betting=False
-            playerinfo[message.author].betting=False
-            playerinfo[message.author].challenger=None
+            reset_gamblegame(message.author)
 async def CODE(message,message2):
     from subprocess import Popen, PIPE
     p=Popen('/home/pi/KIPP/KIPPSTUFF/NewestCommit.sh',stdout=PIPE,stderr=PIPE)

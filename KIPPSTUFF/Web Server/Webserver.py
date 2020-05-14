@@ -46,8 +46,8 @@ def eventStream():
 @app.route('/')
 def home():
     global status
-    global ti
     global oldcpu
+    ti=get_time()
     return flask.render_template('index.html',time=ti,cpu=oldcpu)
 @app.route('/CountUp')
 def CountUp():

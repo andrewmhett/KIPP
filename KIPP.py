@@ -141,7 +141,7 @@ class MUSC(Command):
     pass
 class SCIN(Command):
     pass
-def reset_gamblegame(self,user):
+def reset_gamblegame(user):
     playerinfo[user].gamblemessage=None
     playerinfo[playerinfo[user].challenger].gamblemessage=None
     playerinfo[playerinfo[user].challenger].challenger=None

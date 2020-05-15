@@ -1,5 +1,7 @@
 import sys
-sys.path.append("KIPPSTUFF")
+import os
+KIPP_DIR=os.environ["KIPP_DIR"]
+sys.path.append(KIPP_DIR+"/KIPPSTUFF")
 import ESSENTIAL_PACKAGES
 commands=[]
 command={}

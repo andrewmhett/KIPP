@@ -176,7 +176,6 @@ async def background_loop():
                             print ("Voice client timeout, can't disconnect")
         await asyncio.sleep(1)
 #discord.opus.load_opus('/usr/lib/arm-linux-gnueabihf/libopus.so.0.5.3')
-InterstellarQuotes = ["'Do not go gentle into that good night'\n**Professor Brand**", "'Come on, TARS!'\n**Cooper**", "'Cooper, this is no time for caution!'\n**TARS**", "'You tell that to Doyle.'\n**Cooper**", "'Newton's third law. You gotta leave something behind.'\n**Cooper**", "'Step back, professor, step back!'\n**TARS**","'No, it's necessary.'\n**Cooper**"]
 playingName = 'Type !help'
 oldyear = ((str(datetime.now())[0])+(str(datetime.now())[1])+(str(datetime.now())[2])+(str(datetime.now())[3]))
 oldmonth = ((str(datetime.now())[5])+(str(datetime.now())[6]))

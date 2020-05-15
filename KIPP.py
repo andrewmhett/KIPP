@@ -498,6 +498,11 @@ async def CATORDOG(message,message2):
     else:
         prediction = results.predictions[0]
         await message.channel.send("\t" + prediction.tag_name + ": {0:.2f}%".format(prediction.probability * 100))
+async def send_image(message,url,ext):
+    emb=discord.Embed(title=("{0} result for '{1}'".format(ext,str(message.content).split('|')[1])),colour=EMBEDCOLOR)
+    emb.set_image(url=url)
+    emb.set_footer(text=profooter)
+    await message.channel.send(embed=emb)
 async def IMAGE(message,message2):
     await message.channel.send( "Processing image request...")
     url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(message2.split('|')[1].replace(' ','+').replace("'","%27"),message2.split('|')[1].replace(' ','+').replace("'","%27"))
@@ -515,10 +520,7 @@ async def IMAGE(message,message2):
             if ".JPEG" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper() or ".JPG" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper():
                 image = "https://"+str(req).split('https://')[i].split('"')[0]
                 if requests.get(image).status_code==200:
-                    emb=discord.Embed(title=("Image result for '{0}'".format(str(message.content).split('|')[1])),colour=EMBEDCOLOR)
-                    emb.set_image(url=image)
-                    emb.set_footer(text=profooter)
-                    await message.channel.send( embed=emb)
+                    await send_image(message,image,"Image")
                     break
         except Exception:
             cont=cont+1
@@ -539,10 +541,7 @@ async def GIF(message,message2):
             if ".GIF" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper():
                 image = "https://"+str(req).split('https://')[i].split('"')[0]
                 if requests.get(image).status_code==200:
-                    emb=discord.Embed(title=("Gif result for '{0}'".format(str(message.content).split('|')[1])),colour=EMBEDCOLOR)
-                    emb.set_image(url=image)
-                    emb.set_footer(text=profooter)
-                    await message.channel.send( embed=emb)
+                    await send_image(message,image,"Gif")
                     break
         except Exception:
             cont=cont+1
@@ -1457,14 +1456,10 @@ while True:
         if message2.startswith("!HELP|"):
             found=False
             for command in commands:
-                if "!" in message2.split("|")[1]:
-                    if command.Name==message2.split("|")[1]:
-                        emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
-                        emb.set_footer(text=profooter)
-                        await message.channel.send( embed=emb)
-                        found=True
-                else:
-                    if command.Name=="!"+message2.split("|")[1]:
+                search=message2.split("|")[1]
+                if "!" not in search:
+                    search="!"+search
+                    if command.Name==search:
                         emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
                         emb.set_footer(text=profooter)
                         await message.channel.send( embed=emb)

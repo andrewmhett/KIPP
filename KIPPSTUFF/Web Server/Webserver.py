@@ -1,11 +1,11 @@
 import flask
 import json
 import time as t
+import os
+KIPP_DIR=os.eviron['KIPP_DIR']
 app=flask.Flask(__name__)
-#counter=0
-#oldcount=0
 from subprocess import Popen, PIPE
-p=Popen('/home/pi/KIPP/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
+p=Popen(KIPP_DIR+'/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
 stdout=p.communicate()[0].decode()
 p.kill()
 status=stdout.split('ago')[0]+"ago"
@@ -32,7 +32,7 @@ def eventStream():
             ti=get_time()
             time=datetime.datetime.now().strftime("%H:%M")
             yield "event:time_event\ndata:{}\n\n".format(ti)
-        p=Popen('/home/pi/KIPP/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
+        p=Popen(KIPP_DIR+'/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
         stdout=p.communicate()[0].decode()
         p.kill()
         if (stdout.split('ago')[0]+"ago" != status):

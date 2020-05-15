@@ -12,7 +12,8 @@ import logging
 import os
 import threading
 import subprocess
-sys.path.append('/home/pi/KIPP/KIPPSTUFF')
+KIPP_DIR=os.environ['KIPP_DIR']
+sys.path.append(KIPP_DIR+'/KIPPSTUFF')
 from ESSENTIAL_PACKAGES import *
 CREATOR_ID=289920025077219328
 KIPP_ID=386352783550447628
@@ -76,17 +77,17 @@ class Server:
         song=self.search_server_configs("PLAYLIST:{0}".format(self.playlist))[0][1:][i]
         return song
     def add_server_config(self,data):
-        arr=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}".format(str(self.server.id)))
+        arr=READ_DATA_IN(KIPP_DIR+"/KIPPSTUFF/ServerConfigs/{0}".format(str(self.server.id)))
         if arr==None:
             arr=[]
         arr.append(data)
-        with open('/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}'.format(str(self.server.id)),'w') as f:
+        with open(KIPP_DIR+'/KIPPSTUFF/ServerConfigs/{0}'.format(str(self.server.id)),'w') as f:
             writer=csv.writer(f)
             for row in arr:
                 writer.writerow(row)
             f.close()
     def change_server_config(self,data,newdata):
-        arr=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}".format(str(self.server.id)))
+        arr=READ_DATA_IN(KIPP_DIR+"/KIPPSTUFF/ServerConfigs/{0}".format(str(self.server.id)))
         if arr==None:
             arr=[]
         cntr=0
@@ -95,13 +96,13 @@ class Server:
                 arr[cntr] = newdata
                 break
             cntr=cntr+1
-        with open('/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}'.format(str(self.server.id)),'w') as f:
+        with open(KIPP_DIR+'/KIPPSTUFF/ServerConfigs/{0}'.format(str(self.server.id)),'w') as f:
             writer=csv.writer(f)
             for row in arr:
                 writer.writerow(row)
             f.close()
     def search_server_configs(self,query):
-        data=READ_DATA_IN('/home/pi/KIPP/KIPPSTUFF/ServerConfigs/{0}'.format(str(self.server.id)),condition=lambda x: True if query in str(x) else False)
+        data=READ_DATA_IN(KIPP_DIR+'/KIPPSTUFF/ServerConfigs/{0}'.format(str(self.server.id)),condition=lambda x: True if query in str(x) else False)
         return data
 class Profile:
     def __init__(self,user):
@@ -120,10 +121,10 @@ class Profile:
         self.streaming = False
         self.user = user
     def GET_KIPPCOINS(self):
-        return int(subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])
+        return int(subprocess.Popen([KIPP_DIR+"/KIPPSTUFF/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])
     def GIVE_KIPPCOINS(self, KC):
-        balance=int(subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])+KC
-        subprocess.Popen(["/home/pi/KIPP/KIPPSTUFF/KIPPCOINS_IO","w",str(self.user.id),str(balance)])
+        balance=int(subprocess.Popen([KIPP_DIR+"/KIPPSTUFF/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])+KC
+        subprocess.Popen([KIPP_DIR+"/KIPPSTUFF/KIPPCOINS_IO","w",str(self.user.id),str(balance)])
 class Command:
     def __init__(self,n,h,e):
         global commands
@@ -406,7 +407,7 @@ async def PLAY(message,message2):
             reset_gamblegame(message.author)
 async def CODE(message,message2):
     from subprocess import Popen, PIPE
-    p=Popen('/home/pi/KIPP/KIPPSTUFF/NewestCommit.sh',stdout=PIPE,stderr=PIPE)
+    p=Popen(KIPP_DIR+'/KIPPSTUFF/NewestCommit.sh',stdout=PIPE,stderr=PIPE)
     stdout=p.communicate()[0]
     p.kill()
     try:
@@ -416,7 +417,7 @@ async def CODE(message,message2):
 async def SPEEDTEST(message,message2):
     if await VerifyOwner(message):
         await message.channel.send("Running Ookla speedtest... (this may take a moment)")
-        out = subprocess.Popen("/home/pi/KIPP/KIPPSTUFF/speedtest.sh",stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode()
+        out = subprocess.Popen(KIPP_DIR+"/KIPPSTUFF/speedtest.sh",stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode()
         await message.channel.send("```\n"+out+"\n```")
 async def GA(message,message2):
     mass = str(message.content).split('|')[1].replace('^', '**')
@@ -468,13 +469,13 @@ async def GRAPH(message,message2):
     with open ('graph.png','rb') as f:
         await client.send_message_file(message.channel, f)
 async def FATE(message,message2):
-    imgs=os.listdir("/home/pi//KIPPSTUFF/FATE")
+    imgs=os.listdir(KIPP_DIR+"/KIPPSTUFF/FATE")
     arrlen = int(len(imgs))
     picNum = SystemRandom().randrange(0,arrlen)
     yakub=False
     if "YAKUB" in imgs[picNum].upper():
         yakub=True
-    with open("/home/pi/KIPP/KIPPSTUFF/FATE/"+imgs[picNum], 'rb') as f:
+    with open(KIPP_DIR+"/KIPPSTUFF/FATE/"+imgs[picNum], 'rb') as f:
         await client.send_message_file(message.channel, f)
         f.close()
     if yakub==True:
@@ -673,7 +674,7 @@ async def BET(message,message2):
             await client.delete_message(message)
 async def STATUS(message,message2):
     from subprocess import Popen, PIPE
-    p=Popen('/home/pi/KIPP/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
+    p=Popen(KIPP_DIR+'/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
     stdout=p.communicate()[0].decode()
     p.kill()
     await message.channel.send("```"+stdout.split('ago')[0]+"ago```")
@@ -1360,7 +1361,7 @@ while True:
         if str(message.channel).upper().startswith('DIRECT MESSAGE') == False:
             serverinfo[message.guild].recentchannel = message.channel
         readarray=[]
-        readarray=READ_DATA_IN("/home/pi/KIPP/KIPPSTUFF/KIPPCOINS")
+        readarray=READ_DATA_IN(KIPP_DIR+"/KIPPSTUFF/KIPPCOINS")
         if str(message.guild) != "None":
             user = message.guild.get_member(KIPP_ID)
             playerinfo[message.author].game = str(message.author.activity)

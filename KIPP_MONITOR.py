@@ -6,8 +6,10 @@ import concurrent.futures._base
 import aiohttp
 import logging
 import threading
+print(os.environ)
+KIPP_DIR=os.environ['KIPP_DIR']
 def WebMonitor():
-    os.system('sudo python3.6 "/home/pi/KIPP/KIPPSTUFF/Web Server/Webserver.py"')
+    os.system('sudo -E python3.6 "{0}/KIPPSTUFF/Web Server/Webserver.py"'.format(KIPP_DIR))
 t1=threading.Thread(target=WebMonitor)
 t1.start()
 KIPP_RESET_ERRORS = [ConnectionResetError,
@@ -17,18 +19,18 @@ KIPP_RESET_ERRORS = [ConnectionResetError,
                      websockets.exceptions.InvalidStatusCode]
 try:
     logging.log(50,"Backing KIPP up to GitHub...")
-    os.system('sudo /home/pi/KIPP/KIPPSTUFF/BackupKIPP.sh')
+    os.system('sudo -E {0}/KIPPSTUFF/BackupKIPP.sh'.format(KIPP_DIR))
 except FileNotFoundError:
     logging.log(50,"KIPP backup file not found.")
 try:
     logging.log(50,"Checking for package updates")
-    os.system('sudo /home/pi/KIPP/KIPPSTUFF/REQUIREMENTUPDATES.sh')
+    os.system('sudo -E {0}/KIPPSTUFF/REQUIREMENTUPDATES.sh'.format(KIPP_DIR))
 except FileNotFoundError:
     logging.log(50,"KIPP package updater not found.")
 while True:
     logging.log(50,"KIPP starting...")
     try:
-        os.system("sudo python3.6 /home/pi/KIPP/KIPP.py")
+        os.system("sudo -E python3.6 {0}/KIPP.py".format(KIPP_DIR))
     except Exception as e:
         #if type(e) in KIPP_RESET_ERRORS:
             #pass

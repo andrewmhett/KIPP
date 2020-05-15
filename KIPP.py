@@ -162,9 +162,9 @@ async def join_voice_channel(message):
         await user.edit(voice_channel=channel)
 def search_music(query):
     music=None
-    if ((music4.startswith("https://www.youtube.com") == False) and (music4.startswith("https://youtu.be") == False) and (music4.startswith("http://www.youtube.com") == False) and "//soundcloud.com" not in music4):
+    if ((query.startswith("https://www.youtube.com") == False) and (query.startswith("https://youtu.be") == False) and (query.startswith("http://www.youtube.com") == False) and "//soundcloud.com" not in query):
         try:
-            query_string = urllib.parse.urlencode({"search_query" : music4})
+            query_string = urllib.parse.urlencode({"search_query" : query})
             req = urllib.request.Request("http://www.youtube.com/results?" + query_string)
             with urllib.request.urlopen(req) as html:
                 searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.read().decode())

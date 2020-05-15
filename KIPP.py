@@ -26,7 +26,6 @@ START_TIME=datetime.now()
 client = discord.Client()
 profooter=""
 last_ping=t.time()
-EMBEDCOLOR=0x36393E
 def reset_gamblegame(user):
     playerinfo[user].gamblemessage=None
     playerinfo[playerinfo[user].challenger].gamblemessage=None
@@ -384,7 +383,7 @@ while True:
                 c=message2
             for command in commands:
                 if command.Name == c:
-                    await command.Execute[0](message,message2)
+                    await command.Execute[0](message,message2,profooter)
         if message2 == ('!HELP'):
             misc=[]
             musc=[]

@@ -20,6 +20,7 @@ import socket
 from lxml import etree
 import logging
 import youtube_dl
+EMBEDCOLOR=0x36393E
 logging.getLogger().setLevel(logging.INFO)
 try:
 	from Token import TOKEN

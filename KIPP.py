@@ -1024,7 +1024,7 @@ async def background_loop():
                     if serverinfo[server].playlist != None:
                         serverinfo[server].queue.append(serverinfo[server].queue[0])
                 player = await YTDLSource.from_url(music, loop=asyncio.get_event_loop()) 
-                serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
+                serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel,profooter,client.loop,serverinfo)
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
                 c=datetime.datetime.now()-serverinfo[server].end_time
                 b=datetime.datetime.now()-serverinfo[server].jointime

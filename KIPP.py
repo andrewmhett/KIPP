@@ -205,7 +205,7 @@ class music_handler:
                     self.length=str(mins)+":"+str(seconds)
         else:
             self.length = "Currently Streaming"
-        self.desc = ("["+self.title+"]("+self.link+")\n**Progress:**: `0:00 / "+self.length)
+        self.desc = ("["+self.title+"]("+self.link+")**Progress:**: `0:00 / "+self.length)
         self.em = discord.Embed(description=self.desc,colour=EMBEDCOLOR)
         self.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
         self.footer=profooter
@@ -263,9 +263,9 @@ class music_handler:
                     self.minutedelta="0"+str(self.minutedelta)
                 else:
                     self.minutedelta=str(self.minutedelta)
-                self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'\n**Progress:** `'+str(self.hours)+":"+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+'`'+pauseStr+'\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
+                self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'**Progress:** `'+str(self.hours)+":"+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+'`'+pauseStr+'\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
             else:
-                self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'\n**Progress:** `'+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+'`'+pauseStr+'\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
+                self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'**Progress:** `'+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+'`'+pauseStr+'\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
             self.em.set_footer(text=self.footer)
             self.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
             if (self.is_playing == False or c.seconds >= self.duration) and self.player.is_live == False:

@@ -26,14 +26,7 @@ command={}
 client = discord.Client()
 profooter=""
 last_ping=t.time()
-ytdl_format_options = {
-    'format': 'bestaudio/best',
-}
 EMBEDCOLOR=0x36393E
-ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
-ffmpeg_options = {
-    'options': '-vn'
-}
 class Profile:
     def __init__(self,user):
         self.gamblemessage=None

@@ -328,7 +328,7 @@ while True:
                 c=message2
             for command in commands:
                 if command.Name == c:
-                    await command.Execute[0](message,message2,profooter)
+                    await command.Execute[0](message,message2,profooter,serverinfo,playerinfo)
         if message2 == ('!HELP'):
             misc=[]
             musc=[]

@@ -205,7 +205,7 @@ class music_handler:
                     self.length=str(mins)+":"+str(seconds)
         else:
             self.length = "Currently Streaming"
-        self.desc = ("["+self.title+"]("+self.link+")\n**Progress:**: `0:00 / "+self.length+"`\n**Volume:** "+str(int(self.player.volume*100)))
+        self.desc = ("["+self.title+"]("+self.link+")\n**Progress:**: `0:00 / "+self.length)
         self.em = discord.Embed(description=self.desc,colour=EMBEDCOLOR)
         self.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
         self.footer=profooter
@@ -263,9 +263,9 @@ class music_handler:
                     self.minutedelta="0"+str(self.minutedelta)
                 else:
                     self.minutedelta=str(self.minutedelta)
-                self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'**Volume:** '+str(int(self.player.volume*100))+'%'+'\n**Progress:** `'+str(self.hours)+":"+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+'`'+pauseStr+'\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
+                self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'\n**Progress:** `'+str(self.hours)+":"+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+'`'+pauseStr+'\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
             else:
-                self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'**Volume:** '+str(int(self.player.volume*100))+'%'+'\n**Progress:** `'+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+'`'+pauseStr+'\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
+                self.em=discord.Embed(description = self.desc.split('**Progress:**')[0]+'\n**Progress:** `'+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+'`'+pauseStr+'\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
             self.em.set_footer(text=self.footer)
             self.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
             if (self.is_playing == False or c.seconds >= self.duration) and self.player.is_live == False:
@@ -838,28 +838,6 @@ async def REMOVESONG(message,message2):
                 await message.channel.send("Invalid song index")
         else:
             await message.channel.send("There are no songs in the queue.")
-async def SETVOL(message,message2):
-    if await VerifyMusicUser(message):
-        player = serverinfo[message.guild].mHandler.player
-        vol = player.volume
-        try:
-            if (int(message2.split('|')[1])<101 and int(message2.split('|')[1])>-1) and str(message.guild.id) != '329449782160654336' and str(message.guild.id) != '451227721545285649':
-                vol = int(message2.split('|')[1])
-                player.volume = vol/100
-                serverinfo[message.guild].volume = player.volume
-                await message.channel.send( "Volume set to "+str(int(player.volume*100))+"%.")
-            elif str(message.guild.id) == '451227721545285649':
-                vol = int(message2.split('|')[1])
-                player.volume = vol/100
-                serverinfo[message.guild].volume = player.volume
-                if int(player.volume*100) < 101:
-                    await message.channel.send( "Volume set to "+str(int(player.volume*100))+"%.")
-                elif int(player.volume*100) > 100:
-                    await message.channel.send( "Server exclusive ability: Volume set to "+str(int(player.volume*100))+"%.")
-            else:
-                await message.channel.send( "Invalid volume. Volume must be from 0% to 100%. (Don't use '%' in command)")
-        except ValueError:
-            await message.channel.send( "Invalid setting. Volume must be an integer from 0-100.")
 async def PAUSE(message,message2):
     if await VerifyMusicUser(message):
         player = serverinfo[message.guild].mHandler.player
@@ -1223,7 +1201,6 @@ command["!EXEC"]=Command("!EXEC","This command can be used by LockdownDoom in or
 command["!CLEAR"]=MISC("!CLEAR","This command will clear the last 100 messages sent in the channel\n**Usage**\n`!CLEAR`",CLEAR)
 command["!ADDKIPP"]=MISC("!ADDKIPP","This command returns a link that anyone can use to add KIPP to another server\n**Usage**\n`!ADDKIPP`",ADDKIPP)
 command["!MUSIC"]=MUSC("!MUSIC","This command will cause KIPP to play music from youtube or spotify in your VC based on your entered link or query\n**Usage**\n`!MUSIC|query or link`",MUSIC)
-command["!SETVOL"]=MUSC("!SETVOL","This command will change KIPPs colume to the specified volume\n**Usage**\n`!SETVOL|volume [0-100]`",SETVOL)
 command["!PAUSE"]=MUSC("!PAUSE","This command will pause KIPP, if playing\n**Usage**\n`!PAUSE`",PAUSE)
 command["!RESUME"]=MUSC("!RESUME","This command will resume KIPP, if paused\n**Usage**\n`!RESUME`",RESUME)
 command["!REMOVESONG"]=MUSC("!REMOVESONG","This command will remove the specified song from the queue\n**Usage**\n`!REMOVESONG|queue #`",REMOVESONG)

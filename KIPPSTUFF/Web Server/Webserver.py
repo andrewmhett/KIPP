@@ -2,7 +2,7 @@ import flask
 import json
 import time as t
 import os
-KIPP_DIR=os.eviron['KIPP_DIR']
+KIPP_DIR=os.environ['KIPP_DIR']
 app=flask.Flask(__name__)
 from subprocess import Popen, PIPE
 p=Popen(KIPP_DIR+'/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)

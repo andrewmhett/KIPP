@@ -2,7 +2,7 @@ import sys
 import os
 KIPP_DIR=os.environ["KIPP_DIR"]
 sys.path.append(KIPP_DIR+"/KIPPSTUFF")
-import ESSENTIAL_PACKAGES
+from ESSENTIAL_PACKAGES import *
 commands=[]
 command={}
 InterstellarQuotes = ["'Do not go gentle into that good night'\n**Professor Brand**", "'Come on, TARS!'\n**Cooper**", "'Cooper, this is no time for caution!'\n**TARS**", "'You tell that to Doyle.'\n**Cooper**", "'Newton's third law. You gotta leave something behind.'\n**Cooper**", "'Step back, professor, step back!'\n**TARS**","'No, it's necessary.'\n**Cooper**"]

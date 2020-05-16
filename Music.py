@@ -30,10 +30,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         if self.duration == 0:
             self.is_live = True
     @classmethod
-    async def from_url(cls, url, *, loop=None, stream=False):
-        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
-        if data.get('duration')==0 or data.get('duration')>3600:
-            stream=True
+    async def from_url(cls, url, *, loop=None, stream=True):
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
         cls.url=url
         if 'entries' in data:
@@ -145,7 +142,6 @@ class music_handler:
                 self.is_playing=False
                 serverinfo[self.server].mHandler=None
                 serverinfo[self.server].end_time=datetime.datetime.now()
-                os.system("sudo rm *.*")
             elif self.paused and self.server.voice_client == None:
                 self.is_playing=False
                 self.pausetimeout=True

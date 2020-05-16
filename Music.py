@@ -1,11 +1,4 @@
-import discord
-import asyncio
-from datetime import datetime
-import youtube_dl
-import urllib
-from lxml import etree
-import re
-import os
+from ESSENTIAL_PACKAGES import *
 from config import *
 EMBEDCOLOR=0x36393E
 ytdl_format_options = {

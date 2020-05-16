@@ -36,7 +36,7 @@ After=multi-user.target
 [Service]
 Environment="KIPP_DIR=/path/to/KIPP"
 Type=simple
-ExecStart=/bin/bash -c 'exec $KIPP_DIR/Python/KIPP_MONITOR.py'
+ExecStart=sudo -E /bin/bash -c 'exec $KIPP_DIR/Python/KIPP_MONITOR.py'
 Restart=on-abort
 RestartSec=0
 

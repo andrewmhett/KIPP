@@ -55,7 +55,10 @@ print("KIPP starting up...")
 while True:
     @client.event
     async def on_voice_state_update(member,before, after):
-        server = after.channel.guild
+        try:
+            server = after.channel.guild
+        except TypeError:
+            server = before.channel.guild
         user = server.get_member(KIPP_ID)
         users = []
         try:

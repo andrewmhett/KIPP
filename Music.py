@@ -40,6 +40,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 class music_handler:
     def __init__(self,server,player,channel,loop):
         self.server=server
+        self.resend_timer=0
         self.loop=loop
         self.channel=channel
         server.voice_client.play(player)
@@ -78,12 +79,13 @@ class music_handler:
         self.is_playing=True
         self.pausedatetime=None
         self.pausetime=None
-        self.loop.create_task(self.update_loop())
+        self.task = self.loop.create_task(self.update_loop())
     def skip(self):
         self.server.voice_client.stop()
         self.player.is_live=False
     async def update_loop(self):
         while self.is_playing:
+            self.resend_timer+=1
             if self.server.voice_client.is_playing():
                 self.is_playing=True
             elif self.paused:
@@ -133,6 +135,8 @@ class music_handler:
                 self.em=discord.Embed(description = self.desc.split('`')[0]+"`"+str(self.minutedelta)+':'+str(self.seconddelta)+' / '+self.length+'`'+pauseStr+'\n'+self.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
             self.em.set_footer(text=self.footer)
             self.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
+            if self.resend_timer/30 >= 5:
+                await self.message.delete()
             if (self.is_playing == False or c.seconds >= self.duration) and self.player.is_live == False:
                 self.server.voice_client.stop()
                 em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Song Ended**", colour=EMBEDCOLOR)
@@ -142,6 +146,7 @@ class music_handler:
                 self.is_playing=False
                 serverinfo[self.server].mHandler=None
                 serverinfo[self.server].end_time=datetime.datetime.now()
+                self.task.cancel()
             elif self.paused and self.server.voice_client == None:
                 self.is_playing=False
                 self.pausetimeout=True

@@ -191,7 +191,7 @@ async def FATE(message,message2):
     if "YAKUB" in imgs[picNum].upper():
         yakub=True
     f=discord.File(KIPP_DIR+"/KIPPSTUFF/FATE/"+imgs[picNum])
-    await message.channel.send(f)
+    await message.channel.send(file=f)
     if yakub==True:
         msg = "You will see Yakub. You will live."
         await message.channel.send( msg)

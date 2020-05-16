@@ -191,7 +191,7 @@ async def FATE(message,message2):
     if "YAKUB" in imgs[picNum].upper():
         yakub=True
     with open(KIPP_DIR+"/KIPPSTUFF/FATE/"+imgs[picNum], 'rb') as f:
-        await client.send_message_file(message.channel, f)
+        await message.channel.send_message_file(f)
         f.close()
     if yakub==True:
         msg = "You will see Yakub. You will live."
@@ -204,16 +204,6 @@ async def CORETEMP(message,message2):
     cpu = tmp.read()
     tmp.close()
     await message.channel.send( '{:.2f}'.format( float(cpu)/1000 ) + ' C')
-async def CATORDOG(message,message2):
-    link=str(message.content).split('|')[1]
-    from azure.cognitiveservices.vision.customvision.prediction import CustomVisionPredictionClient
-    predictor = CustomVisionPredictionClient('205c6f54f37e49c08592092e4a980ea0', endpoint="https://southcentralus.api.cognitive.microsoft.com")
-    results = predictor.predict_image_url('a98ab5cb-4615-4e6b-8a67-df44bbf7d62d', url=link)
-    if results.predictions[0].probability<0.9:
-        await message.channel.send("I cannot identify this as a cat or a dog.")
-    else:
-        prediction = results.predictions[0]
-        await message.channel.send("\t" + prediction.tag_name + ": {0:.2f}%".format(prediction.probability * 100))
 async def send_image(message,url,ext):
     emb=discord.Embed(title=("{0} result for '{1}'".format(ext,str(message.content).split('|')[1])),colour=EMBEDCOLOR)
     emb.set_image(url=url)

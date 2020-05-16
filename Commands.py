@@ -191,7 +191,7 @@ async def FATE(message,message2):
     if "YAKUB" in imgs[picNum].upper():
         yakub=True
     with open(KIPP_DIR+"/KIPPSTUFF/FATE/"+imgs[picNum], 'rb') as f:
-        await message.channel.send(file=f)
+        await message.channel.send(f)
         f.close()
     if yakub==True:
         msg = "You will see Yakub. You will live."

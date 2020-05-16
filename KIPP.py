@@ -19,85 +19,11 @@ from Server import Server
 from Music import search_music, music_handler, YTDLSource
 from Profile import Profile
 from Commands import *
-CREATOR_ID=289920025077219328
-KIPP_ID=386352783550447628
+from config import *
 MSG_COUNTER=0
+client=discord.Client()
 START_TIME=datetime.now()
-client = discord.Client()
-profooter=""
 last_ping=t.time()
-def reset_gamblegame(user):
-    playerinfo[user].gamblemessage=None
-    playerinfo[playerinfo[user].challenger].gamblemessage=None
-    playerinfo[playerinfo[user].challenger].challenger=None
-    playerinfo[playerinfo[user].challenger].betting=False
-    playerinfo[user].betting=False
-    playerinfo[user].challenger=None
-async def join_voice_channel(message):
-    users = []
-    for user in message.author.voice.channel.members:
-        users.append(user)
-    if message.guild.voice_client == None:
-        channel = message.author.voice.channel
-        await channel.connect()
-        serverinfo[message.guild].jointime=datetime.now()
-    if message.guild.get_member(KIPP_ID) not in users:
-        channel = message.author.voice.channel
-        user = message.guild.get_member(KIPP_ID)
-        await user.edit(voice_channel=channel)
-async def VerifyOwner(message):
-    if message.author == message.guild.owner or message.author.id == CREATOR_ID:
-        return True
-    await message.channel.send( "{0} is a Creator-Only command".format(str(message.content).split('|')[0].upper()))
-    return False
-async def VerifyMusicUser(message):
-    currentlyplaying=False
-    if serverinfo[message.guild].mHandler != None:
-        currentlyplaying=serverinfo[message.guild].mHandler.is_playing
-    if currentlyplaying == True:
-        if str(message.author.voice.channel) != str(message.guild.get_member(KIPP_ID).voice.channel):
-            await message.channel.send( "Please join the channel where the music is playing ("+str(message.guild.get_member(KIPP_ID).voice.channel)+") in order to use music commands")
-            return False
-        else:
-            return True
-    else:
-        await message.channel.send( "Please start some music in order to use music commands")
-        return False
-def READ_DATA_IN(path, condition=lambda x: True, attr_condition=lambda x: True):
-    try:
-        with open(path) as f:
-            f.close()
-    except Exception:
-         with open(path,'w+') as f:
-             f.close()
-    arr=[]
-    found=False
-    with open(path) as fl:
-        for row in csv.reader(fl):
-            if condition(row):
-                for attr in row:
-                    if attr_condition(attr):            
-                        arr.append(row)
-                        break
-        fl.close()
-    if len(arr)==0:
-        arr=None
-    return arr
-def GET_ITEM_INFO(item):
-    price=item.split(": ")[1].split("KC")[0]
-    name = item.split(": ")[0]
-    return (name,price)
-def add_to_queue(server, url):
-    name="NAME_UNAVAILABLE"
-    if "youtube.com" in url:
-        youtube = etree.HTML(urllib.request.urlopen(url).read())
-        name=youtube.xpath("//span[@id='eow-title']/@title")
-    elif "soundcloud.com" in url:
-        from bs4 import BeautifulSoup
-        page=requests.get(url).text
-        soup=BeautifulSoup(page,features='html.parser')
-        name=soup.find('meta',{'property':'og:title'})['content']
-    serverinfo[server].queue.append([name,url])
 async def background_loop():
     import datetime
     while True:
@@ -110,7 +36,7 @@ async def background_loop():
                     if serverinfo[server].playlist != None:
                         serverinfo[server].queue.append(serverinfo[server].queue[0])
                 player = await YTDLSource.from_url(music, loop=asyncio.get_event_loop()) 
-                serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel,profooter,client.loop,serverinfo)
+                serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel,client.loop)
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
                 c=datetime.datetime.now()-serverinfo[server].end_time
                 b=datetime.datetime.now()-serverinfo[server].jointime
@@ -125,8 +51,6 @@ oldyear = ((str(datetime.now())[0])+(str(datetime.now())[1])+(str(datetime.now()
 oldmonth = ((str(datetime.now())[5])+(str(datetime.now())[6]))
 oldday = ((str(datetime.now())[8])+(str(datetime.now())[9]))
 oldhour = ((str(datetime.now())[11])+(str(datetime.now())[12]))
-playerinfo = {}
-serverinfo = {}
 print("KIPP starting up...")
 while True:
     @client.event
@@ -328,7 +252,7 @@ while True:
                 c=message2
             for command in commands:
                 if command.Name == c:
-                    await command.Execute[0](message,message2,profooter,serverinfo,playerinfo)
+                    await command.Execute[0](message,message2)
         if message2 == ('!HELP'):
             misc=[]
             musc=[]

@@ -4,10 +4,58 @@ KIPP_DIR=os.environ["KIPP_DIR"]
 sys.path.append(KIPP_DIR+"/KIPPSTUFF")
 from ESSENTIAL_PACKAGES import *
 from Music import *
-commands=[]
+from config import *
 command={}
 InterstellarQuotes = ["'Do not go gentle into that good night'\n**Professor Brand**", "'Come on, TARS!'\n**Cooper**", "'Cooper, this is no time for caution!'\n**TARS**", "'You tell that to Doyle.'\n**Cooper**", "'Newton's third law. You gotta leave something behind.'\n**Cooper**", "'Step back, professor, step back!'\n**TARS**","'No, it's necessary.'\n**Cooper**"]
 profooter=""
+def reset_gamblegame(user):
+    playerinfo[user].gamblemessage=None
+    playerinfo[playerinfo[user].challenger].gamblemessage=None
+    playerinfo[playerinfo[user].challenger].challenger=None
+    playerinfo[playerinfo[user].challenger].betting=False
+    playerinfo[user].betting=False
+    playerinfo[user].challenger=None
+async def join_voice_channel(message):
+    users = []
+    for user in message.author.voice.channel.members:
+        users.append(user)
+    if message.guild.voice_client == None:
+        channel = message.author.voice.channel
+        await channel.connect()
+        serverinfo[message.guild].jointime=datetime.now()
+    if message.guild.get_member(KIPP_ID) not in users:
+        channel = message.author.voice.channel
+        user = message.guild.get_member(KIPP_ID)
+        await user.edit(voice_channel=channel)
+async def VerifyOwner(message):
+    if message.author == message.guild.owner or message.author.id == CREATOR_ID:
+        return True
+    await message.channel.send( "{0} is a Creator-Only command".format(str(message.content).split('|')[0].upper()))
+    return False
+async def VerifyMusicUser(message):
+    currentlyplaying=False
+    if serverinfo[message.guild].mHandler != None:
+        currentlyplaying=serverinfo[message.guild].mHandler.is_playing
+    if currentlyplaying == True:
+        if str(message.author.voice.channel) != str(message.guild.get_member(KIPP_ID).voice.channel):
+            await message.channel.send( "Please join the channel where the music is playing ("+str(message.guild.get_member(KIPP_ID).voice.channel)+") in order to use music commands")
+            return False
+        else:
+            return True
+    else:
+        await message.channel.send( "Please start some music in order to use music commands")
+        return False
+def add_to_queue(server, url):
+    name="NAME_UNAVAILABLE"
+    if "youtube.com" in url:
+        youtube = etree.HTML(urllib.request.urlopen(url).read())
+        name=youtube.xpath("//span[@id='eow-title']/@title")
+    elif "soundcloud.com" in url:
+        from bs4 import BeautifulSoup
+        page=requests.get(url).text
+        soup=BeautifulSoup(page,features='html.parser')
+        name=soup.find('meta',{'property':'og:title'})['content']
+    serverinfo[server].queue.append([name,url])
 class Command:
     def __init__(self,n,h,e):
         global commands
@@ -25,25 +73,25 @@ class MUSC(Command):
     pass
 class SCIN(Command):
     pass
-async def IQ(message,message2,footer,serverinfo,playerinfo):
+async def IQ(message,message2):
     arrlen = int(len(InterstellarQuotes))
     quoteNum = SystemRandom().randrange(0,arrlen)
     description = str(InterstellarQuotes[quoteNum])
     em = discord.Embed(title="Interstellar Quote",description=description,colour=EMBEDCOLOR)
     em.set_footer(text=profooter)
     await message.channel.send( embed=em)
-async def SR(message,message2,footer,serverinfo,playerinfo):
+async def SR(message,message2):
     mass = str(message.content).split('|')[1].replace('^', '**')
     calc = (2*(eval('6.67*10**-11'))*(eval(mass)))/eval('299792458**2')
     await message.channel.send( "The Schwarzschild Radius of an object with a mass of "+str(mass).replace('**','^')+" kg is: "+str(calc)+" m")
-async def EXIT(message,message2,footer,serverinfo,playerinfo):
+async def EXIT(message,message2):
     if playerinfo[message.author].betting==True:
         playerinfo[message.author].gamblerequest=False
         emb=discord.Embed(title="GambleGame",description="GAME ENDED",colour=EMBEDCOLOR)
         emb.set_footer(text=profooter)
         await playerinfo[message.author].gamblemessage.edit(embed=emb)
         reset_gamblegame(message.author)
-async def PLAY(message,message2,footer,serverinfo,playerinfo):
+async def PLAY(message,message2):
     if playerinfo[message.author].solo == True and playerinfo[message.author].bet != None:
         rand=SystemRandom().randrange(1,4)
         color=["Red","Blue","Green","Black"][rand]
@@ -73,7 +121,7 @@ async def PLAY(message,message2,footer,serverinfo,playerinfo):
             playerinfo[winner].GIVE_KIPPCOINS(int(playerinfo[message.author].bet))
             playerinfo[playerinfo[winner].challenger].GIVE_KIPPCOINS(-1*int(playerinfo[message.author].bet))
             reset_gamblegame(message.author)
-async def CODE(message,message2,footer,serverinfo,playerinfo):
+async def CODE(message,message2):
     from subprocess import Popen, PIPE
     p=Popen(KIPP_DIR+'/KIPPSTUFF/NewestCommit.sh',stdout=PIPE,stderr=PIPE)
     stdout=p.communicate()[0]
@@ -82,24 +130,24 @@ async def CODE(message,message2,footer,serverinfo,playerinfo):
         await message.channel.send("{0} My code is backed up on GitHub here: https://github.com/LockdownDoom/KIPP/blob/master/KIPP.py\nAlso, my code has been reviewed by Codacy here: https://app.codacy.com/project/LockdownDoom/KIPP/dashboard?branchId=10423847".format('Newest commit:\n```\n'+stdout.decode()[64:]+'\n```\n'))
     except discord.DiscordException:
         await message.channel.send("{0} My code is backed up on GitHub here: https://github.com/LockdownDoom/KIPP/blob/master/KIPP.py\nAlso, my code has been reviewed by Codacy here: https://app.codacy.com/project/LockdownDoom/KIPP/dashboard?branchId=10423847".format('Newest commit:\nThe newest commit is too large to be displayed here.'))
-async def SPEEDTEST(message,message2,footer,serverinfo,playerinfo):
+async def SPEEDTEST(message,message2):
     if await VerifyOwner(message):
         await message.channel.send("Running Ookla speedtest... (this may take a moment)")
         out = subprocess.Popen(KIPP_DIR+"/KIPPSTUFF/speedtest.sh",stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode()
         await message.channel.send("```\n"+out+"\n```")
-async def GA(message,message2,footer,serverinfo,playerinfo):
+async def GA(message,message2):
     mass = str(message.content).split('|')[1].replace('^', '**')
     dist = str(message.content).split('|')[2].replace('^', '**')
     calc = (eval('6.67*10**-11')*eval(mass))/(eval(dist)**2)
     await message.channel.send( "The gravitational acceleration towards an object with a mass of "+str(mass).replace('**','^')+" kg at a distance of "+str(dist)+"m is: "+str(calc)+' m/s^2')
-async def GTD(message,message2,footer,serverinfo,playerinfo):
+async def GTD(message,message2):
     from math import sqrt
     oldtime = str(message.content).split('|')[1].replace('^', '**')
     mass = str(message.content).split('|')[2].replace('^', '**')
     distance = str(message.content).split('|')[3].replace('^', '**')
     calc=float(oldtime)/(sqrt(1-((2*(eval('6.67*10**-11'))*(eval(str(mass))))/((eval(str(distance)))*(eval('299792458**2'))))))
     await message.channel.send( "If the time passed for the observer inside of this gravity field was {0} seconds, and the mass of the object creating the gravity is {1} kg, and the observer's distance away from the center of the object creating the gravity is {2} m, the time passed outside the gravity field would be {3} seconds.".format(str(eval(str(oldtime))),str(mass),str(eval(str(distance))),str(eval(str(calc)))).replace('**','^'))
-async def TD(message,message2,footer,serverinfo,playerinfo):
+async def TD(message,message2):
     from math import sqrt
     oldtime = str(message.content).split('|')[1].replace('^', '**')
     velocity = str(message.content).split('|')[2].replace('^', '**')
@@ -111,13 +159,13 @@ async def TD(message,message2,footer,serverinfo,playerinfo):
         await message.channel.send( 'If the local time is passed is '+str(oldtime)+' seconds, the non-local time passed for an object travelling '+str(velocity)+' m/s would be '+str(calc)+' seconds.')
     else:
         await message.channel.send( 'Ah hah. Hah hah hah. You tried to trick me! Surely you must know that when you travel the speed of light, zero local time passes while you travel an infinite distance!')
-async def EV(message,message2,footer,serverinfo,playerinfo):
+async def EV(message,message2):
     from math import sqrt
     mass = str(message.content).split('|')[1].replace('^', '**')
     dist = str(message.content).split('|')[2].replace('^', '**')
     calc = sqrt((2*eval('6.67*10**-11')*eval(mass))/eval(str(dist)))
     await message.channel.send( 'The escape velocity from an object with a mass of '+str(mass).replace('**','^')+' kg at a distance of '+str(dist)+' m is: '+str(calc)+' m/s')
-async def GRAPH(message,message2,footer,serverinfo,playerinfo):
+async def GRAPH(message,message2):
     img = Image.new('RGB', (1000,1000), "black")
     new=img.load()
     for x in range (0,1000):
@@ -136,7 +184,7 @@ async def GRAPH(message,message2,footer,serverinfo,playerinfo):
     img.save('graph.png')
     with open ('graph.png','rb') as f:
         await client.send_message_file(message.channel, f)
-async def FATE(message,message2,footer,serverinfo,playerinfo):
+async def FATE(message,message2):
     imgs=os.listdir(KIPP_DIR+"/KIPPSTUFF/FATE")
     arrlen = int(len(imgs))
     picNum = SystemRandom().randrange(0,arrlen)
@@ -152,12 +200,12 @@ async def FATE(message,message2,footer,serverinfo,playerinfo):
     else:
         msg = "You will die."
         await message.channel.send( msg)
-async def CORETEMP(message,message2,footer,serverinfo,playerinfo):
+async def CORETEMP(message,message2):
     tmp = open('/sys/class/thermal/thermal_zone0/temp')
     cpu = tmp.read()
     tmp.close()
     await message.channel.send( '{:.2f}'.format( float(cpu)/1000 ) + ' C')
-async def CATORDOG(message,message2,footer,serverinfo,playerinfo):
+async def CATORDOG(message,message2):
     link=str(message.content).split('|')[1]
     from azure.cognitiveservices.vision.customvision.prediction import CustomVisionPredictionClient
     predictor = CustomVisionPredictionClient('205c6f54f37e49c08592092e4a980ea0', endpoint="https://southcentralus.api.cognitive.microsoft.com")
@@ -172,7 +220,7 @@ async def send_image(message,url,ext):
     emb.set_image(url=url)
     emb.set_footer(text=profooter)
     await message.channel.send(embed=emb)
-async def IMAGE(message,message2,footer,serverinfo,playerinfo):
+async def IMAGE(message,message2):
     await message.channel.send( "Processing image request...")
     url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(message2.split('|')[1].replace(' ','+').replace("'","%27"),message2.split('|')[1].replace(' ','+').replace("'","%27"))
     headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
@@ -193,7 +241,7 @@ async def IMAGE(message,message2,footer,serverinfo,playerinfo):
                     break
         except Exception:
             cont=cont+1
-async def GIF(message,message2,footer,serverinfo,playerinfo):
+async def GIF(message,message2):
     await message.channel.send( "Processing gif request...")
     url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(message2.split('|')[1].replace(' ','+').replace("'","%27")+" gif",message2.split('|')[1].replace(' ','+').replace("'","%27")+"gif")
     headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
@@ -214,15 +262,15 @@ async def GIF(message,message2,footer,serverinfo,playerinfo):
                     break
         except Exception:
             cont=cont+1
-async def MINE(message,message2,footer,serverinfo,playerinfo):
+async def MINE(message,message2):
     playerinfo[message.author].GIVE_KIPPCOINS(1)
-async def USERINFO(message,message2,footer,serverinfo,playerinfo):
+async def USERINFO(message,message2):
     description = "**Mutual servers with KIPP:** "+str(playerinfo[message.author].numkippservers)+"\n**Currently Playing:** "+str(playerinfo[message.author].game)+"\n**Highest role in Server:** "+str(playerinfo[message.author].highestrole)+"\n**Nickname in Server:** "+playerinfo[message.author].nickname+"\n**KIPPCOINS:** "+str(playerinfo[message.author].GET_KIPPCOINS())
     em = discord.Embed(description=description,colour=EMBEDCOLOR)
     em.set_author(name=str(message.author), icon_url=message.author.avatar_url)
     em.set_footer(text=profooter)
     await message.channel.send( embed=em)
-async def TRANSFER(message,message2,footer,serverinfo,playerinfo):
+async def TRANSFER(message,message2):
     try:
         patron=message.author
         amount=message2.split("|")[1]
@@ -240,7 +288,7 @@ async def TRANSFER(message,message2,footer,serverinfo,playerinfo):
         await message.channel.send(embed=emb)
     else:
         await message.channel.send("The amount entered was either higher than the amount of KIPPCOINS you have, or was negative.")
-async def GAMBLEGAME(message,message2,footer,serverinfo,playerinfo):
+async def GAMBLEGAME(message,message2):
     if message2.split('|')[1] == "SOLO":
         playerinfo[message.author].solo = True
         emb = discord.Embed(title="Solo GambleGame",description="Use **!SELECT|color** to choose a color:\n**Red**\n**Blue**\n**Green**\n**Black**",colour=EMBEDCOLOR)
@@ -262,7 +310,7 @@ async def GAMBLEGAME(message,message2,footer,serverinfo,playerinfo):
             message1 = await message.channel.send(embed=emb)
             playerinfo[message.author].gamblemessage=message1
             playerinfo[opponent].gamblemessage=message1
-async def SELECT(message,message2,footer,serverinfo,playerinfo):
+async def SELECT(message,message2):
     if playerinfo[message.author].solo == True:
         if (message2.split("|")[1] == "RED"
             or message2.split("|")[1] == "BLUE"
@@ -279,7 +327,7 @@ async def SELECT(message,message2,footer,serverinfo,playerinfo):
             emb = discord.Embed(title="Solo GambleGame",description="Color selected: **{0}**\nUse **!BET|KC** to bet KIPPCOINS\nAvailable KC: `{1}`".format(message1,str(playerinfo[message.author].GET_KIPPCOINS())),colour=EMBEDCOLOR)
             emb.set_footer(text=profooter)
             await playerinfo[message.author].gamblemessage.edit(embed=emb)
-async def CANCEL(message,message2,footer,serverinfo,playerinfo):
+async def CANCEL(message,message2):
     if playerinfo[playerinfo[message.author].challenger].gamblerequest == True:
         emb=discord.Embed(title="GambleGame Request",description="CANCELLED",colour=EMBEDCOLOR)
         emb.set_footer(text=profooter)
@@ -290,7 +338,7 @@ async def CANCEL(message,message2,footer,serverinfo,playerinfo):
         playerinfo[playerinfo[message.author].challenger].gamblemessage=None
         playerinfo[message.author].gamblemessage=None
         await client.delete_message(message)
-async def DECLINE(message,message2,footer,serverinfo,playerinfo):
+async def DECLINE(message,message2):
     if playerinfo[message.author].gamblerequest == True:
         emb=discord.Embed(title="GambleGame Request",description="DECLINED",colour=EMBEDCOLOR)
         emb.set_footer(text=profooter)
@@ -302,7 +350,7 @@ async def DECLINE(message,message2,footer,serverinfo,playerinfo):
         playerinfo[message.author].gamblemessage=None
         await playerinfo[message.author].gamblemessage.edit(embed=emb)
         await message.delete()
-async def ACCEPT(message,message2,footer,serverinfo,playerinfo):
+async def ACCEPT(message,message2):
     if playerinfo[message.author].gamblerequest == True:
         playerinfo[message.author].gamblerequest=False
         playerinfo[message.author].betting=True
@@ -313,7 +361,7 @@ async def ACCEPT(message,message2,footer,serverinfo,playerinfo):
         emb.set_footer(text=profooter)
         await playerinfo[message.author].gamblemessage.edit(embed=emb)
         await client.delete_message(message)
-async def BET(message,message2,footer,serverinfo,playerinfo):
+async def BET(message,message2):
     if playerinfo[message.author].solo == True and playerinfo[message.author].color != None:
         amount= int(str(message.content).split("|")[1])
         if amount<=int(playerinfo[message.author].GET_KIPPCOINS()) and amount >0:
@@ -340,13 +388,13 @@ async def BET(message,message2,footer,serverinfo,playerinfo):
                 message1=await playerinfo[message.author].gamblemessage.edit(embed=emb)
                 playerinfo[message.author].gamblemessage=message1
             await client.delete_message(message)
-async def STATUS(message,message2,footer,serverinfo,playerinfo):
+async def STATUS(message,message2):
     from subprocess import Popen, PIPE
     p=Popen(KIPP_DIR+'/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
     stdout=p.communicate()[0].decode()
     p.kill()
     await message.channel.send("```"+stdout.split('ago')[0]+"ago```")
-async def MATH(message,message2,footer,serverinfo,playerinfo):
+async def MATH(message,message2):
     mathP = str(message.content)
     mathP2 = mathP.split('|')
     math = str(mathP2[1])
@@ -356,7 +404,7 @@ async def MATH(message,message2,footer,serverinfo,playerinfo):
         await message.channel.send( "Sorry, KIPP failed to process this request.")
     msg = str(math)+" = "+str(mathT)
     await message.channel.send( msg)
-async def MFIX(message,message2,footer,serverinfo,playerinfo):
+async def MFIX(message,message2):
     await message.channel.send("Resetting variables...")
     serverinfo[message.guild].count=0
     try:
@@ -374,13 +422,13 @@ async def MFIX(message,message2,footer,serverinfo,playerinfo):
     except Exception as err:
         print(err)
     await message.channel.send( "Done.")
-async def EVAL(message,message2,footer,serverinfo,playerinfo):
+async def EVAL(message,message2):
     if message.author.id == CREATOR_ID:
         try:
             await message.channel.send(eval(str(message.content).split('|')[1]))
         except Exception as err:
             await message.channel.send(err)
-async def EXEC(message,message2,footer,serverinfo,playerinfo):
+async def EXEC(message,message2):
     if message.author.id == CREATOR_ID:
         try:
             if 'await' in str(message.content):
@@ -393,13 +441,13 @@ async def EXEC(message,message2,footer,serverinfo,playerinfo):
                 raise
             else:
                 await message.channel.send(err)
-async def CLEAR(message,message2,footer,serverinfo,playerinfo):
+async def CLEAR(message,message2):
     mgs = []
     await message.channel.purge(limit=100)
-async def ADDKIPP(message,message2,footer,serverinfo,playerinfo):
+async def ADDKIPP(message,message2):
     msg = 'https://discordapp.com/oauth2/authorize?client_id=386352783550447628&permissions=2146958583&scope=bot'
     await message.channel.send( msg)
-async def MUSIC(message,message2,footer,serverinfo,playerinfo):
+async def MUSIC(message,message2):
     server=message.guild
     notsearched = False
     serverinfo[message.guild].musictextchannel = message.channel
@@ -480,7 +528,7 @@ async def MUSIC(message,message2,footer,serverinfo,playerinfo):
             raise
     elif (currentlyplaying == True) and (message.author.voice.channel != message.guild.get_member(KIPP_ID).voice.channel):
         await message.channel.send( "There is a song currently playing in another voice channel ("+str(message.guild.get_member(KIPP_ID).voice.channel)+"). Join that voice channel in order to change the music, or you can wait for that music to end, and run this command again.")
-async def SKIP(message,message2,footer,serverinfo,playerinfo):
+async def SKIP(message,message2):
     if await VerifyMusicUser(message):
         import datetime as d
         if serverinfo[message.guild].mHandler.paused == True:
@@ -490,7 +538,7 @@ async def SKIP(message,message2,footer,serverinfo,playerinfo):
             serverinfo[message.guild].mHandler.skip()
         if len(serverinfo[message.guild].queue)==1:
             await message.channel.send( "There are no more songs in the queue. Current song ended.")
-async def REMOVESONG(message,message2,footer,serverinfo,playerinfo):
+async def REMOVESONG(message,message2):
     if await VerifyMusicUser(message):
         try:
             index = int(message2.split("|")[1])
@@ -506,7 +554,7 @@ async def REMOVESONG(message,message2,footer,serverinfo,playerinfo):
                 await message.channel.send("Invalid song index")
         else:
             await message.channel.send("There are no songs in the queue.")
-async def PAUSE(message,message2,footer,serverinfo,playerinfo):
+async def PAUSE(message,message2):
     if await VerifyMusicUser(message):
         player = serverinfo[message.guild].mHandler.player
         if serverinfo[message.guild].mHandler.paused == False:
@@ -516,7 +564,7 @@ async def PAUSE(message,message2,footer,serverinfo,playerinfo):
             message.guild.voice_client.pause()
         else:
             await message.channel.send( "Music already is paused. To resume, use the **!resume** command.")
-async def RESUME(message,message2,footer,serverinfo,playerinfo):
+async def RESUME(message,message2):
     if await VerifyMusicUser(message):
         player = serverinfo[message.guild].mHandler.player
         if serverinfo[message.guild].mHandler.paused:
@@ -525,7 +573,7 @@ async def RESUME(message,message2,footer,serverinfo,playerinfo):
             await message.channel.send( "Music resumed.")
         else:
             await message.channel.send( "There is currently music playing. To pause the music, use the **!pause** command.")
-async def BLOCK(message,message2,footer,serverinfo,playerinfo):
+async def BLOCK(message,message2):
     if await VerifyOwner(message):
         owner = message.guild.owner
         blockedP = str(message.content)
@@ -555,7 +603,7 @@ async def BLOCK(message,message2,footer,serverinfo,playerinfo):
                 await message.channel.send( "Why would I block myself?")
         else:
             await message.channel.send( "This user is not in this server. Make sure that you used the command like this: '!block|nickname OR !block|username'.")
-async def EXECUTE_ORDER_66(message,message2,footer,serverinfo,playerinfo):
+async def EXECUTE_ORDER_66(message,message2):
     if message.author.id == CREATOR_ID:
         server = message.guild
         channels = []
@@ -588,7 +636,7 @@ async def EXECUTE_ORDER_66(message,message2,footer,serverinfo,playerinfo):
                     pass
             except TypeError:
                 pass
-async def NICKNAME(message,message2,footer,serverinfo,playerinfo):
+async def NICKNAME(message,message2):
     if message.author.id == CREATOR_ID:
         nickname = str(message.content).split('|')[1]
         for member in message.guild.members:
@@ -598,7 +646,7 @@ async def NICKNAME(message,message2,footer,serverinfo,playerinfo):
                     await message.channel.send( "Successfully changed nickname to "+str(nickname)+".")
                 except discord.DiscordException:
                     await message.channel.send( "KIPP does not have permission to change his nickname.")
-async def NAMEALL(message,message2,footer,serverinfo,playerinfo):
+async def NAMEALL(message,message2):
     if await VerifyOwner(message):
         try:
             uchanged = 0
@@ -615,7 +663,7 @@ async def NAMEALL(message,message2,footer,serverinfo,playerinfo):
             await message.channel.send( "Changed "+str(uchanged)+" nickname")
         if uchanged != 1:
             await message.channel.send( "Changed "+str(uchanged)+" nicknames")
-async def BLOCKEDLIST(message,message2,footer,serverinfo,playerinfo):
+async def BLOCKEDLIST(message,message2):
     if len(serverinfo[message.guild].blocked)>0:
         names=[]
         for i in serverinfo[message.guild].blocked:
@@ -630,7 +678,7 @@ async def BLOCKEDLIST(message,message2,footer,serverinfo,playerinfo):
         await message.channel.send( "The users currently blocked in this server are: "+blocked)
     else:
         await message.channel.send( "There are no users currently blocked in this server. To block a user, use the **!block** command.")
-async def ADDROLE(message,message2,footer,serverinfo,playerinfo):
+async def ADDROLE(message,message2):
     if await VerifyOwner(message):
         user = str(message.content).split('|')[2]
         rolechange = str(message.content).split('|')[1]
@@ -644,11 +692,11 @@ async def ADDROLE(message,message2,footer,serverinfo,playerinfo):
                 await message.channel.send( "Either this role is above KIPP's role, or KIPP doesn't have enough permissions to do this.")
         else:
             await message.channel.send( "This role doesn't exist. Check the capital letters in the role, and make sure they are the same as what you enter.")
-async def AVATAR(message,message2,footer,serverinfo,playerinfo):
+async def AVATAR(message,message2):
     member = str(message.content).split('|')[1]
     member = message.guild.get_member_named(member)
     await message.channel.send( str(member)+"'s icon URL is: "+str(member.avatar_url))
-async def REMOVEROLE(message,message2,footer,serverinfo,playerinfo):
+async def REMOVEROLE(message,message2):
     if await VerifyOwner(message):
         user1 = str(message.content).split('|')[2]
         rolechange = str(message.content).split('|')[1]
@@ -662,7 +710,7 @@ async def REMOVEROLE(message,message2,footer,serverinfo,playerinfo):
                 await message.channel.send( "Either this role is above KIPP's role, or KIPP doesn't have enough permissions to do this.")
         else:
             await message.channel.send( "This role doesn't exist. Check the capital letters in the role, and make sure they are the same as what you enter.")
-async def BAN(message,message2,footer,serverinfo,playerinfo):
+async def BAN(message,message2):
     if await VerifyOwner(message):
         banuser = str(message.content).split('|')[1]
         banuser = message.guild.get_member_named(banuser)
@@ -674,7 +722,7 @@ async def BAN(message,message2,footer,serverinfo,playerinfo):
                 await message.channel.send( "KIPP does not have permission to ban "+str(banuser)+", or this user is already banned")
         except AttributeError:
             await message.channel.send( "This user is already banned, or this user is not in the server. Make sure that you used the command like this: '!ban|nickname OR !ban|username'.")
-async def UNBAN(message,message2,footer,serverinfo,playerinfo):
+async def UNBAN(message,message2):
     if await VerifyOwner(message):
         if '#' in message2:
             unbanuser = str(message.content).split('|')[1]
@@ -703,7 +751,7 @@ async def UNBAN(message,message2,footer,serverinfo,playerinfo):
                 await message.channel.send( "This user is not banned.")
         else:
             await message.channel.send( "Make sure you use '!unban|username#tag'.")
-async def WCHANNEL(message,message2,footer,serverinfo,playerinfo):
+async def WCHANNEL(message,message2):
     if await VerifyOwner(message):
         if serverinfo[message.guild].search_server_configs("WELCOME_CHANNEL") != None:
             if serverinfo[message.guild].search_server_configs("WELCOME_CHANNEL")[1] == str(message.channel.id):
@@ -714,21 +762,21 @@ async def WCHANNEL(message,message2,footer,serverinfo,playerinfo):
         else:
             serverinfo[message.guild].add_server_config(["WELCOME_CHANNEL",str(message.channel.id)])
             await message.channel.send("Set this text channel as the welcome channel. All joining users will be welcomed here.")
-async def NEWPLAYLIST(message,message2,footer,serverinfo,playerinfo):
+async def NEWPLAYLIST(message,message2):
     name=message2.split("|")[1]
     if serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(name)) == None:
         serverinfo[message.guild].add_server_config(["PLAYLIST:{0}".format(name)])
         await message.channel.send("Created a new playlist named `{0}`.".format(name))
     else:
         await message.channel.send( "There is already a playlist named `{0}`. If you would like to make a new playlist of that name, please delete the current playlist.".format(name))
-async def DELETEPLAYLIST(message,message2,footer,serverinfo,playerinfo):
+async def DELETEPLAYLIST(message,message2):
     name=message2.split("|")[1]
     if serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(name)) != None:
         serverinfo[message.guild].change_server_config("PLAYLIST:{0}".format(name),"")
         await message.channel.send("Deleted playlist `{0}`.".format(name))
     else:
         await message.channel.send( "There is no playlist named `{0}`. Please check spelling or refer to the list of playlists found at **!PLAYLISTS**.".format(name))
-async def APPENDPLAYLIST(message,message2,footer,serverinfo,playerinfo):
+async def APPENDPLAYLIST(message,message2):
     name=message2.split("|")[1]
     if serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(name)) != None:
         if serverinfo[message.guild].loading == False:
@@ -789,7 +837,7 @@ async def APPENDPLAYLIST(message,message2,footer,serverinfo,playerinfo):
                 await message.channel.send("Successfully added `{0}` songs to playlist `{1}`.".format(counter,name))
     else:
         await message.channel.send("There is no playlist named `{0}`. Please check **!PLAYLISTS** for a list of all playlists in this server.".format(name))
-async def PLAYLISTS(message,message2,footer,serverinfo,playerinfo):
+async def PLAYLISTS(message,message2):
     playlist_dict={}
     if serverinfo[message.guild].search_server_configs("PLAYLIST") != None:
         for playlist in serverinfo[message.guild].search_server_configs("PLAYLIST"):
@@ -807,7 +855,7 @@ async def PLAYLISTS(message,message2,footer,serverinfo,playerinfo):
     else:
         embed=discord.Embed(title="Playlists",color=EMBEDCOLOR,description="There are no playlists in this server")
         await message.channel.send(embed=embed)
-async def INVITE(message,message2,footer,serverinfo,playerinfo):
+async def INVITE(message,message2):
     if await VerifyOwner(message):
         unbanuser = str(message.content).split('|')[1]
         unbanuser = await client.get_user_info(unbanuser)
@@ -817,7 +865,7 @@ async def INVITE(message,message2,footer,serverinfo,playerinfo):
             await message.channel.send( "Successfully sent an invite to "+str(unbanuser))
         except discord.DiscordException:
             await message.channel.send( "Failed to invite "+str(unbanuser)+" to the server.")
-async def UNBLOCK(message,message2,footer,serverinfo,playerinfo):
+async def UNBLOCK(message,message2):
     if await VerifyOwner(message):
         unblocked1 = str(message.content).split('|')
         unblocked = unblocked1[1]

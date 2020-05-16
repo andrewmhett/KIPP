@@ -1,4 +1,5 @@
 from datetime import datetime
+from config import *
 class Server:
     def __init__(self,server):
         self.server=server

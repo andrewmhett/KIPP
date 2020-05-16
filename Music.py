@@ -6,6 +6,7 @@ import urllib
 from lxml import etree
 import re
 import os
+from config import *
 EMBEDCOLOR=0x36393E
 ytdl_format_options = {
     'format': 'bestaudio/best',
@@ -47,9 +48,9 @@ class YTDLSource(discord.PCMVolumeTransformer):
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 class music_handler:
-    def __init__(self,server,player,channel,footer,loop,serverinfo):
+    def __init__(self,server,player,channel,loop):
         self.server=server
-        self.serverinfo=serverinfo
+        self.loop=loop
         self.channel=channel
         server.voice_client.play(player)
         self.player=player
@@ -59,8 +60,7 @@ class music_handler:
         self.duration=player.duration
         self.title=player.title
         self.link=player.url
-        self.footer=footer
-        self.loop=loop
+        self.footer=profooter
         if self.player.is_live == False:
             mins=int(self.duration/60)
             seconds=int(self.duration-(mins*60))
@@ -102,10 +102,10 @@ class music_handler:
                 self.is_playing=False
             import datetime
             queuelist="\nNo songs in queue"
-            if len(self.serverinfo[self.server].queue)>1:
+            if len(serverinfo[self.server].queue)>1:
                 queuelist=""
                 i=0
-                for song in self.serverinfo[self.server].queue[1:]:
+                for song in serverinfo[self.server].queue[1:]:
                     i=i+1
                     if len(song)>2:
                         queuelist=queuelist+"\n`#{0}` {1}".format(i,song)
@@ -148,10 +148,10 @@ class music_handler:
                 em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Song Ended**", colour=EMBEDCOLOR)
                 em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
                 await self.message.edit(embed=em)
-                self.serverinfo[self.server].queue.remove(self.serverinfo[self.server].queue[0])
+                serverinfo[self.server].queue.remove(self.serverinfo[self.server].queue[0])
                 self.is_playing=False
-                self.serverinfo[self.server].mHandler=None
-                self.serverinfo[self.server].end_time=datetime.datetime.now()
+                serverinfo[self.server].mHandler=None
+                serverinfo[self.server].end_time=datetime.datetime.now()
                 #os.system("sudo rm *.*")
             elif self.paused and self.server.voice_client == None:
                 self.is_playing=False

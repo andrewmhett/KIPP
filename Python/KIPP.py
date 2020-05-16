@@ -56,7 +56,7 @@ while True:
     async def on_voice_state_update(member,before, after):
         try:
             server = after.channel.guild
-        except TypeError:
+        except AttributeError:
             server = before.channel.guild
         user = server.get_member(KIPP_ID)
         users = []

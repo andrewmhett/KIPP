@@ -58,7 +58,6 @@ def add_to_queue(server, url):
     serverinfo[server].queue.append([name,url])
 class Command:
     def __init__(self,n,h,e):
-        global commands
         self.Help=h,
         self.Execute=e,
         self.Name=n

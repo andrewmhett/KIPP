@@ -148,11 +148,11 @@ class music_handler:
                 em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Song Ended**", colour=EMBEDCOLOR)
                 em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
                 await self.message.edit(embed=em)
-                serverinfo[self.server].queue.remove(self.serverinfo[self.server].queue[0])
+                serverinfo[self.server].queue.remove(serverinfo[self.server].queue[0])
                 self.is_playing=False
                 serverinfo[self.server].mHandler=None
                 serverinfo[self.server].end_time=datetime.datetime.now()
-                #os.system("sudo rm *.*")
+                os.system("sudo rm *.*")
             elif self.paused and self.server.voice_client == None:
                 self.is_playing=False
                 self.pausetimeout=True

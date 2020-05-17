@@ -126,7 +126,7 @@ class music_handler:
             if self.paused:
                 pauseStr=" (paused)"
             if self.hours>0:
-                self.minutedelta=int(self.minutedelta)-(hours*60)
+                self.minutedelta=int(self.minutedelta)-(self.hours*60)
                 if len(str(self.minutedelta))==1:
                     self.minutedelta="0"+str(self.minutedelta)
                 else:

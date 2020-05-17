@@ -18,7 +18,7 @@ from Server import Server
 from Music import search_music, music_handler, YTDLSource
 from Profile import Profile
 from Commands import *
-from FooterGenerator import FooterGenerator
+from Footer import get_footer
 from config import *
 MSG_COUNTER=0
 client=discord.Client()
@@ -151,7 +151,7 @@ while True:
         playerinfo[message.author].hrolecolor = role1.colour
         playerinfo[message.author].numkippservers = kippservers
         playerinfo[message.author].game = message.author.activity
-        profooter=FooterGenerator.get_footer()
+        profooter=get_footer()
         message2 = str(message.content).upper()
         if message.guild.get_member(KIPP_ID).mention in message2:
             await message.channel.send("What do you want? Use **!help** for the commands.")

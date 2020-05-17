@@ -17,7 +17,7 @@ from ESSENTIAL_PACKAGES import *
 from Server import Server
 from Music import search_music, music_handler, YTDLSource
 from Profile import Profile
-from Commands import commands, update_info, send_data
+from Commands import commands
 CREATOR_ID=289920025077219328
 KIPP_ID=386352783550447628
 serverinfo={}
@@ -27,13 +27,7 @@ START_TIME=datetime.now()
 last_ping=t.time()
 async def background_loop():
     import datetime
-    global serverinfo
-    global playerinfo
     while True:
-        try:
-            serverinfo,playerinfo=update_info()
-        except NameError:
-            pass
         for server in client.guilds:
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)>=1:
                 music=serverinfo[server].queue[0][1]

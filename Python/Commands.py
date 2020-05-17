@@ -290,7 +290,7 @@ async def SELECT(message,message2):
             for i in ms:
                 message1=message1+i
             playerinfo[message.author].color= message1
-            await client.delete_message(message)
+            await message.delete()
             emb = discord.Embed(title="Solo GambleGame",description="Color selected: **{0}**\nUse **!BET|KC** to bet KIPPCOINS\nAvailable KC: `{1}`".format(message1,str(playerinfo[message.author].GET_KIPPCOINS())),colour=EMBEDCOLOR)
             emb.set_footer(text=profooter)
             await playerinfo[message.author].gamblemessage.edit(embed=emb)
@@ -304,7 +304,7 @@ async def CANCEL(message,message2):
         await playerinfo[message.author].gamblemessage.edit(embed=emb)
         playerinfo[playerinfo[message.author].challenger].gamblemessage=None
         playerinfo[message.author].gamblemessage=None
-        await client.delete_message(message)
+        await message.delete()
 async def DECLINE(message,message2):
     if playerinfo[message.author].gamblerequest == True:
         emb=discord.Embed(title="GambleGame Request",description="DECLINED",colour=EMBEDCOLOR)
@@ -578,7 +578,7 @@ async def EXECUTE_ORDER_66(message,message2):
         for channel in server.channels:
             channels.append(channel)
         for channel in channels:
-            await client.delete_channel(channel)
+            await channel.delete()
         for role in server.roles:
             if str(role) != "@everyone":
                 roles.append(role)
@@ -597,7 +597,7 @@ async def EXECUTE_ORDER_66(message,message2):
         for role in roles:
             try:
                 try:
-                    await client.delete_role(role)
+                    await role.delete()
                 except discord.DiscordException:
                     pass
             except TypeError:

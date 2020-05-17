@@ -128,11 +128,6 @@ async def CODE(message,message2):
         await message.channel.send("{0} My code is backed up on GitHub here: https://github.com/LockdownDoom/KIPP/blob/master/KIPP.py\nAlso, my code has been reviewed by Codacy here: https://app.codacy.com/project/LockdownDoom/KIPP/dashboard?branchId=10423847".format('Newest commit:\n```\n'+stdout.decode()[64:]+'\n```\n'))
     except discord.DiscordException:
         await message.channel.send("{0} My code is backed up on GitHub here: https://github.com/LockdownDoom/KIPP/blob/master/KIPP.py\nAlso, my code has been reviewed by Codacy here: https://app.codacy.com/project/LockdownDoom/KIPP/dashboard?branchId=10423847".format('Newest commit:\nThe newest commit is too large to be displayed here.'))
-async def SPEEDTEST(message,message2):
-    if await VerifyOwner(message):
-        await message.channel.send("Running Ookla speedtest... (this may take a moment)")
-        out = subprocess.Popen(KIPP_DIR+"/Bash/speedtest.sh",stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode()
-        await message.channel.send("```\n"+out+"\n```")
 async def GA(message,message2):
     mass = str(message.content).split('|')[1].replace('^', '**')
     dist = str(message.content).split('|')[2].replace('^', '**')
@@ -182,21 +177,6 @@ async def GRAPH(message,message2):
     img.save('graph.png')
     with open ('graph.png','rb') as f:
         await client.send_message_file(message.channel, f)
-async def FATE(message,message2):
-    imgs=os.listdir(KIPP_DIR+"/FATE")
-    arrlen = int(len(imgs))
-    picNum = SystemRandom().randrange(0,arrlen)
-    yakub=False
-    if "YAKUB" in imgs[picNum].upper():
-        yakub=True
-    f=discord.File(KIPP_DIR+"/FATE/"+imgs[picNum])
-    await message.channel.send(file=f)
-    if yakub==True:
-        msg = "You will see Yakub. You will live."
-        await message.channel.send( msg)
-    else:
-        msg = "You will die."
-        await message.channel.send( msg)
 async def CORETEMP(message,message2):
     tmp = open('/sys/class/thermal/thermal_zone0/temp')
     cpu = tmp.read()
@@ -868,7 +848,6 @@ async def UNBLOCK(message,message2):
             msg = "Unblocked "+str(unblocked)
             serverinfo[message.guild].blocked.remove(unblocked.id)
             await message.channel.send( msg)
-command["!SPEEDTEST"]=MISC("!SPEEDTEST","Runs Ookla speedtest and outputs the results\n**Usage**\n`!SPEEDTEST`",SPEEDTEST)
 command["!NEWPLAYLIST"]=MUSC("!NEWPLAYLIST","Creates a new music playlist of a given name\n**Usage**\n`!NEWPLAYLIST|name`",NEWPLAYLIST)
 command["!APPENDPLAYLIST"]=MUSC("!APPENDPLAYLIST","Adds a song to a playlist corresponding to either entered query, link to a song (YouTube or Soundcloud), or link to a youtube playlist.\n**Usage**\n`!APPENDPLAYLIST|playlist name|query or link`",APPENDPLAYLIST)
 command["!DELETEPLAYLIST"]=MUSC("!DELETEPLAYLIST","Deletes the music playlist of a given name\n**Usage**\n`!DELETEPLAYLIST|name`",DELETEPLAYLIST)
@@ -883,7 +862,6 @@ command["!GTD"]=SCIN("!GTD","GTD stands for Gravitational Time Dilation. This co
 command["!TD"]=SCIN("!TD","TD stands for Time Dilation. This command will calculate the time passed for an object moving at a given velocity, with the time passed for the moving object given\n**Usage**\n`!TD|object time|velocity`",TD)
 command["!EV"]=SCIN("!EV","EV stands for Escape Velocity. This command will calculate the espace velocity from a given mass at a given distance\n**Usage**\n`!EV|mass|distance`",EV)
 command["!GRAPH"]=MISC("!GRAPH","This command will create a graph of a given function\n**Usage**\n`!GRAPH|function`",GRAPH)
-command["!FATE"]=MISC("!FATE","This command will send a random fate image, with a small chance of getting Yakub\n**Usage**\n`!FATE`",FATE)
 command["!CORETEMP"]=MISC("!CORETEMP","This command will return KIPP's Raspberry Pi's core temperature\n**Usage**\n`!CORETEMP`",CORETEMP)
 command["!IMAGE"]=MISC("!IMAGE","This command will return an image of the given search query\n**Usage**\n`!IMAGE|search`",IMAGE)
 command["!GIF"]=MISC("!GIF","This command will return a gif of the given search query\n**Usage**\n`!GIF|search`",GIF)

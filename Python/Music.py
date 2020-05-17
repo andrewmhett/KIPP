@@ -52,6 +52,7 @@ class music_handler:
         self.title=player.title
         self.link=player.url
         self.footer=profooter
+        self.hours=0
         if self.player.is_live == False:
             mins=int(self.duration/60)
             seconds=int(self.duration-(mins*60))

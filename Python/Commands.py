@@ -4,8 +4,10 @@ KIPP_DIR=os.environ["KIPP_DIR"]
 from ESSENTIAL_PACKAGES import *
 from Music import *
 from Footer import get_footer
-from config import *
 command={}
+commands=[]
+serverinfo={}
+playerinfo={}
 InterstellarQuotes = ["'Do not go gentle into that good night'\n**Professor Brand**", "'Come on, TARS!'\n**Cooper**", "'Cooper, this is no time for caution!'\n**TARS**", "'You tell that to Doyle.'\n**Cooper**", "'Newton's third law. You gotta leave something behind.'\n**Cooper**", "'Step back, professor, step back!'\n**TARS**","'No, it's necessary.'\n**Cooper**"]
 def reset_gamblegame(user):
     playerinfo[user].gamblemessage=None
@@ -58,9 +60,14 @@ def add_to_queue(server, url):
 class Command:
     def __init__(self,n,h,e):
         self.Help=h,
-        self.Execute=e,
+        self.exe=e,
         self.Name=n
         commands.append(self)
+    async def Execute(self,message,message2,sinfo,pinfo):
+        serverinfo=sinfo
+        playerinfo=pinfo
+        await self.exe[0](message,message2)
+        return serverinfo, playerinfo
 class MISC(Command):
     pass
 class OWON(Command):

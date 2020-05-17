@@ -1,6 +1,6 @@
 from ESSENTIAL_PACKAGES import *
 from Footer import get_footer
-from config import *
+serverinfo={}
 EMBEDCOLOR=0x36393E
 ytdl_format_options = {
     'format': 'bestaudio/best',
@@ -39,7 +39,9 @@ class YTDLSource(discord.PCMVolumeTransformer):
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 class music_handler:
-    def __init__(self,server,player,channel,loop):
+    def __init__(self,server,player,channel,loop,sinfo):
+        global serverinfo
+        serverinfo=sinfo
         self.server=server
         self.resend_timer=0
         self.loop=loop

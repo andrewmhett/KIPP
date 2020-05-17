@@ -18,8 +18,10 @@ from Server import Server
 from Music import search_music, music_handler, YTDLSource
 from Profile import Profile
 from Commands import *
-from config import *
-MSG_COUNTER=0
+CREATOR_ID=289920025077219328
+KIPP_ID=386352783550447628
+serverinfo={}
+playerinfo={}
 client=discord.Client()
 START_TIME=datetime.now()
 last_ping=t.time()
@@ -35,7 +37,7 @@ async def background_loop():
                     if serverinfo[server].playlist != None:
                         serverinfo[server].queue.append(serverinfo[server].queue[0])
                 player = await YTDLSource.from_url(music, loop=asyncio.get_event_loop()) 
-                serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel,client.loop)
+                serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel,client.loop,serverinfo)
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
                 c=datetime.datetime.now()-serverinfo[server].end_time
                 b=datetime.datetime.now()-serverinfo[server].jointime
@@ -46,10 +48,6 @@ async def background_loop():
                         except Exception as e:
                             print ("Voice client timeout, can't disconnect")
         await asyncio.sleep(1)
-oldyear = ((str(datetime.now())[0])+(str(datetime.now())[1])+(str(datetime.now())[2])+(str(datetime.now())[3]))
-oldmonth = ((str(datetime.now())[5])+(str(datetime.now())[6]))
-oldday = ((str(datetime.now())[8])+(str(datetime.now())[9]))
-oldhour = ((str(datetime.now())[11])+(str(datetime.now())[12]))
 print("KIPP starting up...")
 while True:
     @client.event
@@ -117,6 +115,7 @@ while True:
             serverinfo[server] = Server(server)
             for member in server.members:
                 playerinfo[member] = Profile(member)
+        print(serverinfo)
     @client.event
     async def on_join(member):
         server = member.server
@@ -132,6 +131,8 @@ while True:
                print("Welcome channel was deleted, couldn't send message to welcome channel")
     @client.event
     async def on_message(message):
+        global serverinfo
+        global playerinfo
         if message.author == client.user or message.guild==None:
             return
         if message.author.id in serverinfo[message.guild].blocked:
@@ -157,5 +158,5 @@ while True:
             c=message2
         for command in commands:
             if command.Name == c:
-                await command.Execute[0](message,message2)
+                serverinfo, playerinfo = await command.Execute(message,message2,serverinfo,playerinfo)
     client.loop.run_until_complete(client.start(TOKEN))

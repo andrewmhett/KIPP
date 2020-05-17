@@ -5,7 +5,7 @@ import os
 KIPP_DIR=os.environ['KIPP_DIR']
 app=flask.Flask(__name__)
 from subprocess import Popen, PIPE
-p=Popen(KIPP_DIR+'/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
+p=Popen(KIPP_DIR+'/Bash/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
 stdout=p.communicate()[0].decode()
 p.kill()
 status=stdout.split('ago')[0]+"ago"
@@ -32,7 +32,7 @@ def eventStream():
             ti=get_time()
             time=datetime.datetime.now().strftime("%H:%M")
             yield "event:time_event\ndata:{}\n\n".format(ti)
-        p=Popen(KIPP_DIR+'/KIPPSTUFF/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
+        p=Popen(KIPP_DIR+'/Bash/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
         stdout=p.communicate()[0].decode()
         p.kill()
         if (stdout.split('ago')[0]+"ago" != status):

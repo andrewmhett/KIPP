@@ -1,6 +1,5 @@
 from ESSENTIAL_PACKAGES import *
 from Footer import get_footer
-serverinfo={}
 EMBEDCOLOR=0x36393E
 ytdl_format_options = {
     'format': 'bestaudio/best',
@@ -40,8 +39,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 class music_handler:
     def __init__(self,server,player,channel,loop,sinfo):
-        global serverinfo
-        serverinfo=sinfo
+        self.serverinfo=sinfo
         self.server=server
         self.resend_timer=0
         self.loop=loop
@@ -98,10 +96,10 @@ class music_handler:
                 self.is_playing=False
             import datetime
             queuelist="\nNo songs in queue"
-            if len(serverinfo[self.server].queue)>1:
+            if len(self.serverinfo[self.server].queue)>1:
                 queuelist=""
                 i=0
-                for song in serverinfo[self.server].queue[1:]:
+                for song in self.serverinfo[self.server].queue[1:]:
                     i=i+1
                     if len(song)>2:
                         queuelist=queuelist+"\n`#{0}` {1}".format(i,song)
@@ -146,10 +144,10 @@ class music_handler:
                 em=discord.Embed(description = "["+self.title+"]("+self.link+")\n**Song Ended**", colour=EMBEDCOLOR)
                 em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
                 await self.message.edit(embed=em)
-                serverinfo[self.server].queue.remove(serverinfo[self.server].queue[0])
+                self.serverinfo[self.server].queue.remove(serverinfo[self.server].queue[0])
                 self.is_playing=False
-                serverinfo[self.server].mHandler=None
-                serverinfo[self.server].end_time=datetime.datetime.now()
+                self.serverinfo[self.server].mHandler=None
+                self.serverinfo[self.server].end_time=datetime.datetime.now()
                 self.task.cancel()
             elif self.paused and self.server.voice_client == None:
                 self.is_playing=False

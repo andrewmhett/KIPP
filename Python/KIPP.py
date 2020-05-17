@@ -17,7 +17,7 @@ from ESSENTIAL_PACKAGES import *
 from Server import Server
 from Music import search_music, music_handler, YTDLSource
 from Profile import Profile
-from Commands import *
+from Commands import commands
 CREATOR_ID=289920025077219328
 KIPP_ID=386352783550447628
 serverinfo={}
@@ -156,7 +156,7 @@ while True:
             c=message2.split("|")[0]
         else:
             c=message2
-        for command in commands:
+        for command in Commands:
             if command.Name == c:
                 serverinfo, playerinfo = await command.Execute(message,message2,serverinfo,playerinfo)
     client.loop.run_until_complete(client.start(TOKEN))

@@ -156,7 +156,7 @@ while True:
             c=message2.split("|")[0]
         else:
             c=message2
-        for command in Commands:
+        for command in commands:
             if command.Name == c:
                 serverinfo, playerinfo = await command.Execute(message,message2,serverinfo,playerinfo)
     client.loop.run_until_complete(client.start(TOKEN))

@@ -127,6 +127,7 @@ class Server:
                 self.mHandler.em.set_footer(text=self.mHandler.footer)
                 self.mHandler.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
                 if self.mHandler.resend_timer/30 >= 5:
+                    self.mHandler.resend_timer=0
                     await self.mHandler.message.delete()
                 if (self.mHandler.is_playing == False or c.seconds >= self.mHandler.duration) and self.mHandler.player.is_live == False:
                     self.server.voice_client.stop()

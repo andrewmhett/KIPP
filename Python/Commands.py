@@ -327,7 +327,7 @@ async def ACCEPT(message,message2):
         emb=discord.Embed(title="GambleGame",description="Game started.\nEach player must bet the same amount. Once this is done, the winner will be decided.\n\n**{0}**:\nKC Available `{1}`\nBet: **0**\n\n**{2}**:\nKC Available `{3}`\nBet: **0**\n\nUse **!BET|VALUE** to bet\nUse **!EXIT** to leave the game".format(message.author,str(playerinfo[message.author].GET_KIPPCOINS()),playerinfo[message.author].challenger,str(playerinfo[playerinfo[message.author].challenger].GET_KIPPCOINS())),colour=EMBEDCOLOR)
         emb.set_footer(text=profooter)
         await playerinfo[message.author].gamblemessage.edit(embed=emb)
-        await client.delete_message(message)
+        await message.delete()
 async def BET(message,message2):
     if playerinfo[message.author].solo == True and playerinfo[message.author].color != None:
         amount= int(str(message.content).split("|")[1])
@@ -336,7 +336,7 @@ async def BET(message,message2):
             emb = discord.Embed(title="Solo GambleGame",description="Color: **{0}**\nBet: `{1} KC`\n**!PLAY**".format(playerinfo[message.author].color,str(playerinfo[message.author].bet)),colour=EMBEDCOLOR)
             emb.set_footer(text=profooter)
             await playerinfo[message.author].gamblemessage.edit(embed=emb)
-        await client.delete_message(message)
+        await message.delete()
     else:
         if playerinfo[message.author].betting==True:
             amount= int(str(message.content).split("|")[1])
@@ -352,9 +352,8 @@ async def BET(message,message2):
                     playerinfo[playerinfo[message.author].challenger].betting=False
                     playerinfo[message.author].betting=False
                 emb.set_footer(text=profooter)
-                message1=await playerinfo[message.author].gamblemessage.edit(embed=emb)
-                playerinfo[message.author].gamblemessage=message1
-            await client.delete_message(message)
+                await playerinfo[message.author].gamblemessage.edit(embed=emb)
+            await message.delete()
 async def STATUS(message,message2):
     from subprocess import Popen, PIPE
     p=Popen(KIPP_DIR+'/BASH/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)

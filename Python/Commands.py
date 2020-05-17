@@ -8,7 +8,17 @@ CREATOR_ID=289920025077219328
 KIPP_ID=386352783550447628
 command={}
 commands=[]
+serverinfo={}
+playerinfo={}
 InterstellarQuotes = ["'Do not go gentle into that good night'\n**Professor Brand**", "'Come on, TARS!'\n**Cooper**", "'Cooper, this is no time for caution!'\n**TARS**", "'You tell that to Doyle.'\n**Cooper**", "'Newton's third law. You gotta leave something behind.'\n**Cooper**", "'Step back, professor, step back!'\n**TARS**","'No, it's necessary.'\n**Cooper**"]
+def update_info():
+    global serverinfo
+    global playerinfo
+    return serverinfo, playerinfo
+def send_data(sinfo,pinfo):
+    global serverinfo
+    global playerinfo
+    serverinfo,playerinfo=sinfo,pinfo
 def reset_gamblegame(user):
     playerinfo[user].gamblemessage=None
     playerinfo[playerinfo[user].challenger].gamblemessage=None

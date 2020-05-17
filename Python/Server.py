@@ -1,5 +1,6 @@
 from ESSENTIAL_PACKAGES import *
 from config import *
+KIPP_DIR=os.environ["KIPP_DIR"]
 class Server:
     def __init__(self,server):
         self.server=server

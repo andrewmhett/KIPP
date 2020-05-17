@@ -445,7 +445,7 @@ async def MUSIC(message,message2):
                             notsearched=False
                             if music4==None:
                                 notsearched=True
-                                await message.chanel.send("Could not find music matching query `{0}`".format(query))
+                                await message.channel.send("Could not find music matching query `{0}`".format(query))
                             server = message.guild
                             if notsearched == False:
                                 if ((music3[0]).upper() == "!MUSIC"):

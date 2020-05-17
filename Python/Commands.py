@@ -3,6 +3,7 @@ import os
 KIPP_DIR=os.environ["KIPP_DIR"]
 from ESSENTIAL_PACKAGES import *
 from Music import *
+from Footer import get_footer
 from config import *
 command={}
 InterstellarQuotes = ["'Do not go gentle into that good night'\n**Professor Brand**", "'Come on, TARS!'\n**Cooper**", "'Cooper, this is no time for caution!'\n**TARS**", "'You tell that to Doyle.'\n**Cooper**", "'Newton's third law. You gotta leave something behind.'\n**Cooper**", "'Step back, professor, step back!'\n**TARS**","'No, it's necessary.'\n**Cooper**"]
@@ -79,7 +80,7 @@ async def HELP(message,message2):
                 search="!"+search
                 if command.Name==search:
                     emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
-                    emb.set_footer(text=profooter)
+                    emb.set_footer(text=get_footer())
                     await message.channel.send( embed=emb)
                     found=True
         if found==False:
@@ -110,14 +111,14 @@ async def HELP(message,message2):
         else:
             em.add_field(name="Owner Only",value="```"+"\n".join(oo)+"```")
         em.add_field(name="KIPPCOINS",value="```"+"\n".join(kc)+"```")
-        em.set_footer(text=profooter)
+        em.set_footer(text=get_footer())
         await message.channel.send(embed=em)
 async def IQ(message,message2):
     arrlen = int(len(InterstellarQuotes))
     quoteNum = SystemRandom().randrange(0,arrlen)
     description = str(InterstellarQuotes[quoteNum])
     em = discord.Embed(title="Interstellar Quote",description=description,colour=EMBEDCOLOR)
-    em.set_footer(text=profooter)
+    em.set_footer(text=get_footer())
     await message.channel.send( embed=em)
 async def SR(message,message2):
     mass = str(message.content).split('|')[1].replace('^', '**')
@@ -127,7 +128,7 @@ async def EXIT(message,message2):
     if playerinfo[message.author].betting==True:
         playerinfo[message.author].gamblerequest=False
         emb=discord.Embed(title="GambleGame",description="GAME ENDED",colour=EMBEDCOLOR)
-        emb.set_footer(text=profooter)
+        emb.set_footer(text=get_footer())
         await playerinfo[message.author].gamblemessage.edit(embed=emb)
         reset_gamblegame(message.author)
 async def PLAY(message,message2):
@@ -136,11 +137,11 @@ async def PLAY(message,message2):
         color=["Red","Blue","Green","Black"][rand]
         if color == playerinfo[message.author].color:
             emb = discord.Embed(title="Solo GambleGame",description="Selected Color: **{0}**\nActual Color: **{1}**\nYou gain `{2} KC`".format(playerinfo[message.author].color,color,playerinfo[message.author].bet),colour=EMBEDCOLOR)
-            emb.set_footer(text=profooter)
+            emb.set_footer(text=get_footer())
             playerinfo[message.author].GIVE_KIPPCOINS(int(playerinfo[message.author].bet))
         if color != playerinfo[message.author].color:
             emb = discord.Embed(title="Solo GambleGame",description="Selected Color: **{0}**\nActual Color: **{1}**\nYou lose `{2} KC`".format(playerinfo[message.author].color,color,playerinfo[message.author].bet),colour=EMBEDCOLOR)
-            emb.set_footer(text=profooter)
+            emb.set_footer(text=get_footer())
             playerinfo[message.author].GIVE_KIPPCOINS(-1*int(playerinfo[message.author].bet))
         await playerinfo[message.author].gamblemessage.edit(embed=emb)
         await message.delete()
@@ -155,7 +156,7 @@ async def PLAY(message,message2):
             else:
                 winner=playerinfo[message.author].challenger
             emb=discord.Embed(title="GambleGame",description="Winner: **{2}**\n`+{0} KC`\n\nLoser: **{1}**\n`-{0} KC`".format(playerinfo[message.author].bet,playerinfo[winner].challenger,winner),colour=EMBEDCOLOR)
-            emb.set_footer(text=profooter)
+            emb.set_footer(text=get_footer())
             await playerinfo[message.author].gamblemessage.edit(embed=emb)
             playerinfo[winner].GIVE_KIPPCOINS(int(playerinfo[message.author].bet))
             playerinfo[playerinfo[winner].challenger].GIVE_KIPPCOINS(-1*int(playerinfo[message.author].bet))
@@ -226,7 +227,7 @@ async def CORETEMP(message,message2):
 async def send_image(message,url,ext):
     emb=discord.Embed(title=("{0} result for '{1}'".format(ext,str(message.content).split('|')[1])),colour=EMBEDCOLOR)
     emb.set_image(url=url)
-    emb.set_footer(text=profooter)
+    emb.set_footer(text=get_footer())
     await message.channel.send(embed=emb)
 async def IMAGE(message,message2):
     await message.channel.send( "Processing image request...")
@@ -276,7 +277,7 @@ async def USERINFO(message,message2):
     description = "**Mutual servers with KIPP:** "+str(playerinfo[message.author].numkippservers)+"\n**Currently Playing:** "+str(playerinfo[message.author].game)+"\n**Highest role in Server:** "+str(playerinfo[message.author].highestrole)+"\n**Nickname in Server:** "+playerinfo[message.author].nickname+"\n**KIPPCOINS:** "+str(playerinfo[message.author].GET_KIPPCOINS())
     em = discord.Embed(description=description,colour=EMBEDCOLOR)
     em.set_author(name=str(message.author), icon_url=message.author.avatar_url)
-    em.set_footer(text=profooter)
+    em.set_footer(text=get_footer())
     await message.channel.send( embed=em)
 async def TRANSFER(message,message2):
     try:
@@ -292,7 +293,7 @@ async def TRANSFER(message,message2):
         playerinfo[patron].GIVE_KIPPCOINS(-1*int(amount))
         playerinfo[receiver].GIVE_KIPPCOINS(int(amount))
         emb = discord.Embed(title="Transfer",description="Transferred **{0}** KIPPCOINS to **{1}**'s account.\n You now have **{2}** KIPPCOINS.".format(amount,str(receiver),int(playerinfo[patron].GET_KIPPCOINS())),colour=EMBEDCOLOR)
-        emb.set_footer(text=profooter)
+        emb.set_footer(text=get_footer())
         await message.channel.send(embed=emb)
     else:
         await message.channel.send("The amount entered was either higher than the amount of KIPPCOINS you have, or was negative.")
@@ -300,7 +301,7 @@ async def GAMBLEGAME(message,message2):
     if message2.split('|')[1] == "SOLO":
         playerinfo[message.author].solo = True
         emb = discord.Embed(title="Solo GambleGame",description="Use **!SELECT|color** to choose a color:\n**Red**\n**Blue**\n**Green**\n**Black**",colour=EMBEDCOLOR)
-        emb.set_footer(text=profooter)
+        emb.set_footer(text=get_footer())
         message1=await message.channel.send(embed=emb)
         playerinfo[message.author].gamblemessage=message1
     else:
@@ -314,7 +315,7 @@ async def GAMBLEGAME(message,message2):
             playerinfo[message.author].challenger=opponent
             desc = "{0}, you have been challenged to a GambleGame by {1}.\n**!ACCEPT** or **!DECLINE**\n{2} may **!CANCEL**".format(opponent.mention,message.author.mention,message.author.mention)
             emb=discord.Embed(title="GambleGame Request",description = desc,colour=EMBEDCOLOR)
-            emb.set_footer(text=profooter)
+            emb.set_footer(text=get_footer())
             message1 = await message.channel.send(embed=emb)
             playerinfo[message.author].gamblemessage=message1
             playerinfo[opponent].gamblemessage=message1
@@ -333,12 +334,12 @@ async def SELECT(message,message2):
             playerinfo[message.author].color= message1
             await message.delete()
             emb = discord.Embed(title="Solo GambleGame",description="Color selected: **{0}**\nUse **!BET|KC** to bet KIPPCOINS\nAvailable KC: `{1}`".format(message1,str(playerinfo[message.author].GET_KIPPCOINS())),colour=EMBEDCOLOR)
-            emb.set_footer(text=profooter)
+            emb.set_footer(text=get_footer())
             await playerinfo[message.author].gamblemessage.edit(embed=emb)
 async def CANCEL(message,message2):
     if playerinfo[playerinfo[message.author].challenger].gamblerequest == True:
         emb=discord.Embed(title="GambleGame Request",description="CANCELLED",colour=EMBEDCOLOR)
-        emb.set_footer(text=profooter)
+        emb.set_footer(text=get_footer())
         playerinfo[playerinfo[message.author].challenger].gamblerequest=False
         playerinfo[playerinfo[message.author].challenger].challenger=None
         playerinfo[message.author].challenger=None
@@ -349,7 +350,7 @@ async def CANCEL(message,message2):
 async def DECLINE(message,message2):
     if playerinfo[message.author].gamblerequest == True:
         emb=discord.Embed(title="GambleGame Request",description="DECLINED",colour=EMBEDCOLOR)
-        emb.set_footer(text=profooter)
+        emb.set_footer(text=get_footer())
         playerinfo[message.author].gamblerequest=False
         playerinfo[message.author].gamblemessage=None
         playerinfo[playerinfo[message.author].challenger].gamblemessage=None
@@ -366,7 +367,7 @@ async def ACCEPT(message,message2):
         playerinfo[playerinfo[message.author].challenger].bet = 0
         playerinfo[playerinfo[message.author].challenger].betting=True
         emb=discord.Embed(title="GambleGame",description="Game started.\nEach player must bet the same amount. Once this is done, the winner will be decided.\n\n**{0}**:\nKC Available `{1}`\nBet: **0**\n\n**{2}**:\nKC Available `{3}`\nBet: **0**\n\nUse **!BET|VALUE** to bet\nUse **!EXIT** to leave the game".format(message.author,str(playerinfo[message.author].GET_KIPPCOINS()),playerinfo[message.author].challenger,str(playerinfo[playerinfo[message.author].challenger].GET_KIPPCOINS())),colour=EMBEDCOLOR)
-        emb.set_footer(text=profooter)
+        emb.set_footer(text=get_footer())
         await playerinfo[message.author].gamblemessage.edit(embed=emb)
         await message.delete()
 async def BET(message,message2):
@@ -375,7 +376,7 @@ async def BET(message,message2):
         if amount<=int(playerinfo[message.author].GET_KIPPCOINS()) and amount >0:
             playerinfo[message.author].bet = amount
             emb = discord.Embed(title="Solo GambleGame",description="Color: **{0}**\nBet: `{1} KC`\n**!PLAY**".format(playerinfo[message.author].color,str(playerinfo[message.author].bet)),colour=EMBEDCOLOR)
-            emb.set_footer(text=profooter)
+            emb.set_footer(text=get_footer())
             await playerinfo[message.author].gamblemessage.edit(embed=emb)
         await message.delete()
     else:
@@ -392,7 +393,7 @@ async def BET(message,message2):
                     emb=discord.Embed(title="GambleGame",description="The agreed bet is "+str(amount)+" KIPPCOINS.\n\n**!PLAY** to decide the winner",colour=EMBEDCOLOR)
                     playerinfo[playerinfo[message.author].challenger].betting=False
                     playerinfo[message.author].betting=False
-                emb.set_footer(text=profooter)
+                emb.set_footer(text=get_footer())
                 await playerinfo[message.author].gamblemessage.edit(embed=emb)
             await message.delete()
 async def STATUS(message,message2):

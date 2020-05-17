@@ -18,7 +18,6 @@ from Server import Server
 from Music import search_music, music_handler, YTDLSource
 from Profile import Profile
 from Commands import *
-from Footer import get_footer
 from config import *
 MSG_COUNTER=0
 client=discord.Client()
@@ -151,7 +150,6 @@ while True:
         playerinfo[message.author].hrolecolor = role1.colour
         playerinfo[message.author].numkippservers = kippservers
         playerinfo[message.author].game = message.author.activity
-        profooter=get_footer()
         message2 = str(message.content).upper()
         if "|" in message2:
             c=message2.split("|")[0]

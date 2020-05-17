@@ -1,4 +1,5 @@
 from ESSENTIAL_PACKAGES import *
+from Footer import get_footer
 from config import *
 EMBEDCOLOR=0x36393E
 ytdl_format_options = {
@@ -51,7 +52,7 @@ class music_handler:
         self.duration=player.duration
         self.title=player.title
         self.link=player.url
-        self.footer=profooter
+        self.footer=get_footer()
         self.hours=0
         if self.player.is_live == False:
             mins=int(self.duration/60)

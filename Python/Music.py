@@ -30,7 +30,10 @@ class YTDLSource(discord.PCMVolumeTransformer):
         if self.duration == 0:
             self.is_live = True
     @classmethod
-    async def from_url(cls, url, *, loop=None, stream=True):
+    async def from_url(cls, url, *, loop=None, stream=False):
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
+        if data.get('duration')==0 or data.get('duration')>3600:
+            stream=True
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
         cls.url=url
         if 'entries' in data:
@@ -38,8 +41,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 class music_handler:
-    def __init__(self,server,player,channel,loop,sinfo):
-        self.serverinfo=sinfo
+    def __init__(self,server,player,channel,loop):
+        self.loop-loop
         self.server=server
         self.resend_timer=0
         self.loop=loop

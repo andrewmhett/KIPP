@@ -37,7 +37,7 @@ After=multi-user.target
 Environment="KIPP_DIR=/path/to/KIPP"
 Type=simple
 ExecStart=sudo -E /bin/bash -c 'exec $KIPP_DIR/Python/KIPP_MONITOR.py'
-Restart=on-abort
+Restart=always
 RestartSec=0
 
 [Install]

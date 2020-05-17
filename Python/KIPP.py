@@ -23,8 +23,6 @@ KIPP_ID=386352783550447628
 serverinfo={}
 playerinfo={}
 client=discord.Client()
-START_TIME=datetime.now()
-last_ping=t.time()
 async def background_loop():
     import datetime
     while True:
@@ -36,17 +34,18 @@ async def background_loop():
                     music=serverinfo[server].pick_playlist_song()
                     if serverinfo[server].playlist != None:
                         serverinfo[server].queue.append(serverinfo[server].queue[0])
-                player = await YTDLSource.from_url(music, loop=asyncio.get_event_loop()) 
-                serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel,client.loop,serverinfo)
-            if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
-                c=datetime.datetime.now()-serverinfo[server].end_time
-                b=datetime.datetime.now()-serverinfo[server].jointime
-                if c.seconds/60 >= 5 and b.seconds/60 >= 5:
-                    if server.voice_client != None:
-                        try:
-                            await server.voice_client.disconnect()
-                        except Exception as e:
-                            print ("Voice client timeout, can't disconnect")
+                player = await YTDLSource.from_url(music, loop=client.loop)
+                serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel,client.loop)
+                serverinfo[server].mHandler.task=client.loop.create_task(serverinfo[server].update_loop())
+#            if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
+#                c=datetime.datetime.now()-serverinfo[server].end_time
+#                b=datetime.datetime.now()-serverinfo[server].jointime
+#                if c.seconds/60 >= 5 and b.seconds/60 >= 5:
+#                    if server.voice_client != None:
+#                        try:
+#                            await server.voice_client.disconnect()
+#                        except Exception as e:
+#                            print ("Voice client timeout, can't disconnect")
         await asyncio.sleep(1)
 print("KIPP starting up...")
 while True:
@@ -80,22 +79,6 @@ while True:
             pass
     @client.event
     async def on_server_join(server):
-        general=False
-        for channel in server.channels:
-            if channel.name=='general':
-                general=True
-                try:
-                    await channel.send("Hello, and thank you for using KIPP. To get started, type **!help** for all of the commands.")
-                    break
-                except discord.DiscordException:
-                    pass
-        if general == False:
-            for channel in server.channels:
-                try:
-                    await channel.send("Hello, and thank you for using KIPP. To get started, type **!help** for all of the commands.")
-                    break
-                except discord.DiscordException:
-                    pass
         for member in server.members:
             try:
                 playerinfo[member].game
@@ -108,14 +91,12 @@ while True:
     @client.event
     async def on_ready():
         await client.change_presence(activity=discord.Streaming(platform="Twitch",name="3.1.24 Simulator",twitch_name="KIPP4780",url="https://twitch.tv/kipp4780"))
-        loop = asyncio.get_event_loop()
-        loop.create_task(background_loop())
+        client.loop.create_task(background_loop())
         logging.log(5,"KIPP started.")
         for server in client.guilds:
             serverinfo[server] = Server(server)
             for member in server.members:
                 playerinfo[member] = Profile(member)
-            loop.create_task(serverinfo[server].update_loop())
     @client.event
     async def on_join(member):
         server = member.server

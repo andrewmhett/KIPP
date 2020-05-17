@@ -42,7 +42,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 class music_handler:
     def __init__(self,server,player,channel,loop):
-        self.loop-loop
+        self.loop=loop
         self.server=server
         self.resend_timer=0
         self.loop=loop

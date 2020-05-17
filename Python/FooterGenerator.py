@@ -1,6 +1,7 @@
 from datetime import datetime
 class FooterGenerator:
-    self.footer=""
+    def __init__(self):
+        self.footer=""
     def get_footer(self):
         weekint = datetime.today().weekday()
         if weekint == 0:

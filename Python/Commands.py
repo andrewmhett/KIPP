@@ -553,8 +553,7 @@ async def SKIP(message,message2):
         if serverinfo[message.guild].mHandler.paused == True:
             message.guild.voice_client.resume()
             serverinfo[message.guild].mHandler.paused = False
-        if not serverinfo[message.guild].mHandler.player.is_live:
-            serverinfo[message.guild].mHandler.skip()
+        serverinfo[message.guild].mHandler.skip()
         if len(serverinfo[message.guild].queue)==1:
             await message.channel.send( "There are no more songs in the queue. Current song ended.")
 async def REMOVESONG(message,message2):

@@ -115,7 +115,7 @@ while True:
             serverinfo[server] = Server(server)
             for member in server.members:
                 playerinfo[member] = Profile(member)
-        send_data(serverinfo,playerinfo)
+            loop.create_task(serverinfo[server].update_loop())
     @client.event
     async def on_join(member):
         server = member.server

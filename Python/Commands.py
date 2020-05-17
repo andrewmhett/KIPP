@@ -71,6 +71,48 @@ class MUSC(Command):
     pass
 class SCIN(Command):
     pass
+async def HELP(message,message2):
+    if "|" in message2:
+        found=False
+        for command in commands:
+            search=message2.split("|")[1]
+            if "!" not in search:
+                search="!"+search
+                if command.Name==search:
+                    emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
+                    emb.set_footer(text=profooter)
+                    await message.channel.send( embed=emb)
+                    found=True
+        if found==False:
+            await message.channel.send("Sorry, but I couldn't find a registered command with that name.")
+    else:
+        misc=[]
+        musc=[]
+        sc=[]
+        kc=[]
+        oo=[]
+        for c in commands:
+            if isinstance(c,MISC):
+                misc.append(c.Name)
+            elif isinstance(c,MUSC):
+                musc.append(c.Name)
+            elif isinstance(c,SCIN):
+                sc.append(c.Name)
+            elif isinstance(c,KIPC):
+                kc.append(c.Name)
+            elif isinstance(c,OWON):
+                oo.append(c.Name)
+        em = discord.Embed(title='Help',description="**Use !Help|command for command-specific information**",colour=EMBEDCOLOR)
+        em.add_field(name="Miscellaneous",value="```"+"\n".join(misc)+"```")
+        em.add_field(name="Music",value="```"+"\n".join(musc)+"```")
+        em.add_field(name="Scientific",value="```"+"\n".join(sc)+"```")
+        if str(message.guild.id) == '451227721545285649':
+            em.add_field(name="Meema Only",value="```"+"\n".join(oo)+"```")
+        else:
+            em.add_field(name="Owner Only",value="```"+"\n".join(oo)+"```")
+        em.add_field(name="KIPPCOINS",value="```"+"\n".join(kc)+"```")
+        em.set_footer(text=profooter)
+        await message.channel.send(embed=em)
 async def IQ(message,message2):
     arrlen = int(len(InterstellarQuotes))
     quoteNum = SystemRandom().randrange(0,arrlen)
@@ -847,6 +889,7 @@ async def UNBLOCK(message,message2):
             msg = "Unblocked "+str(unblocked)
             serverinfo[message.guild].blocked.remove(unblocked.id)
             await message.channel.send( msg)
+command["!HELP"]=Command("!HELP","Displays either a list of commands or command-specific help\n**Usage**\n`!HELP or !HELP|command`",HELP)
 command["!NEWPLAYLIST"]=MUSC("!NEWPLAYLIST","Creates a new music playlist of a given name\n**Usage**\n`!NEWPLAYLIST|name`",NEWPLAYLIST)
 command["!APPENDPLAYLIST"]=MUSC("!APPENDPLAYLIST","Adds a song to a playlist corresponding to either entered query, link to a song (YouTube or Soundcloud), or link to a youtube playlist.\n**Usage**\n`!APPENDPLAYLIST|playlist name|query or link`",APPENDPLAYLIST)
 command["!DELETEPLAYLIST"]=MUSC("!DELETEPLAYLIST","Deletes the music playlist of a given name\n**Usage**\n`!DELETEPLAYLIST|name`",DELETEPLAYLIST)

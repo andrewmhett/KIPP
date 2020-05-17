@@ -153,55 +153,11 @@ while True:
         playerinfo[message.author].game = message.author.activity
         profooter=get_footer()
         message2 = str(message.content).upper()
-        if message.guild.get_member(KIPP_ID).mention in message2:
-            await message.channel.send("What do you want? Use **!help** for the commands.")
-        if message2.startswith("!HELP|"):
-            found=False
-            for command in commands:
-                search=message2.split("|")[1]
-                if "!" not in search:
-                    search="!"+search
-                    if command.Name==search:
-                        emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
-                        emb.set_footer(text=profooter)
-                        await message.channel.send( embed=emb)
-                        found=True
-            if found==False:
-                await message.channel.send("Sorry, but I couldn't find a registered command with that name.")
+        if "|" in message2:
+            c=message2.split("|")[0]
         else:
-            if "|" in message2:
-                c=message2.split("|")[0]
-            else:
-                c=message2
-            for command in commands:
-                if command.Name == c:
-                    await command.Execute[0](message,message2)
-        if message2 == ('!HELP'):
-            misc=[]
-            musc=[]
-            sc=[]
-            kc=[]
-            oo=[]
-            for c in commands:
-                if isinstance(c,MISC):
-                    misc.append(c.Name)
-                elif isinstance(c,MUSC):
-                    musc.append(c.Name)
-                elif isinstance(c,SCIN):
-                    sc.append(c.Name)
-                elif isinstance(c,KIPC):
-                    kc.append(c.Name)
-                elif isinstance(c,OWON):
-                    oo.append(c.Name)
-            em = discord.Embed(title='Help',description="**Use !Help|command for command-specific information**",colour=EMBEDCOLOR)
-            em.add_field(name="Miscellaneous",value="```"+"\n".join(misc)+"```")
-            em.add_field(name="Music",value="```"+"\n".join(musc)+"```")
-            em.add_field(name="Scientific",value="```"+"\n".join(sc)+"```")
-            if str(message.guild.id) == '451227721545285649':
-                em.add_field(name="Meema Only",value="```"+"\n".join(oo)+"```")
-            else:
-                em.add_field(name="Owner Only",value="```"+"\n".join(oo)+"```")
-            em.add_field(name="KIPPCOINS",value="```"+"\n".join(kc)+"```")
-            em.set_footer(text=profooter)
-            await message.channel.send(embed=em)
+            c=message2
+        for command in commands:
+            if command.Name == c:
+                await command.Execute[0](message,message2)
     client.loop.run_until_complete(client.start(TOKEN))

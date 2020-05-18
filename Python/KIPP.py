@@ -13,11 +13,13 @@ import os
 import threading
 import subprocess
 KIPP_DIR=os.environ['KIPP_DIR']
+sys.path.append(KIPP_DIR+"/Python/Commands")
 from ESSENTIAL_PACKAGES import *
 from Server import Server
 from Music import search_music, music_handler, YTDLSource
 from Profile import Profile
-from Commands import commands
+import Commands 
+from Command import commands
 CREATOR_ID=289920025077219328
 KIPP_ID=386352783550447628
 serverinfo={}
@@ -36,15 +38,6 @@ async def background_loop():
                         serverinfo[server].queue.append(serverinfo[server].queue[0])
                 player = await YTDLSource.from_url(music, loop=client.loop)
                 serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
-#            if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
-#                c=datetime.datetime.now()-serverinfo[server].end_time
-#                b=datetime.datetime.now()-serverinfo[server].jointime
-#                if c.seconds/60 >= 5 and b.seconds/60 >= 5:
-#                    if server.voice_client != None:
-#                        try:
-#                            await server.voice_client.disconnect()
-#                        except Exception as e:
-#                            print ("Voice client timeout, can't disconnect")
         await asyncio.sleep(1)
 print("KIPP starting up...")
 while True:

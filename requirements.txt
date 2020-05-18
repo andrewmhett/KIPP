@@ -2,3 +2,4 @@ youtube-dl
 discord.py
 lxml
 bs4
+flask

@@ -32,12 +32,6 @@ def eventStream():
             ti=get_time()
             time=datetime.datetime.now().strftime("%H:%M")
             yield "event:time_event\ndata:{}\n\n".format(ti)
-        p=Popen(KIPP_DIR+'/Bash/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
-        stdout=p.communicate()[0].decode()
-        p.kill()
-        if (stdout.split('ago')[0]+"ago" != status):
-            status=stdout.split('ago')[0]+"ago"
-            yield "event:status_event\ndata:{}\n\n".format(status.replace("\n","<br>"))
         tmp = open('/sys/class/thermal/thermal_zone0/temp')
         cpu = tmp.read()
         tmp.close()

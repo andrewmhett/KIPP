@@ -728,47 +728,6 @@ async def REMOVEROLE(message,message2):
                 await message.channel.send( "Either this role is above KIPP's role, or KIPP doesn't have enough permissions to do this.")
         else:
             await message.channel.send( "This role doesn't exist. Check the capital letters in the role, and make sure they are the same as what you enter.")
-async def BAN(message,message2):
-    if await VerifyOwner(message):
-        banuser = str(message.content).split('|')[1]
-        banuser = message.guild.get_member_named(banuser)
-        try:
-            try:
-                await client.ban(banuser)
-                await message.channel.send( "Successfully banned "+str(banuser)+" from "+str(message.guild)+".")
-            except discord.DiscordException:
-                await message.channel.send( "KIPP does not have permission to ban "+str(banuser)+", or this user is already banned")
-        except AttributeError:
-            await message.channel.send( "This user is already banned, or this user is not in the server. Make sure that you used the command like this: '!ban|nickname OR !ban|username'.")
-async def UNBAN(message,message2):
-    if await VerifyOwner(message):
-        if '#' in message2:
-            unbanuser = str(message.content).split('|')[1]
-            banned = await client.get_bans(message.guild)
-            for user in banned:
-                if '#' in str(unbanuser):
-                    if str(user.name) == str(unbanuser).split('#')[0]:
-                        unbanuser1 = user.id
-                        unbanuser = await client.get_user_info(unbanuser1)
-                else:
-                    unbanuser1 = user.id
-                    unbanuser = await client.get_user_info(unbanuser1)
-            try:
-                try:
-                    await client.unban(message.guild, unbanuser)
-                    await message.channel.send( "Successfully unbanned "+str(unbanuser)+" from "+str(message.guild)+".")
-                    try:
-                        invite = await client.create_invite(message.channel, max_uses=1)
-                        await unbanuser.send("You have been unbanned from the server '"+str(message.guild)+"'. Here is an invite to the server.\n"+str(invite))
-                        await message.channel.send( "Successfully sent an invite to "+str(unbanuser))
-                    except discord.DiscordException:
-                        await message.channel.send( "Failed to re-invite "+str(unbanuser)+" to the server.")
-                except discord.DiscordException:
-                    await message.channel.send( "KIPP does not have permission to unban "+str(unbanuser)+", or this user is not banned.")
-            except AttributeError:
-                await message.channel.send( "This user is not banned.")
-        else:
-            await message.channel.send( "Make sure you use '!unban|username#tag'.")
 async def WCHANNEL(message,message2):
     if await VerifyOwner(message):
         if serverinfo[message.guild].search_server_configs("WELCOME_CHANNEL") != None:
@@ -945,8 +904,6 @@ command["!BLOCKEDLIST"]=MISC("!BLOCKEDLIST","This command will return a list of 
 command["!ADDROLE"]=OWON("!ADDROLE","This command will add the specified role to the specified user\n**Usage**\n`!ADDROLE|role|user`",ADDROLE)
 command["!AVATAR"]=MISC("!AVATAR","This command will return the full-size avatar picture of the given user\n**Usage**\n`!AVATAR|user`",AVATAR)
 command["!REMOVEROLE"]=OWON("!REMOVEROLE","This command will remove the specefied role from the speceified user\n**Usage**\n`!REMOVEROLE|role|user`",REMOVEROLE)
-command["!BAN"]=OWON("!BAN","This command will ban the specified user from the server\n**Usage**\n`!BAN|user`",BAN)
-command["!UNBAN"]=OWON("!UNBAN","This command will unban the specified user from the server, and send a new invite to them\n**Usage**\n`!UNBAN|user#tag`",UNBAN)
 command["!WCHANNEL"]=OWON("!WCHANNEL","This command will set the current text channel as the channel where welcoming messages are sent whenever someone joins the server\n**Usage**\n`!WCHANNEL`",WCHANNEL)
 command["!INVITE"]=OWON("!INVITE","This command will DM an invite to the user with the specified user id\n**Usage**\n`!INVITE|user id`",INVITE)
 command["!UNBLOCK"]=OWON("!UNBLOCK","This command will unblock the specified user\n**Usage**\n`!UNBLOCK|user`",UNBLOCK)

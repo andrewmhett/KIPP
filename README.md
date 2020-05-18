@@ -13,7 +13,20 @@ cd /home/pi
 git clone https://github.com/LockdownDoom/KIPP
 ```
 This will clone this repository into a directory named `KIPP` in `/home/pi`.
-#### Step 2: Running KIPP
+#### Step 2: Setting the `KIPP_DIR` environment variable
+KIPP depends upon an environment variable named `KIPP_DIR` in order to know where his repository is stored on your machine. You can set this variable temporarily with this command:
+```
+export KIPP_DIR=/path/to/KIPP
+```
+In order to set this variable permanently, open up `/etc/environment` with vim.
+```
+sudo vim /etc/environment
+```
+Now, add this line to the file and save.
+```
+KIPP_DIR=/path/to/KIPP
+```
+#### Step 3: Running KIPP
 KIPP automatically checks for the status of his dependencies during start-up, so there is no need to install these manually. To run KIPP, simply open a terminal and use this command.
 ```
 cd /home/pi/KIPP

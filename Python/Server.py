@@ -139,7 +139,6 @@ class Server:
                     self.mHandler=None
                     self.end_time=datetime.datetime.now()
                     os.system("sudo rm *.*")
-                    self.mHandler.loop.remove_task(self.mHandler.task)
                 else:
                     if self.mHandler.message != None:
                         try:

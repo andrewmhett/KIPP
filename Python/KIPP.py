@@ -35,8 +35,7 @@ async def background_loop():
                     if serverinfo[server].playlist != None:
                         serverinfo[server].queue.append(serverinfo[server].queue[0])
                 player = await YTDLSource.from_url(music, loop=client.loop)
-                serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel,client.loop)
-                serverinfo[server].mHandler.task=client.loop.create_task(serverinfo[server].update_loop())
+                serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
 #            if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
 #                c=datetime.datetime.now()-serverinfo[server].end_time
 #                b=datetime.datetime.now()-serverinfo[server].jointime
@@ -97,6 +96,7 @@ while True:
             serverinfo[server] = Server(server)
             for member in server.members:
                 playerinfo[member] = Profile(member)
+            client.loop.create_task(serverinfo[server].update_loop())
     @client.event
     async def on_join(member):
         server = member.server

@@ -165,7 +165,7 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                                             add_to_queue(message.guild, music4, serverinfo)
                                             serverinfo[message.guild].queue.append("PLAYLIST: {0}".format(serverinfo[message.guild].playlist))
                                         else:
-                                            add_to_queue(message.guild, music4)
+                                            add_to_queue(message.guild, music4, serverinfo)
                                         if serverinfo[message.guild].mHandler != None:
                                             if len(serverinfo[message.guild].queue)>1:
                                                 if serverinfo[message.guild].playlist != None:

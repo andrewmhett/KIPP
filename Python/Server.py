@@ -107,7 +107,7 @@ class Server:
                     if len(str(self.mHandler.seconddelta)) == 1:
                         self.mHandler.seconddelta='0'+str(self.mHandler.seconddelta)
                     self.mHandler.hours=int(int(self.mHandler.minutedelta)/60)
-                    self.mHandler.minutedelta=int(self.mHandler.minutedelta)-self.mHandler.hours*60
+                    self.mHandler.minutedelta=int(self.mHandler.minutedelta)%60
                     if self.mHandler.player.is_live == False:
                         percent=int(18*(((int(self.mHandler.hours)*3600)+(int(self.mHandler.minutedelta)*60)+int(self.mHandler.seconddelta))/int(self.mHandler.duration)))+1
                         self.mHandler.bar=("▣"*percent)+"▢"*(18-percent)
@@ -137,9 +137,9 @@ class Server:
                     await self.mHandler.message.edit(embed=em)
                     self.queue.remove(self.queue[0])
                     self.mHandler.is_playing=False
+                    os.system('sudo rm "{0}"'.format(self.mHandler.player.file))
                     self.mHandler=None
                     self.end_time=datetime.datetime.now()
-                    os.system("sudo rm *.*")
                 else:
                     if self.mHandler.message != None:
                         try:

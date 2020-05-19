@@ -17,7 +17,7 @@ import urllib
 from math import *
 import aiohttp
 import socket
-from lxml import etree
+from lxml import defusedxml
 import logging
 import youtube_dl
 import subprocess

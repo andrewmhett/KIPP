@@ -9,6 +9,8 @@ async def CODE(message,message2,serverinfo,playerinfo):
     p.kill()
     try:
         commit_msg='Newest commit:\n```\n'+stdout.decode()[64:]+'\n```\n'
+        if len(commit_msg)>1800:
+            raise discord.DiscordException
     except discord.DiscordException:
         commit_msg = 'The newest commit was to large to be displayed here.\n'
     await message.channel.send("{0} My code is backed up on GitHub [here](https://github.com/LockdownDoom/KIPP/blob/master/KIPP.py)\nAlso, my code has been reviewed by Codacy [here](https://app.codacy.com/project/LockdownDoom/KIPP/dashboard?branchId=10423847)".format(commit_msg))

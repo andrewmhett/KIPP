@@ -146,7 +146,8 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                         if music4.startswith("https://youtu.be"):
                             music4 = music4.split('youtu.be/')[1]
                             music4 = "https://www.youtube.com/watch?v="+music4
-                        if not music4.startswith("https://www.youtube.com"):
+                        notsearched=False
+                        if not music4.startswith("https://www.youtube.com") and "soundcloud.com" not in music4:
                             if str(message.author.voice.channel) != "None":
                                 query=music4
                                 music4=search_music(music4, serverinfo)

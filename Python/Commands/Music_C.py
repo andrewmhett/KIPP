@@ -205,7 +205,7 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
         await message.channel.send( "There is a song currently playing in another voice channel ("+str(message.guild.get_member(KIPP_ID).voice.channel)+"). Join that voice channel in order to change the music, or you can wait for that music to end, and run this command again.")
 
 async def PAUSE(message,message2,serverinfo,playerinfo):
-    if await VerifyMusicUser(message):
+    if await VerifyMusicUser(message,serverinfo):
         player = serverinfo[message.guild].mHandler.player
         if serverinfo[message.guild].mHandler.paused == False:
             await message.channel.send( "Music paused.")
@@ -216,7 +216,7 @@ async def PAUSE(message,message2,serverinfo,playerinfo):
             await message.channel.send( "Music already is paused. To resume, use the **!resume** command.")
 
 async def RESUME(message,message2,serverinfo,playerinfo):
-    if await VerifyMusicUser(message):
+    if await VerifyMusicUser(message,serverinfo):
         player = serverinfo[message.guild].mHandler.player
         if serverinfo[message.guild].mHandler.paused:
             message.guild.voice_client.resume()
@@ -226,7 +226,7 @@ async def RESUME(message,message2,serverinfo,playerinfo):
             await message.channel.send( "There is currently music playing. To pause the music, use the **!pause** command.")
 
 async def REMOVESONG(message,message2,serverinfo,playerinfo):
-    if await VerifyMusicUser(message):
+    if await VerifyMusicUser(message,serverinfo):
         try:
             index = int(message2.split("|")[1])
         except Exception:
@@ -243,7 +243,7 @@ async def REMOVESONG(message,message2,serverinfo,playerinfo):
             await message.channel.send("There are no songs in the queue.")
 
 async def SKIP(message,message2,serverinfo,playerinfo):
-    if await VerifyMusicUser(message):
+    if await VerifyMusicUser(message,serverinfo):
         import datetime as d
         if serverinfo[message.guild].mHandler.paused == True:
             message.guild.voice_client.resume()

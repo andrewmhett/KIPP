@@ -8,7 +8,7 @@ ffmpeg_options = {
     'options': '-vn'
 }
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
-def search_music(query):
+def search_music(query, serverinfo):
     music=None
     if ((query.startswith("https://www.youtube.com") == False) and (query.startswith("https://youtu.be") == False) and (query.startswith("http://www.youtube.com") == False) and "//soundcloud.com" not in query):
         try:

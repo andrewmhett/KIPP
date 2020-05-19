@@ -39,7 +39,7 @@ async def APPENDPLAYLIST(message,message2,serverinfo,playerinfo):
                 music4 = music4.split('youtu.be/')[1]
                 music4 = "https://www.youtube.com/watch?v="+music4   
             query=music4
-            music4=search_music(music4)
+            music4=search_music(music4, serverinfo)
             if music4 == None:
                 await message.channel.send("Could not find song with query `{0}`".format(query))
                 return
@@ -148,7 +148,7 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                             music4 = "https://www.youtube.com/watch?v="+music4
                         if str(message.author.voice.channel) != "None":
                             query=music4
-                            music4=search_music(music4)
+                            music4=search_music(music4, serverinfo)
                             serverinfo[message.guild].loading = False
                             notsearched=False
                             if music4==None:
@@ -159,10 +159,10 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                                 if ((music3[0]).upper() == "!MUSIC"):
                                     if ("user" not in music4 and "youtube.com" in music4) or ("soundcloud.com" in music4):
                                         serverinfo[message.guild].musiccolor=playerinfo[message.author].hrolecolor
-                                        await join_voice_channel(message)
+                                        await join_voice_channel(message,serverinfo)
                                         if serverinfo[message.guild].playlist != None:
                                             serverinfo[message.guild].queue=serverinfo[message.guild].queue[:-1]
-                                            add_to_queue(message.guild, music4)
+                                            add_to_queue(message.guild, music4, serverinfo)
                                             serverinfo[message.guild].queue.append("PLAYLIST: {0}".format(serverinfo[message.guild].playlist))
                                         else:
                                             add_to_queue(message.guild, music4)
@@ -190,7 +190,7 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
             else:
                 if serverinfo[message.guild].search_server_configs(message2.split("|")[1]) != None:
                     if len(serverinfo[message.guild].search_server_configs(message2.split("|")[1])[0][1:])>0:
-                        await join_voice_channel(message)
+                        await join_voice_channel(message,serverinfo)
                         serverinfo[message.guild].musicchannel=message.channel
                         serverinfo[message.guild].queue.append("PLAYLIST: {0}".format(message2.split("PLAYLIST:")[1]))
                     else:

@@ -55,7 +55,7 @@ async def EXIT(message,message2,serverinfo,playerinfo):
         emb=discord.Embed(title="GambleGame",description="GAME ENDED",colour=EMBEDCOLOR)
         emb.set_footer(text=get_footer())
         await playerinfo[message.author].gamblemessage.edit(embed=emb)
-        reset_gamblegame(message.author)
+        reset_gamblegame(message.author,playerinfo)
 
 async def PLAY(message,message2,serverinfo,playerinfo):
     if playerinfo[message.author].solo == True and playerinfo[message.author].bet != None:
@@ -86,7 +86,7 @@ async def PLAY(message,message2,serverinfo,playerinfo):
             await playerinfo[message.author].gamblemessage.edit(embed=emb)
             playerinfo[winner].GIVE_KIPPCOINS(int(playerinfo[message.author].bet))
             playerinfo[playerinfo[winner].challenger].GIVE_KIPPCOINS(-1*int(playerinfo[message.author].bet))
-            reset_gamblegame(message.author)
+            reset_gamblegame(message.author,playerinfo)
 
 async def SELECT(message,message2,serverinfo,playerinfo):
     if playerinfo[message.author].solo == True:

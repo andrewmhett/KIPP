@@ -3,6 +3,7 @@ import os
 KIPP_DIR=os.environ["KIPP_DIR"]
 sys.path.append(KIPP_DIR+"/Python")
 from Footer import get_footer
+from Music import search_music
 from ESSENTIAL_PACKAGES import *
 
 InterstellarQuotes = ["'Do not go gentle into that good night'\n**Professor Brand**", "'Come on, TARS!'\n**Cooper**", "'Cooper, this is no time for caution!'\n**TARS**", "'You tell that to Doyle.'\n**Cooper**", "'Newton's third law. You gotta leave something behind.'\n**Cooper**", "'Step back, professor, step back!'\n**TARS**","'No, it's necessary.'\n**Cooper**"]
@@ -14,7 +15,7 @@ async def send_image(message,url,ext):
     await message.channel.send(embed=emb)
 
 
-def reset_gamblegame(user):
+def reset_gamblegame(user,playerinfo):
     playerinfo[user].gamblemessage=None
     playerinfo[playerinfo[user].challenger].gamblemessage=None
     playerinfo[playerinfo[user].challenger].challenger=None
@@ -22,7 +23,7 @@ def reset_gamblegame(user):
     playerinfo[user].betting=False
     playerinfo[user].challenger=None
 
-async def join_voice_channel(message):
+async def join_voice_channel(message,serverinfo):
     users = []
     for user in message.author.voice.channel.members:
         users.append(user)
@@ -41,7 +42,7 @@ async def VerifyOwner(message):
     await message.channel.send( "{0} is a Creator-Only command".format(str(message.content).split('|')[0].upper()))
     return False
 
-async def VerifyMusicUser(message):
+async def VerifyMusicUser(message,serverinfo):
     currentlyplaying=False
     if serverinfo[message.guild].mHandler != None:
         currentlyplaying=serverinfo[message.guild].mHandler.is_playing
@@ -55,7 +56,7 @@ async def VerifyMusicUser(message):
         await message.channel.send( "Please start some music in order to use music commands")
         return False
 
-def add_to_queue(server, url):
+def add_to_queue(server, url, serverinfo):
     name="NAME_UNAVAILABLE"
     if "youtube.com" in url:
         youtube = etree.HTML(urllib.request.urlopen(url).read())

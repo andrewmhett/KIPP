@@ -5,6 +5,7 @@ from Command import *
 async def CODE(message,message2,serverinfo,playerinfo):
     from subprocess import Popen, PIPE
     p=Popen(KIPP_DIR+'/Bash/NewestCommit.sh',stdout=PIPE,stderr=PIPE)
+    emb=discord.Embed(title="Source Code")
     stdout=p.communicate()[0]
     p.kill()
     try:
@@ -13,7 +14,7 @@ async def CODE(message,message2,serverinfo,playerinfo):
             raise discord.DiscordException
     except discord.DiscordException:
         commit_msg = 'The newest commit was to large to be displayed here.\n'
-    await message.channel.send("{0} My code is backed up on GitHub [here](https://github.com/LockdownDoom/KIPP/blob/master/KIPP.py)\nAlso, my code has been reviewed by Codacy [here](https://app.codacy.com/project/LockdownDoom/KIPP/dashboard?branchId=10423847)".format(commit_msg))
+    emb.discription="{0} My code is backed up on GitHub [here](https://github.com/LockdownDoom/KIPP/blob/master/KIPP.py)\nAlso, my code has been reviewed by Codacy [here](https://app.codacy.com/project/LockdownDoom/KIPP/dashboard?branchId=10423847)".format(commit_msg)
 
 async def GRAPH(message,message2,serverinfo,playerinfo):
     img = Image.new('RGB', (1000,1000), "black")

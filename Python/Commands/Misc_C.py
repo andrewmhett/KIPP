@@ -9,7 +9,7 @@ async def CODE(message,message2,serverinfo,playerinfo):
     stdout=p.communicate()[0]
     p.kill()
     try:
-        commit_msg='Newest commit:\n```\n'+stdout.decode()[64:]+'\n```\n'
+        commit_msg='Newest commit:\n```\n'+stdout.decode()[62:]+'\n```\n'
         if len(commit_msg)>1800:
             raise discord.DiscordException
     except discord.DiscordException:

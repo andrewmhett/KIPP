@@ -107,7 +107,9 @@ class Server:
                     if len(str(self.mHandler.seconddelta)) == 1:
                         self.mHandler.seconddelta='0'+str(self.mHandler.seconddelta)
                     self.mHandler.hours=int(int(self.mHandler.minutedelta)/60)
-                    self.mHandler.minutedelta=self.mHandler.minutedelta-self.mHandler.hours*60
+                    self.mHandler.minutedelta=int(self.mHandler.minutedelta)-self.mHandler.hours*60
+                    if len(str(self.mHandler.minutedelta)) == 1:
+                        self.mHandler.minutedelta='0'+str(self.mHandler.minutedelta)
                     if self.mHandler.player.is_live == False:
                         percent=int(18*(((int(self.mHandler.hours)*3600)+(int(self.mHandler.minutedelta)*60)+int(self.mHandler.seconddelta))/int(self.mHandler.duration)))+1
                         self.mHandler.bar=("▣"*percent)+"▢"*(18-percent)

@@ -1,5 +1,5 @@
 youtube-dl
 discord.py
-lxml
+defusedxml
 bs4
 flask

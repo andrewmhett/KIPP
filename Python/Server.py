@@ -132,9 +132,7 @@ class Server:
                     await self.mHandler.message.delete()
                 if (self.mHandler.is_playing == False or c.seconds >= self.mHandler.duration) and self.mHandler.player.is_live == False:
                     self.server.voice_client.stop()
-                    em=discord.Embed(description = "["+self.mHandler.title+"]("+self.mHandler.link+")\n**Song Ended**", colour=EMBEDCOLOR)
-                    em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
-                    await self.mHandler.message.edit(embed=em)
+                    await self.mHandler.message.delete()
                     self.queue.remove(self.queue[0])
                     self.mHandler.is_playing=False
                     os.system('sudo rm "{0}"'.format(self.mHandler.player.file))

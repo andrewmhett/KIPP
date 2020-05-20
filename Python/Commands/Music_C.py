@@ -38,8 +38,9 @@ async def APPENDPLAYLIST(message,message2,serverinfo,playerinfo):
             if music4.startswith("https://youtu.be"):
                 music4 = music4.split('youtu.be/')[1]
                 music4 = "https://www.youtube.com/watch?v="+music4   
-            query=music4
-            music4=search_music(music4, serverinfo)
+            if not music4.startswith("https://www.youtube.com") and not music4.startswith("https://www.soundcloud.com"):
+                query=music4
+                music4=search_music(music4, serverinfo)
             if music4 == None:
                 await message.channel.send("Could not find song with query `{0}`".format(query))
                 return

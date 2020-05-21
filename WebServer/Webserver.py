@@ -36,7 +36,6 @@ def eventStream():
         t.sleep(1)
 @app.route('/')
 def home():
-    global status
     global oldcpu
     ti=get_time()
     return flask.render_template('index.html',time=ti,cpu=oldcpu)

@@ -7,7 +7,6 @@ app=flask.Flask(__name__)
 import datetime
 time=datetime.datetime.now().strftime("%H:%M")
 def get_time():
-    time=datetime.datetime.now().strftime("%H:%M")
     ampm="AM"
     if int(time[0:2])>=12:
         ampm="PM"
@@ -23,9 +22,8 @@ oldcpu = tmp.read()
 tmp.close()
 oldcpu=str(int(oldcpu)/1000)
 def eventStream():
-    global status
-    global time
     while True:
+        global time
         if datetime.datetime.now().strftime("%H:%M") != time:
             ti=get_time()
             time=datetime.datetime.now().strftime("%H:%M")

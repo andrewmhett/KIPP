@@ -20,14 +20,20 @@ from Music import search_music, music_handler, YTDLSource
 from Profile import Profile
 import Commands 
 from Command import commands
+from BinaryClock import get_clock
 CREATOR_ID=289920025077219328
 KIPP_ID=386352783550447628
 serverinfo={}
 playerinfo={}
 client=discord.Client()
+current_time=""
 async def background_loop():
     import datetime
+    global current_time
     while True:
+        if get_clock() != current_time:
+            await client.change_presence(activity=discord.Game(name=get_clock()))
+            current_time=get_clock()
         for server in client.guilds:
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)>=1:
                 music=serverinfo[server].queue[0][1]
@@ -91,7 +97,6 @@ while True:
             serverinfo[server] = Server(server)
     @client.event
     async def on_ready():
-        await client.change_presence(activity=discord.Streaming(platform="Twitch",name="3.1.24 Simulator",twitch_name="KIPP4780",url="https://twitch.tv/kipp4780"))
         client.loop.create_task(background_loop())
         logging.log(5,"KIPP started.")
         for server in client.guilds:

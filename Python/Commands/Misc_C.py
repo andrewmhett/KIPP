@@ -146,6 +146,7 @@ async def IQ(message,message2,serverinfo,playerinfo):
     quoteNum = SystemRandom().randrange(0,arrlen)
     description = str(InterstellarQuotes[quoteNum])
     em = discord.Embed(title="Interstellar Quote",description=description,colour=EMBEDCOLOR)
+    em.set_footer(text=get_footer())
     await message.channel.send( embed=em)
 
 command["!IQ"]=MISC("!IQ","IQ stands for Interstellar Quote. This command will send a random Interstellar quote\n**Usage**\n`!IQ`",IQ)

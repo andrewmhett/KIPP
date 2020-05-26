@@ -160,7 +160,7 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                         server = message.guild
                         if notsearched == False:
                             if ((music3[0]).upper() == "!MUSIC"):
-                                if ("user" not in music4 and "youtube.com" in music4) or ("soundcloud.com" in music4):
+                                if ("channel" not in music4 and "youtube.com" in music4) or ("soundcloud.com" in music4):
                                     serverinfo[message.guild].musiccolor=playerinfo[message.author].hrolecolor
                                     await join_voice_channel(message,serverinfo)
                                     if serverinfo[message.guild].playlist != None:

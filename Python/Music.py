@@ -78,10 +78,12 @@ class music_handler:
                 else:
                     self.length=str(mins)+":"+str(seconds)
         else:
-            self.length = "Currently Streaming"
-        self.desc = ("["+self.title+"]("+self.link+")\n`0:00 / "+self.length)
-        self.em = discord.Embed(description=self.desc,colour=EMBEDCOLOR)
+            self.length = "Live"
+        self.desc = ("`0:00 / "+self.length)
+        self.em = discord.Embed(colour=EMBEDCOLOR)
+        self.em.description="[{0}]({1})".format(self.title,self.link)
         self.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
+        self.em.add_field(name="",value=self.desc,inline=True)
         self.em.set_footer(text=self.footer)
         self.is_playing=True
         self.pausedatetime=None

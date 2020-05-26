@@ -32,8 +32,11 @@ async def background_loop():
     global current_time
     while True:
         if get_clock() != current_time:
-            await client.change_presence(activity=discord.Game(name=get_clock()))
-            current_time=get_clock()
+            try:
+                await client.change_presence(activity=discord.Game(name=get_clock()))
+                current_time=get_clock()
+            except discord.DiscordException:
+                print("Binary clock rate limited...")
         for server in client.guilds:
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)>=1:
                 music=serverinfo[server].queue[0][1]
@@ -65,7 +68,7 @@ while True:
         user = server.get_member(KIPP_ID)
         users = []
         try:
-            for user in server.get_member(KIPP_ID).voice.voice.channel.members:
+            for user in server.get_member(KIPP_ID).voice.channel.members:
                 if user.bot == False:
                     users.append(user)
             if len(users)==0:
@@ -75,14 +78,11 @@ while True:
                 if currentlyplaying:
                     if serverinfo[server].mHandler.paused == False:
                         await serverinfo[server].musictextchannel.send("Nobody is listening to KIPP. Pausing music...")
-                        serverinfo[server].mHandler.player.pause()
+                        server.voice_client.pause()
                         serverinfo[server].mHandler.paused = True
                         serverinfo[server].mHandler.pausedatetime=datetime.now()
-                        serverinfo[server].everyoneleft = True
-            if (after.voice.voice.channel == server.get_member(KIPP_ID).voice.voice.channel) and serverinfo[server].everyoneleft:
-                serverinfo[server].everyoneleft = False
-                await serverinfo[server].musictextchannel.send("The music that was playing (**"+str(serverinfo[server].mHandler.title)+"**) was paused because nobody was listening. Use **!resume** to resume the music.")
-        except AttributeError:
+        except AttributeError as e:
+            print(e)
             pass
     @client.event
     async def on_server_join(server):

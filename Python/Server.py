@@ -108,11 +108,34 @@ class Server:
                         self.mHandler.seconddelta='0'+str(self.mHandler.seconddelta)
                     self.mHandler.hours=int(int(self.mHandler.minutedelta)/60)
                     self.mHandler.minutedelta=int(self.mHandler.minutedelta)%60
+                    blocks=[" "," "," "," ","╸","╸","╸","╍"]
                     if self.mHandler.player.is_live == False:
-                        percent=int(18*(((int(self.mHandler.hours)*3600)+(int(self.mHandler.minutedelta)*60)+int(self.mHandler.seconddelta))/int(self.mHandler.duration)))+1
-                        self.mHandler.bar=("▣"*percent)+"▢"*(18-percent)
+                        percent=int(21*(((int(self.mHandler.hours)*3600)+(int(self.mHandler.minutedelta)*60)+int(self.mHandler.seconddelta))/int(self.mHandler.duration)))
+                        perc=((int(self.mHandler.hours)*3600)+(int(self.mHandler.minutedelta)*60)+int(self.mHandler.seconddelta))/self.mHandler.duration
+                        rem=perc%(1/21)
+                        rem=rem*21
+                        if rem==0:
+                            self.mHandler.bar="7"*percent+" "*(21-percent)
+                        else:
+                            self.mHandler.bar="7"*percent+str(int(rem*7))+" "*(20-percent)
+                        perc_str=str(int(perc*100))+"%"
+                        if int(perc*100)<10:
+                            perc_str="0"+perc_str
+                        out_str=""
+                        for i in range(9):
+                            if self.mHandler.bar[i] != " ":
+                                out_str+=blocks[int(self.mHandler.bar[i])]
+                            else:
+                                out_str+=" "
+                        out_str+=perc_str
+                        for i in range(12,21):
+                            if self.mHandler.bar[i] != " ":
+                                out_str+=blocks[int(self.mHandler.bar[i])]
+                            else:
+                                out_str+=" "
+                        self.mHandler.bar="`"+out_str+"`"
                     else:
-                        self.mHandler.bar="▣"*18
+                        self.mHandler.bar="`"+(" "*9)+"N/A"+(" "*9)+"`"
                 pauseStr=""
                 if self.mHandler.paused:
                     pauseStr=" (paused)"
@@ -122,11 +145,13 @@ class Server:
                         self.mHandler.minutedelta="0"+str(self.mHandler.minutedelta)
                     else:
                         self.mHandler.minutedelta=str(self.mHandler.minutedelta)
-                    self.mHandler.em=discord.Embed(description = self.mHandler.desc.split('`')[0]+"`"+str(self.mHandler.hours)+":"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr+'\n'+self.mHandler.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
+                    self.mHandler.desc = "`"+str(self.mHandler.hours)+":"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr+'\n'+self.mHandler.bar
                 else:
-                    self.mHandler.em=discord.Embed(description = self.mHandler.desc.split('`')[0]+"`"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr+'\n'+self.mHandler.bar+'\n**Queue:**'+queuelist,colour=EMBEDCOLOR)
+                    self.mHandler.desc= "`"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr+'\n'+self.mHandler.bar
+                self.mHandler.em.clear_fields()
+                self.mHandler.em.add_field(name="Progress",value=self.mHandler.desc,inline=True)
+                self.mHandler.em.add_field(name="Queue",value=queuelist,inline=True)
                 self.mHandler.em.set_footer(text=self.mHandler.footer)
-                self.mHandler.em.set_author(name = "Music", icon_url="http://www.charbase.com/images/glyph/9835")
                 if self.mHandler.resend_timer/30 >= 5:
                     self.mHandler.resend_timer=0
                     await self.mHandler.message.delete()
@@ -146,4 +171,4 @@ class Server:
                             self.mHandler.message=await self.mHandler.channel.send(embed=self.mHandler.em)
                     else:
                         self.mHandler.message = await self.mHandler.channel.send(embed=self.mHandler.em)
-            await asyncio.sleep(2)
+            await asyncio.sleep(1)

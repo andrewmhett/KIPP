@@ -145,16 +145,19 @@ class Server:
                         self.mHandler.minutedelta="0"+str(self.mHandler.minutedelta)
                     else:
                         self.mHandler.minutedelta=str(self.mHandler.minutedelta)
-                    self.mHandler.desc = "`"+str(self.mHandler.hours)+":"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr+'\n'+self.mHandler.bar
+                    self.mHandler.desc = self.mHandler.bar+"\n`"+str(self.mHandler.hours)+":"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr
                 else:
-                    self.mHandler.desc= "`"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr+'\n'+self.mHandler.bar
+                    self.mHandler.desc= self.mHandler.bar+"\n`"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr
                 self.mHandler.em.clear_fields()
                 self.mHandler.em.add_field(name="Progress",value=self.mHandler.desc,inline=True)
                 self.mHandler.em.add_field(name="Queue",value=queuelist,inline=True)
                 self.mHandler.em.set_footer(text=self.mHandler.footer)
                 if self.mHandler.resend_timer/30 >= 5:
                     self.mHandler.resend_timer=0
-                    await self.mHandler.message.delete()
+                    try:
+                        await self.mHandler.message.delete()
+                    except discord.DiscordException:
+                        pass
                 if (self.mHandler.is_playing == False or c.seconds >= self.mHandler.duration) and self.mHandler.player.is_live == False:
                     self.server.voice_client.stop()
                     await self.mHandler.message.delete()

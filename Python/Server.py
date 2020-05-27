@@ -108,8 +108,8 @@ class Server:
                         self.mHandler.seconddelta='0'+str(self.mHandler.seconddelta)
                     self.mHandler.hours=int(int(self.mHandler.minutedelta)/60)
                     self.mHandler.minutedelta=int(self.mHandler.minutedelta)%60
-                    blocks=[" "," "," "," ","╸","╸","╸","╍"]
-                    if self.mHandler.player.is_live == False:
+                    blocks=[" "," "," ","╸","╸","╸","╸","╍"]
+                    if self.mHandler.player.is_live == False and self.mHandler.player.duration != 0:
                         percent=int(21*(((int(self.mHandler.hours)*3600)+(int(self.mHandler.minutedelta)*60)+int(self.mHandler.seconddelta))/int(self.mHandler.duration)))
                         perc=((int(self.mHandler.hours)*3600)+(int(self.mHandler.minutedelta)*60)+int(self.mHandler.seconddelta))/self.mHandler.duration
                         rem=perc%(1/21)
@@ -135,7 +135,7 @@ class Server:
                                 out_str+=" "
                         self.mHandler.bar="`"+out_str+"`"
                     else:
-                        self.mHandler.bar="`"+(" "*9)+"N/A"+(" "*9)+"`"
+                        self.mHandler.bar="`"+(" "*5)+"Live Stream"+(" "*5)+"`"
                 pauseStr=""
                 if self.mHandler.paused:
                     pauseStr=" (paused)"

@@ -83,7 +83,6 @@ while True:
                         serverinfo[server].mHandler.pausedatetime=datetime.now()
         except AttributeError as e:
             print(e)
-            pass
     @client.event
     async def on_server_join(server):
         for member in server.members:

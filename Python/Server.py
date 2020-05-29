@@ -160,7 +160,10 @@ class Server:
                         pass
                 if (self.mHandler.is_playing == False or c.seconds >= self.mHandler.duration) and self.mHandler.player.is_live == False:
                     self.server.voice_client.stop()
-                    await self.mHandler.message.delete()
+                    try:
+                        await self.mHandler.message.delete()
+                    except discord.DiscordException:
+                        pass
                     self.queue.remove(self.queue[0])
                     self.mHandler.is_playing=False
                     os.system('sudo rm "{0}"'.format(self.mHandler.player.file))

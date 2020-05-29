@@ -10,15 +10,14 @@ ffmpeg_options = {
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 def search_music(query, serverinfo):
     music=None
-    if ((query.startswith("https://www.youtube.com") == False) and (query.startswith("https://youtu.be") == False) and (query.startswith("http://www.youtube.com") == False) and "//soundcloud.com" not in query):
-        try:
-            query_string = urllib.parse.urlencode({"search_query" : query})
-            req = urllib.request.Request("http://www.youtube.com/results?" + query_string)
-            with urllib.request.urlopen(req) as html:
-                searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.read().decode())
-            music="http://www.youtube.com/watch?v="+searchresults[0]
-        except IndexError:
-            logging.log(50,"Not found")
+    try:
+        query_string = urllib.parse.urlencode({"search_query" : query})
+        req = urllib.request.Request("http://www.youtube.com/results?" + query_string)
+        with urllib.request.urlopen(req) as html:
+            searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.read().decode())
+        music="http://www.youtube.com/watch?v="+searchresults[0]
+    except IndexError:
+        logging.log(50,"Not found")
     return music
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=1.0):

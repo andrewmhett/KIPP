@@ -79,7 +79,7 @@ async def APPENDPLAYLIST(message,message2,serverinfo,playerinfo):
                 song=soup.find('meta',{'property':'og:title'})['content']
             serverinfo[message.guild].change_server_config("PLAYLIST:{0}".format(name),line)
             if single:
-                await message.channel.send("Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))
+                await message.channel.send("Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song[0],name,len(arr)))
             else:
                 await message.channel.send("Successfully added `{0}` songs to playlist `{1}`.".format(counter,name))
     else:
@@ -183,8 +183,7 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                                     await message.channel.send( "Please do not try to play an entire youtube channel. Get one specific song you would like to hear, and play that.")
                                     serverinfo[message.guild].loading = False
                         else:
-                            await message.channel.send( "You are not in a voice channel. Get in one for KIPP to play music.")
-                            serverinfo[message.guild].loading = False
+                            loading=False
                     else:
                         await message.delete()
                 else:

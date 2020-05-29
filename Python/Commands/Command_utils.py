@@ -27,17 +27,20 @@ def reset_gamblegame(user,playerinfo):
     playerinfo[user].challenger=None
 
 async def join_voice_channel(message,serverinfo):
-    users = []
-    for user in message.author.voice.channel.members:
-        users.append(user)
-    if message.guild.voice_client == None:
-        channel = message.author.voice.channel
-        await channel.connect()
-        serverinfo[message.guild].jointime=datetime.now()
-    if message.guild.get_member(KIPP_ID) not in users:
-        channel = message.author.voice.channel
-        user = message.guild.get_member(KIPP_ID)
-        await user.edit(voice_channel=channel)
+    if message.author.voice != None:
+        users = []
+        for user in message.author.voice.channel.members:
+            users.append(user)
+        if message.guild.voice_client == None:
+            channel = message.author.voice.channel
+            await channel.connect()
+            serverinfo[message.guild].jointime=datetime.now()
+        if message.guild.get_member(KIPP_ID) not in users:
+            channel = message.author.voice.channel
+            user = message.guild.get_member(KIPP_ID)
+            await user.edit(voice_channel=channel)
+    else:
+        await message.channel.send("You are not in a voice channel. Join one in order to play music.")
 
 async def VerifyOwner(message):
     if message.author == message.guild.owner or message.author.id == CREATOR_ID:

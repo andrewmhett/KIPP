@@ -68,7 +68,7 @@ while True:
         user = server.get_member(KIPP_ID)
         users = []
         if before.channel != server.get_member(KIPP_ID).voice.channel:
-            break
+            return
         try:
             for user in server.get_member(KIPP_ID).voice.channel.members:
                 if user.bot == False:

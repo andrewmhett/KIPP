@@ -23,6 +23,8 @@ from Command import commands
 from BinaryClock import get_clock
 CREATOR_ID=289920025077219328
 KIPP_ID=386352783550447628
+if sys.argv[1]=="dev":
+    KIPP_ID=726545013064073277
 serverinfo={}
 playerinfo={}
 client=discord.Client()
@@ -86,14 +88,14 @@ while True:
         except AttributeError as e:
             print(e)
     @client.event
-    async def on_server_join(server):
+    async def on_guild_join(server):
         for member in server.members:
             try:
                 playerinfo[member].game
             except KeyError:
                 playerinfo[member] = Profile(member)
         try:
-            serverinfo[server].musicmessage
+            serverinfo[server]
         except KeyError:
             serverinfo[server] = Server(server)
     @client.event

@@ -8,14 +8,16 @@ ffmpeg_options = {
     'options': '-vn'
 }
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
-def search_music(query, serverinfo):
+def search_music(query, serverinfo, index):
     music=None
     try:
         query_string = urllib.parse.urlencode({"search_query" : query})
-        req = urllib.request.Request("http://www.youtube.com/results?" + query_string)
-        with urllib.request.urlopen(req) as html:
-            searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.read().decode())
-        music="http://www.youtube.com/watch?v="+searchresults[0]
+        req = "http://www.youtube.com/results?"+query_string
+        with requests.get(req) as html:
+            print(req)
+            searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.text)
+        print(searchresults)
+        music="http://www.youtube.com/watch?v="+searchresults[index]
     except IndexError:
         logging.log(50,"Not found")
     return music

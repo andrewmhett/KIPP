@@ -1,5 +1,5 @@
 from ESSENTIAL_PACKAGES import *
-from Command_utils import *
+from .Command_utils import *
 from Command import *
 
 async def CODE(message,message2,serverinfo,playerinfo):

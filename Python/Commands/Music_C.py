@@ -3,7 +3,7 @@ import os
 KIPP_DIR=os.environ["KIPP_DIR"]
 sys.path.append(KIPP_DIR+"/Python")
 from ESSENTIAL_PACKAGES import *
-from Command_utils import *
+from .Command_utils import *
 from Command import *
 
 async def NEWPLAYLIST(message,message2,serverinfo,playerinfo):
@@ -151,7 +151,18 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                         if not music4.startswith("https://www.youtube.com") and "soundcloud.com" not in music4:
                             if str(message.author.voice.channel) != "None":
                                 query=music4
-                                music4=search_music(music4, serverinfo)
+                                index=0
+                                ytdl = youtube_dl.YoutubeDL()
+                                while index<=10:
+                                    try:
+                                        music4=search_music(query, serverinfo, index)
+                                        if music4 != None:
+                                            ytdl.extract_info(music4, download=False)
+                                            break
+                                        else:
+                                            index+=1
+                                    except youtube_dl.utils.DownloadError:
+                                        index+=1
                                 serverinfo[message.guild].loading = False
                                 notsearched=False
                                 if music4==None:

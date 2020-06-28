@@ -3,7 +3,7 @@ import os
 KIPP_DIR=os.environ["KIPP_DIR"]
 sys.path.append(KIPP_DIR+"/Python")
 from ESSENTIAL_PACKAGES import *
-from Command_utils import *
+from .Command_utils import *
 from Command import *
 
 async def SR(message,message2,serverinfo,playerinfo):

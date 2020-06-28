@@ -15,7 +15,7 @@ async def CODE(message,message2,serverinfo,playerinfo):
     except discord.DiscordException:
         commit_msg = 'The newest commit was too large to be displayed here.\n'
     emb.color=EMBEDCOLOR
-    emb.description="{0} My code is backed up on GitHub [here](https://github.com/LockdownDoom/KIPP)\nAlso, my code has been reviewed by Codacy [here](https://app.codacy.com/project/LockdownDoom/KIPP/dashboard?branchId=10423847)".format(commit_msg)
+    emb.description="{0} My code is backed up on GitHub [here](https://github.com/andrewmhett/KIPP)\nAlso, my code has been reviewed by Codacy [here](https://app.codacy.com/project/LockdownDoom/KIPP/dashboard?branchId=10423847)".format(commit_msg)
     await message.channel.send(embed=emb)
 
 async def GRAPH(message,message2,serverinfo,playerinfo):

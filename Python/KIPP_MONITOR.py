@@ -18,11 +18,6 @@ KIPP_RESET_ERRORS = [ConnectionResetError,
                      aiohttp.ClientOSError,
                      websockets.exceptions.InvalidStatusCode]
 try:
-    logging.log(50,"Backing KIPP up to GitHub...")
-    os.system('sudo -E {0}/Bash/BackupKIPP.sh'.format(KIPP_DIR))
-except FileNotFoundError:
-    logging.log(50,"KIPP backup file not found.")
-try:
     logging.log(50,"Checking for package updates")
     os.system('sudo -E {0}/Bash/REQUIREMENTUPDATES.sh'.format(KIPP_DIR))
 except FileNotFoundError:

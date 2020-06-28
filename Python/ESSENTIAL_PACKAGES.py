@@ -18,7 +18,7 @@ from math import *
 import aiohttp
 import socket
 from defusedxml import lxml
-from defusedxml.lxml import etree
+from lxml import etree
 import logging
 import youtube_dl
 import subprocess

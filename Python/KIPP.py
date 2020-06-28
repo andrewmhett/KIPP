@@ -23,8 +23,9 @@ from Command import commands
 from BinaryClock import get_clock
 CREATOR_ID=289920025077219328
 KIPP_ID=386352783550447628
-if sys.argv[1]=="dev":
-    KIPP_ID=726545013064073277
+if len(sys.argv)>1:
+    if sys.argv[1]=="dev":
+        KIPP_ID=726545013064073277
 serverinfo={}
 playerinfo={}
 client=discord.Client()

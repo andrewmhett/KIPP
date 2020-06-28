@@ -18,7 +18,7 @@ from math import *
 import aiohttp
 import socket
 from defusedxml import lxml
-from lxml import etree
+from defusedxml.lxml import etree
 import logging
 import youtube_dl
 import subprocess
@@ -26,7 +26,7 @@ EMBEDCOLOR=0x36393E
 logging.getLogger().setLevel(logging.INFO)
 try:
 	from Token import TOKEN
-except:
+except ModuleNotFoundError:
 	print("TOKEN FILE NOT FOUND")
 	try:
 		TOKEN=os.environ['TOKEN']

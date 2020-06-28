@@ -18,7 +18,7 @@ from ESSENTIAL_PACKAGES import *
 from Server import Server
 from Music import search_music, music_handler, YTDLSource
 from Profile import Profile
-import Commands 
+import Commands
 from Command import commands
 from BinaryClock import get_clock
 CREATOR_ID=289920025077219328
@@ -57,7 +57,7 @@ async def background_loop():
                     if server.voice_client != None:
                         try:
                             await server.voice_client.disconnect()
-                        except Exception as e:
+                        except Exception:
                             print ("Voice client timeout, can't disconnect")
         await asyncio.sleep(1)
 print("KIPP starting up...")
@@ -86,7 +86,7 @@ while True:
                         server.voice_client.pause()
                         serverinfo[server].mHandler.paused = True
                         serverinfo[server].mHandler.pausedatetime=datetime.now()
-        except AttributeError as e:
+        except AttributeError:
             print(e)
     @client.event
     async def on_guild_join(server):
@@ -132,7 +132,6 @@ while True:
             return
         serverinfo[message.guild].recentchannel = message.channel
         kippservers = 0
-        roles = []
         for server in client.guilds:
             for member in server.members:
                 if member == message.author:

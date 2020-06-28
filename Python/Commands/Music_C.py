@@ -37,10 +37,21 @@ async def APPENDPLAYLIST(message,message2,serverinfo,playerinfo):
                 music4 = music4[0]
             if music4.startswith("https://youtu.be"):
                 music4 = music4.split('youtu.be/')[1]
-                music4 = "https://www.youtube.com/watch?v="+music4   
+                music4 = "https://www.youtube.com/watch?v="+music4
             if not music4.startswith("https://www.youtube.com") and not music4.startswith("https://www.soundcloud.com"):
                 query=music4
-                music4=search_music(music4, serverinfo)
+                index=0
+                ytdl = youtube_dl.YoutubeDL()
+                while index<=10:
+                    try:
+                        music4=search_music(query, serverinfo, index)
+                        if music4 != None:
+                            ytdl.extract_info(music4, download=False)
+                            break
+                        else:
+                            index+=1
+                    except youtube_dl.utils.DownloadError:
+                        index+=1 
             if music4 == None:
                 await message.channel.send("Could not find song with query `{0}`".format(query))
                 return
@@ -194,7 +205,7 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                                     await message.channel.send( "Please do not try to play an entire youtube channel. Get one specific song you would like to hear, and play that.")
                                     serverinfo[message.guild].loading = False
                         else:
-                            loading=False
+                            serverinfo[message.guild].loading=False
                     else:
                         await message.delete()
                 else:
@@ -219,7 +230,6 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
 
 async def PAUSE(message,message2,serverinfo,playerinfo):
     if await VerifyMusicUser(message,serverinfo):
-        player = serverinfo[message.guild].mHandler.player
         if serverinfo[message.guild].mHandler.paused == False:
             await message.channel.send( "Music paused.")
             serverinfo[message.guild].mHandler.pausedatetime=datetime.now()
@@ -257,7 +267,6 @@ async def REMOVESONG(message,message2,serverinfo,playerinfo):
 
 async def SKIP(message,message2,serverinfo,playerinfo):
     if await VerifyMusicUser(message,serverinfo):
-        import datetime as d
         if serverinfo[message.guild].mHandler.paused == True:
             message.guild.voice_client.resume()
             serverinfo[message.guild].mHandler.paused = False

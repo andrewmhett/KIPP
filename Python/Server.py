@@ -7,12 +7,11 @@ def READ_DATA_IN(path, condition=lambda x: True, attr_condition=lambda x: True):
          with open(path,'w+') as f:
              f.close()
     arr=[]
-    found=False
     with open(path) as fl:
         for row in csv.reader(fl):
             if condition(row):
                 for attr in row:
-                    if attr_condition(attr):            
+                    if attr_condition(attr):
                         arr.append(row)
                         break
         fl.close()
@@ -173,7 +172,7 @@ class Server:
                     if self.mHandler.message != None:
                         try:
                             await self.mHandler.message.edit(embed=self.mHandler.em)
-                        except Exception as e:
+                        except Exception:
                             self.mHandler.message=await self.mHandler.channel.send(embed=self.mHandler.em)
                     else:
                         self.mHandler.message = await self.mHandler.channel.send(embed=self.mHandler.em)

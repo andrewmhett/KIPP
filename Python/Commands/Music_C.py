@@ -51,7 +51,7 @@ async def APPENDPLAYLIST(message,message2,serverinfo,playerinfo):
                         else:
                             index+=1
                     except youtube_dl.utils.DownloadError:
-                        index+=1 
+                        index+=1
             if music4 == None:
                 await message.channel.send("Could not find song with query `{0}`".format(query))
                 return
@@ -240,7 +240,6 @@ async def PAUSE(message,message2,serverinfo,playerinfo):
 
 async def RESUME(message,message2,serverinfo,playerinfo):
     if await VerifyMusicUser(message,serverinfo):
-        player = serverinfo[message.guild].mHandler.player
         if serverinfo[message.guild].mHandler.paused:
             message.guild.voice_client.resume()
             serverinfo[message.guild].mHandler.paused=False

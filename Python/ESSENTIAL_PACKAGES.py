@@ -30,5 +30,5 @@ except ModuleNotFoundError:
 	print("TOKEN FILE NOT FOUND")
 	try:
 		TOKEN=os.environ['TOKEN']
-	except:
+	except KeyError:
 		print("TOKEN NOT FOUND IN ENVIRONMENT")

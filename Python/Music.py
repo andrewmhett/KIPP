@@ -14,12 +14,10 @@ def search_music(query, serverinfo, index):
         query_string = urllib.parse.urlencode({"search_query" : query})
         req = "http://www.youtube.com/results?"+query_string
         with requests.get(req) as html:
-            print(req)
             searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.text)
-        print(searchresults)
         music="http://www.youtube.com/watch?v="+searchresults[index]
     except IndexError:
-        logging.log(50,"Not found")
+        print("Not found") 
     return music
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=1.0):
@@ -33,7 +31,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
-        if data.get('duration')==0 or data.get('duration')>1200:
+        if data.get('duration')==0 or data.get('filesize')>20000000:
             stream=True
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
         cls.url=url

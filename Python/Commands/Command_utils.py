@@ -65,13 +65,9 @@ async def VerifyMusicUser(message,serverinfo):
 
 def add_to_queue(server, url, serverinfo):
     name="NAME_UNAVAILABLE"
-    if "youtube.com" in url:
-        youtube = etree.HTML(urllib.request.urlopen(url).read())
-        name=youtube.xpath("//span[@id='eow-title']/@title")
-    elif "soundcloud.com" in url:
-        from bs4 import BeautifulSoup
-        page=requests.get(url).text
-        soup=BeautifulSoup(page,features='html.parser')
-        name=soup.find('meta',{'property':'og:title'})['content']
+    #this parser code works for both youtube and soundcloud HTML
+    from bs4 import BeautifulSoup
+    page=requests.get(url).text
+    soup=BeautifulSoup(page,features='html.parser')
+    name=soup.find('meta',{'property':'og:title'})['content']
     serverinfo[server].queue.append([name,url])
-

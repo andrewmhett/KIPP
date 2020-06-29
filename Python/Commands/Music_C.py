@@ -83,17 +83,13 @@ async def APPENDPLAYLIST(message,message2,serverinfo,playerinfo):
                 line.append(item)
             song=""
             url=music4
-            if "youtube.com" in url:
-                youtube = etree.HTML(urllib.request.urlopen(url).read())
-                song=youtube.xpath("//span[@id='eow-title']/@title")
-            elif "soundcloud.com" in url:
-                from bs4 import BeautifulSoup
-                page=requests.get(url).text
-                soup=BeautifulSoup(page,features='html.parser')
-                song=soup.find('meta',{'property':'og:title'})['content']
+            from bs4 import BeautifulSoup
+            page=requests.get(url).text
+            soup=BeautifulSoup(page,features='html.parser')
+            song=soup.find('meta',{'property':'og:title'})['content']
             serverinfo[message.guild].change_server_config("PLAYLIST:{0}".format(name),line)
             if single:
-                await message.channel.send("Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song[0],name,len(arr)))
+                await message.channel.send("Successfully added **{0}** to playlist `{1}`. `#{2}`.".format(song,name,len(arr)))
             else:
                 await message.channel.send("Successfully added `{0}` songs to playlist `{1}`.".format(counter,name))
     else:

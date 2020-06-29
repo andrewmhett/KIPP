@@ -17,7 +17,7 @@ def search_music(query, serverinfo, index):
             searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.text)
         music="http://www.youtube.com/watch?v="+searchresults[index]
     except IndexError:
-        print("Not found") 
+        print("Not found")
     return music
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=1.0):

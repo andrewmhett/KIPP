@@ -115,7 +115,12 @@ while True:
     @client.event
     async def on_ready():
         client.loop.create_task(background_loop())
-        client.loop.create_task(git_update_loop())
+        dev=False
+        if len(sys.argv)>1:
+            if sys.argv[1]=="dev":
+                dev=True
+        if not dev:
+            client.loop.create_task(git_update_loop())
         logging.log(5,"KIPP started.")
         for server in client.guilds:
             serverinfo[server] = Server(server)

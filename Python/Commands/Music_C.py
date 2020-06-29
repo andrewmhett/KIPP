@@ -193,7 +193,7 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                                     if len(serverinfo[message.guild].queue) == 1:
                                         serverinfo[message.guild].musicchannel=message.channel
                                         serverinfo[message.guild].loading = False
-                                else:
+                                elif "channel" in music4 and "youtube.com" in music4:
                                     await message.channel.send( "Please do not try to play an entire youtube channel. Get one specific song you would like to hear, and play that.")
                                     serverinfo[message.guild].loading = False
                         else:
@@ -204,15 +204,19 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                     await message.channel.send( "Please use the correct syntax. Use !music|youtubelink/soundcloudlink or !music|youtubesearch to use the music command.")
                     serverinfo[message.guild].loading = False
             else:
-                if serverinfo[message.guild].search_server_configs(message2.split("|")[1]) != None:
-                    if len(serverinfo[message.guild].search_server_configs(message2.split("|")[1])[0][1:])>0:
-                        await join_voice_channel(message,serverinfo)
-                        serverinfo[message.guild].musicchannel=message.channel
-                        serverinfo[message.guild].queue.append("PLAYLIST: {0}".format(message2.split("PLAYLIST:")[1]))
+                if serverinfo[message.guild].playlist == None:
+                    if serverinfo[message.guild].search_server_configs(message2.split("|")[1]) != None:
+                        if len(serverinfo[message.guild].search_server_configs(message2.split("|")[1])[0][1:])>0:
+                            await join_voice_channel(message,serverinfo)
+                            serverinfo[message.guild].musicchannel=message.channel
+                            serverinfo[message.guild].playlist=message2.split('PLAYLIST:')[1]
+                            serverinfo[message.guild].queue.append("PLAYLIST: {0}".format(message2.split("PLAYLIST:")[1]))
+                        else:
+                            await message.channel.send("The playlist named `{0}` is empty. You may append songs to this playlist with **!APPENDPLAYLIST**.".format(message2.split("PLAYLIST:")[1]))
                     else:
-                        await message.channel.send( "There are no songs in the playlist named `{0}`. You may append songs to this playlist with **!APPENDPLAYLIST**.".format(message2.split("PLAYLIST:")[1]))
+                        await message.channel.send( "There is no playlist named `{0}`. Use **!PLAYLISTS** to see a list of all playlists in this server.".format(message2.split("PLAYLIST:")[1]))
                 else:
-                    await message.channel.send( "There is no playlist named `{0}`. Use **!PLAYLISTS** to see a list of all playlists in this server.".format(message2.split("PLAYLIST:")[1]))
+                    await message.channel.send("There is already a playlist playing. In order to play another playlist, please remove the current playlist from the queue.")
         except Exception as err:
             serverinfo[message.guild].loading = False
             await message.channel.send( err)
@@ -247,10 +251,10 @@ async def REMOVESONG(message,message2,serverinfo,playerinfo):
             await message.channel.send( "Song index must be an integer.")
         if len(serverinfo[message.guild].queue)>1:
             if index >0 and index <= len(serverinfo[message.guild].queue):
-                serverinfo[message.guild].queue.remove(serverinfo[message.guild].queue[index])
-                await message.channel.send( "Removed song #{0} from queue".format(index))
-                if serverinfo[message.guild].playlist != None:
+                if serverinfo[message.guild].playlist != None and len(serverinfo[message.guild].queue[index])>2:
                     serverinfo[message.guild].playlist = None
+                serverinfo[message.guild].queue.pop(index)
+                await message.channel.send( "Removed song #{0} from queue".format(index))
             else:
                 await message.channel.send("Invalid song index")
         else:

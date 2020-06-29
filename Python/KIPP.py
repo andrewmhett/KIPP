@@ -64,7 +64,7 @@ async def background_loop():
 async def git_update_loop():
     while True:
         stdout=subprocess.check_output("sudo git pull --dry-run",shell=True).decode()
-        if "up to date" not in stdout:
+        if "Updating" in stdout:
             print("New commit on master branch, updating and restarting...")
             os.system("sudo git pull")
             quit()

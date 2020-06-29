@@ -62,10 +62,9 @@ async def background_loop():
         await asyncio.sleep(1)
 async def git_update_loop():
     while True:
-        stdout=subprocess.check_output("sudo git pull --dry-run",shell=True).decode()
-        if "Updating" in stdout:
+        stdout=subprocess.check_output("sudo git pull",shell=True).decode()
+        if "Already up to date" not in stdout:
             print("New commit on master branch, updating and restarting...")
-            os.system("sudo git pull")
             quit()
         await asyncio.sleep(120)
 print("KIPP starting up...")

@@ -70,8 +70,9 @@ while True:
             server = before.channel.guild
         user = server.get_member(KIPP_ID)
         users = []
-        if before.channel != server.get_member(KIPP_ID).voice.channel:
-            return
+        if before != None:
+            if before.channel != server.get_member(KIPP_ID).voice.channel:
+                return
         try:
             for user in server.get_member(KIPP_ID).voice.channel.members:
                 if user.bot == False:

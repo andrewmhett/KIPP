@@ -21,6 +21,7 @@ def READ_DATA_IN(path, condition=lambda x: True, attr_condition=lambda x: True):
 KIPP_DIR=os.environ["KIPP_DIR"]
 class Server:
     def __init__(self,server):
+        self.task=None
         self.server=server
         self.mHandler=None
         self.everyoneleft = False

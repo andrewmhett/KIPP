@@ -92,13 +92,17 @@ while True:
     async def on_guild_join(server):
         for member in server.members:
             try:
-                playerinfo[member].game
+                playerinfo[member]
             except KeyError:
                 playerinfo[member] = Profile(member)
         try:
             serverinfo[server]
         except KeyError:
             serverinfo[server] = Server(server)
+        serverinfo[server].task = client.loop.create_task(serverinfo[server].update_loop())
+    @client.event
+    async def on_guild_remove(server):
+        serverinfo[server].task.cancel()
     @client.event
     async def on_ready():
         client.loop.create_task(background_loop())

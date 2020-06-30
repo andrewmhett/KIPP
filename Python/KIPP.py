@@ -61,12 +61,8 @@ async def background_loop():
                             print ("Voice client timeout, can't disconnect")
         await asyncio.sleep(1)
 async def git_update_loop():
-    stdout="Already up to date"
     while True:
-        try:
-            stdout=subprocess.check_output("sudo git pull",shell=True).decode()
-        except subprocess.CalledProcessError as e:
-            print(e)
+        stdout=subprocess.check_output(KIPP_DIR+"/Bash/GitUpdater.sh").decode()
         if "Already up to date" not in stdout:
             print("New commit on master branch, updating and restarting...")
             quit()

@@ -62,7 +62,10 @@ async def background_loop():
         await asyncio.sleep(1)
 async def git_update_loop():
     while True:
-        stdout=subprocess.check_output("sudo git pull",shell=True).decode()
+        try:
+            stdout=subprocess.check_output("sudo git pull",shell=True).decode()
+        except subprocess.CalledProcessError as e:
+            print(e)
         if "Already up to date" not in stdout:
             print("New commit on master branch, updating and restarting...")
             quit()

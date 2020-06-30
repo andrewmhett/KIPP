@@ -60,13 +60,6 @@ async def background_loop():
                         except Exception:
                             print ("Voice client timeout, can't disconnect")
         await asyncio.sleep(1)
-async def git_update_loop():
-    while True:
-        stdout=subprocess.Popen(KIPP_DIR+"/Bash/GitUpdater.sh",stdout=subprocess.PIPE)
-        if stdout.returncode == 0:
-            print("New commit on master branch, updating and restarting...")
-            quit()
-        await asyncio.sleep(120)
 print("KIPP starting up...")
 while True:
     @client.event
@@ -114,12 +107,6 @@ while True:
     @client.event
     async def on_ready():
         client.loop.create_task(background_loop())
-        dev=False
-        if len(sys.argv)>1:
-            if sys.argv[1]=="dev":
-                dev=True
-        if not dev:
-            client.loop.create_task(git_update_loop())
         logging.log(5,"KIPP started.")
         for server in client.guilds:
             serverinfo[server] = Server(server)

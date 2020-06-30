@@ -62,7 +62,7 @@ async def background_loop():
         await asyncio.sleep(1)
 async def git_update_loop():
     while True:
-        stdout=subprocess.check_output("sudo "+KIPP_DIR+"/Bash/GitUpdater.sh").decode()
+        stdout=subprocess.check_output("sudo "+KIPP_DIR+"/Bash/GitUpdater.sh",shell=True).decode()
         if "Already up to date" not in stdout:
             print("New commit on master branch, updating and restarting...")
             quit()

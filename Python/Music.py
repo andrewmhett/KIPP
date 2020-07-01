@@ -14,8 +14,7 @@ def search_music(query, serverinfo, index):
         query_string = urllib.parse.urlencode({"search_query" : query})
         req = "http://www.youtube.com/results?"+query_string
         with requests.get(req) as html:
-            searchresults = re.findall(r'href=\"\/watch\?v=(.{11})', html.text)
-        print(searchresults)
+            searchresults = re.findall("/watch?v=(.{11})", html.text)
         music="http://www.youtube.com/watch?v="+searchresults[index]
     except IndexError:
         print("Not found")

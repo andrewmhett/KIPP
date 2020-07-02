@@ -4,8 +4,9 @@ from Command import *
 
 async def FINDCAR(message,message2,serverinfo,playerinfo):
     os.system("curl {0} -o img.jpg".format(str(message.content).split("|")[1]))
-    os.system("/home/pi/openvino/deployment_tools/inference_engine/samples/build/armv7l/Release/object_detection_sample_ssd -m /home/pi/openvino/deployment_tools/inference_engine/samples/build/vehicle-license-plate-detection-barrier-0106.xml -d MYRIAD -i img.jpg")
-    await message.channel.send(file=discord.File("out_0.bmp"))
+    os.system("/home/pi/openvino/deployment_tools/inference_engine/samples/build/armv7l/Release/object_detection_sample_ssd -m /home/pi/openvino/deployment_tools/inference_engine/samples/build/vehicle-detection-adas-0002.xml -d MYRIAD -i img.jpg")
+    os.system("sudo mv out_0.bmp out_0.jpg")
+    await message.channel.send(file=discord.File("out_0.jpg"))
 
 async def CODE(message,message2,serverinfo,playerinfo):
     from subprocess import Popen, PIPE

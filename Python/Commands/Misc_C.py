@@ -4,7 +4,7 @@ from Command import *
 
 async def FACEDETECT(message,message2,serverinfo,playerinfo):
     os.system("curl {0} -o img.jpg".format(str(message.content).split("|")[1]))
-    os.system("/home/pi/openvino/deployment_tools/inference_engine/samples/build/armv7l/Release/object_detection_sample_ssd -m /home/pi/openvino/deployment_tools/inference_engine/samples/build/face-detection-0100.xml -d MYRIAD -i img.jpg")
+    os.system("sudo home/pi/openvino/deployment_tools/inference_engine/samples/build/armv7l/Release/object_detection_sample_ssd -m /home/pi/openvino/deployment_tools/inference_engine/samples/build/face-detection-0100.xml -d MYRIAD -i img.jpg")
     await message.channel.send(file=discord.File("out_0.bmp"))
 
 async def CODE(message,message2,serverinfo,playerinfo):

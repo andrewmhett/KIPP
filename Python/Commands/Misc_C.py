@@ -4,7 +4,7 @@ from Command import *
 
 async def FACEDETECT(message,message2,serverinfo,playerinfo):
     os.system("sudo curl \"{0}\" -o img.jpg".format(str(message.content).split("|")[1]))
-    os.system("sudo /home/pi/openvino/deployment_tools/inference_engine/samples/build/armv7l/Release/object_detection_sample_ssd -m /home/pi/openvino/deployment_tools/inference_engine/samples/build/face-detection-adas-001.xml -d MYRIAD -i img.jpg")
+    os.system("sudo /home/pi/openvino/deployment_tools/inference_engine/samples/build/armv7l/Release/object_detection_sample_ssd -m /home/pi/openvino/deployment_tools/inference_engine/samples/build/face-detection-adas-0001.xml -d MYRIAD -i img.jpg")
     embed = discord.Embed(title="!FaceDetect", color=EMBEDCOLOR) #creates embed
     file = discord.File(filename="out_0.bmp")
     embed.set_image(url="attachment://image.png")

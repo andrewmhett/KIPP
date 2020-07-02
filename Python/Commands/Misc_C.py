@@ -15,7 +15,8 @@ async def FACEDETECT(message,message2,serverinfo,playerinfo):
             else:
                 await message.channel.send("1 face was detected.")
             file = discord.File("out_0.bmp", filename="out.png")
-            await message.channel.send(file=file)
+            msg=await message.channel.send(file=file) 
+            await message.channel.send("https://media.discordapp.net/attachments/{0}/{1}/image0.jpg".format(message.channel.id,msg.id))
         else:
             await message.channel.send("No faces were detected.")
     else:

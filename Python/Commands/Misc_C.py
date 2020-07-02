@@ -2,9 +2,9 @@ from ESSENTIAL_PACKAGES import *
 from .Command_utils import *
 from Command import *
 
-async def FINDCAR(message,message2,serverinfo,playerinfo):
+async def FACEDETECT(message,message2,serverinfo,playerinfo):
     os.system("curl {0} -o img.jpg".format(str(message.content).split("|")[1]))
-    os.system("/home/pi/openvino/deployment_tools/inference_engine/samples/build/armv7l/Release/object_detection_sample_ssd -m /home/pi/openvino/deployment_tools/inference_engine/samples/build/vehicle-detection-adas-0002.xml -d MYRIAD -i img.jpg")
+    os.system("/home/pi/openvino/deployment_tools/inference_engine/samples/build/armv7l/Release/object_detection_sample_ssd -m /home/pi/openvino/deployment_tools/inference_engine/samples/build/face-detection-0100.xml -d MYRIAD -i img.jpg")
     await message.channel.send(file=discord.File("out_0.bmp"))
 
 async def CODE(message,message2,serverinfo,playerinfo):
@@ -167,4 +167,4 @@ command["!CLEAR"]=MISC("!CLEAR","This command will clear the last 100 messages s
 command["!ADDKIPP"]=MISC("!ADDKIPP","This command returns a link that anyone can use to add KIPP to another server\n**Usage**\n`!ADDKIPP`",ADDKIPP)
 command["!BLOCKEDLIST"]=MISC("!BLOCKEDLIST","This command will return a list of all blocked members of the server\n**Usage**\n`!BLOCKEDLIST`",BLOCKEDLIST)
 command["!AVATAR"]=MISC("!AVATAR","This command will return the full-size avatar picture of the given user\n**Usage**\n`!AVATAR|user`",AVATAR)
-command["!FINDCAR"]=MISC("!FINDCAR","This command utilizes an Intel Neural Compute Stick 2 in order to process an image to find cars\n**Usage**\n`!FINDCAR|link to image`",FINDCAR)
+command["!FACEDETECT"]=MISC("!FACEDETECT","This command utilizes an Intel Neural Compute Stick 2 in order to process an image to detect a face\n**Usage**\n`!FACEDETECT|link to image`",FACEDETECT)

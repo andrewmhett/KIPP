@@ -140,7 +140,6 @@ class Server:
                 if self.mHandler.paused:
                     pauseStr=" (paused)"
                 if self.mHandler.hours>0:
-                    self.mHandler.minutedelta=int(self.mHandler.minutedelta)-(self.mHandler.hours*60)
                     if len(str(self.mHandler.minutedelta))==1:
                         self.mHandler.minutedelta="0"+str(self.mHandler.minutedelta)
                     else:

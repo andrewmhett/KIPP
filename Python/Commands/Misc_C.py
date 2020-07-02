@@ -179,4 +179,3 @@ command["!ADDKIPP"]=MISC("!ADDKIPP","This command returns a link that anyone can
 command["!BLOCKEDLIST"]=MISC("!BLOCKEDLIST","This command will return a list of all blocked members of the server\n**Usage**\n`!BLOCKEDLIST`",BLOCKEDLIST)
 command["!AVATAR"]=MISC("!AVATAR","This command will return the full-size avatar picture of the given user\n**Usage**\n`!AVATAR|user`",AVATAR)
 command["!FACEDETECT"]=MISC("!FACEDETECT","This command utilizes an Intel Neural Compute Stick 2 in order to process an image to detect a face\n**Usage**\n`!FACEDETECT|link to image`",FACEDETECT)
-command["!READTEXT"]=MISC("!READTEXT","This command utilizes an Intel Neural Compute Stick 2 in order to process an image through a convolutional neural network in order to read text\n**Usage**\n`!READTEXT|link to image`",READTEXT)

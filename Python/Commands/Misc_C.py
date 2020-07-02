@@ -8,6 +8,12 @@ async def FACEDETECT(message,message2,serverinfo,playerinfo):
     file = discord.File("out_0.bmp")
     await message.channel.send(file=file)
 
+async def READTEXT(message,message2,serverinfo,playerinfo):
+    os.system("sudo curl \"{0}\" -o img.jpg".format(str(message.content).split("|")[1]))
+    os.system("sudo /home/pi/openvino/deployment_tools/inference_engine/samples/build/armv7l/Release/object_detection_sample_ssd -m /home/pi/openvino/deployment_tools/inference_engine/samples/build/text-detection-0001.xml -d MYRIAD -i img.jpg")
+    file = discord.File("out_0.bmp")
+    await message.channel.send(file=file)
+
 async def CODE(message,message2,serverinfo,playerinfo):
     from subprocess import Popen, PIPE
     p=Popen(KIPP_DIR+'/Bash/NewestCommit.sh',stdout=PIPE,stderr=PIPE)
@@ -169,3 +175,4 @@ command["!ADDKIPP"]=MISC("!ADDKIPP","This command returns a link that anyone can
 command["!BLOCKEDLIST"]=MISC("!BLOCKEDLIST","This command will return a list of all blocked members of the server\n**Usage**\n`!BLOCKEDLIST`",BLOCKEDLIST)
 command["!AVATAR"]=MISC("!AVATAR","This command will return the full-size avatar picture of the given user\n**Usage**\n`!AVATAR|user`",AVATAR)
 command["!FACEDETECT"]=MISC("!FACEDETECT","This command utilizes an Intel Neural Compute Stick 2 in order to process an image to detect a face\n**Usage**\n`!FACEDETECT|link to image`",FACEDETECT)
+command["!READTEXT"]=MISC("READTEXT","This command utilizes an Intel Neural Compute Stick 2 in order to process an image through a convolutional neural network in order to read text\n**Usage**\n`!READTEXT|link to image`",READTEXT)

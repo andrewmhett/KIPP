@@ -167,4 +167,4 @@ command["!CLEAR"]=MISC("!CLEAR","This command will clear the last 100 messages s
 command["!ADDKIPP"]=MISC("!ADDKIPP","This command returns a link that anyone can use to add KIPP to another server\n**Usage**\n`!ADDKIPP`",ADDKIPP)
 command["!BLOCKEDLIST"]=MISC("!BLOCKEDLIST","This command will return a list of all blocked members of the server\n**Usage**\n`!BLOCKEDLIST`",BLOCKEDLIST)
 command["!AVATAR"]=MISC("!AVATAR","This command will return the full-size avatar picture of the given user\n**Usage**\n`!AVATAR|user`",AVATAR)
-command["!FINDCAR"]=MIISC("!FINDCAR","This command utilizes an Intel Neural Compute Stick 2 in order to process an image to find cars\n**Usage**\n`!FINDCAR|link to image`",FINDCAR)
+command["!FINDCAR"]=MISC("!FINDCAR","This command utilizes an Intel Neural Compute Stick 2 in order to process an image to find cars\n**Usage**\n`!FINDCAR|link to image`",FINDCAR)

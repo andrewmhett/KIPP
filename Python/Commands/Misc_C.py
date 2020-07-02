@@ -3,16 +3,20 @@ from .Command_utils import *
 from Command import *
 
 async def FACEDETECT(message,message2,serverinfo,playerinfo):
+    import subprocess
     os.system("sudo curl \"{0}\" -o img.jpg".format(str(message.content).split("|")[1]))
-    os.system("sudo /home/pi/openvino/deployment_tools/inference_engine/samples/build/armv7l/Release/object_detection_sample_ssd -m /home/pi/openvino/deployment_tools/inference_engine/samples/build/face-detection-adas-0001.xml -d MYRIAD -i img.jpg")
-    file = discord.File("out_0.bmp", filename="out.png")
-    await message.channel.send(file=file)
-
-async def READTEXT(message,message2,serverinfo,playerinfo):
-    os.system("sudo curl \"{0}\" -o img.jpg".format(str(message.content).split("|")[1]))
-    os.system("sudo /home/pi/openvino/deployment_tools/inference_engine/samples/build/armv7l/Release/object_detection_sample_ssd -m /home/pi/openvino/deployment_tools/inference_engine/samples/build/text-detection-0001.xml -d MYRIAD -i img.jpg")
-    file = discord.File("out_0.bmp")
-    await message.channel.send(file=file)
+    if os.path.exists("img.jpg"):
+        sttdout=subprocess.Popen("sudo /home/pi/openvino/deployment_tools/inference_engine/samples/build/armv7l/Release/object_detection_sample_ssd -m /home/pi/openvino/deployment_tools/inference_engine/samples/build/face-detection-adas-0001.xml -d MYRIAD -i img.jpg", shell=True,stdout=subprocess.PIPE).communicate[0].decode()
+        faces=stdout.split().count("PRINTED") 
+        if faces>0:
+            await message.channel.send("{0} faces were detected.".format(faces))
+            file = discord.File("out_0.bmp", filename="out.png")
+            await message.channel.send(file=file)
+            os.system("sudo rm out_0.bmp; sudo rm img.jpg")
+        else:
+            await message.channel.send("No faces were detected.")
+    else:
+        await message.channel.send("An error occurred while downloading the image.")
 
 async def CODE(message,message2,serverinfo,playerinfo):
     from subprocess import Popen, PIPE
@@ -175,4 +179,4 @@ command["!ADDKIPP"]=MISC("!ADDKIPP","This command returns a link that anyone can
 command["!BLOCKEDLIST"]=MISC("!BLOCKEDLIST","This command will return a list of all blocked members of the server\n**Usage**\n`!BLOCKEDLIST`",BLOCKEDLIST)
 command["!AVATAR"]=MISC("!AVATAR","This command will return the full-size avatar picture of the given user\n**Usage**\n`!AVATAR|user`",AVATAR)
 command["!FACEDETECT"]=MISC("!FACEDETECT","This command utilizes an Intel Neural Compute Stick 2 in order to process an image to detect a face\n**Usage**\n`!FACEDETECT|link to image`",FACEDETECT)
-command["!READTEXT"]=MISC("READTEXT","This command utilizes an Intel Neural Compute Stick 2 in order to process an image through a convolutional neural network in order to read text\n**Usage**\n`!READTEXT|link to image`",READTEXT)
+command["!READTEXT"]=MISC("!READTEXT","This command utilizes an Intel Neural Compute Stick 2 in order to process an image through a convolutional neural network in order to read text\n**Usage**\n`!READTEXT|link to image`",READTEXT)

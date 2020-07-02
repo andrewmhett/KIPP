@@ -7,14 +7,14 @@ async def FACEDETECT(message,message2,serverinfo,playerinfo):
     os.system("sudo curl \"{0}\" -o img.jpg".format(str(message.content).split("|")[1]))
     if os.path.exists("img.jpg"):
         sttdout=subprocess.Popen("sudo /home/pi/openvino/deployment_tools/inference_engine/samples/build/armv7l/Release/object_detection_sample_ssd -m /home/pi/openvino/deployment_tools/inference_engine/samples/build/face-detection-adas-0001.xml -d MYRIAD -i img.jpg", shell=True,stdout=subprocess.PIPE).communicate()[0].decode()
-        faces=stdout.split().count("PRINTED") 
+        faces=stdout.count("PRINTED")
         if faces>0:
             await message.channel.send("{0} faces were detected.".format(faces))
             file = discord.File("out_0.bmp", filename="out.png")
             await message.channel.send(file=file)
-            os.system("sudo rm out_0.bmp; sudo rm img.jpg")
         else:
             await message.channel.send("No faces were detected.")
+            os.system("sudo rm out_0.bmp; sudo rm img.jpg")
     else:
         await message.channel.send("An error occurred while downloading the image.")
 

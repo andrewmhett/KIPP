@@ -29,7 +29,7 @@ class Command:
         if isinstance(self,CRON) and message.author.id != CREATOR_ID:
             await message.channel.send("Sorry, but this is a CREATOR_ONLY command.")
             valid=False
-        if isinstance(self,CRON) and not await VerifyOwner(message):
+        if isinstance(self,OWON) and not await VerifyOwner(message):
             await message.channel.send("Sorry, but this is a OWNER_ONLY command.")
             valid=False
         if valid:

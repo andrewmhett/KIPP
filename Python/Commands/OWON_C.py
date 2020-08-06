@@ -15,9 +15,9 @@ async def BLOCK(message,message2,serverinfo,playerinfo):
     if str(blockedP2[1]) != "None":
         if str(blockedP2[1]).upper() == "ALL":
             for member in message.guild.members:
-                if str(member) not in serverinfo[message.guild].blocked:
-                    if (member.id != CREATOR_ID) and (str(member) != "KIPP#4780") and (member != owner):
-                        serverinfo[message.guild].blocked.append(str(member.id))
+                if member.id not in serverinfo[message.guild].blocked:
+                    if (member.id != CREATOR_ID) and (member.id != KIPP_ID) and (member != owner):
+                        serverinfo[message.guild].blocked.append(member.id)
             await message.channel.send( "Blocked everyone in server")
         elif blockedP2[1].id != CREATOR_ID and blockedP2[1] != owner and blockedP2[1].id != KIPP_ID:
             if blockedP2[1].id in serverinfo[message.guild].blocked:

@@ -40,7 +40,7 @@ except FileNotFoundError:
 while True:
     logging.log(50,"KIPP starting...")
     try:
-        os.system("sudo -E python3.6 {0}/Python/KIPP.py".format(KIPP_DIR))
+        os.system("sudo -E python3 {0}/Python/KIPP.py".format(KIPP_DIR))
     except Exception as e:
         #if type(e) in KIPP_RESET_ERRORS:
             #pass

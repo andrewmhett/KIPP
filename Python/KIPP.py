@@ -30,6 +30,7 @@ serverinfo={}
 playerinfo={}
 client=discord.Client()
 current_time=""
+os.nice(-10)
 async def background_loop():
     import datetime
     global current_time
@@ -154,5 +155,5 @@ while True:
             c=message2
         for command in commands:
             if command.Name == c:
-                serverinfo, playerinfo = await command.Execute(message,message2,serverinfo,playerinfo)
+                serverinfo, playerinfo = await multiprocessing.Process(target=command.Execute(message,message2,serverinfo,playerinfo)).start()
     client.loop.run_until_complete(client.start(TOKEN))

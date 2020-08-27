@@ -156,5 +156,5 @@ while True:
             c=message2
         for command in commands:
             if command.Name == c:
-                serverinfo, playerinfo = await multiprocessing.Process(initializer=command_process_initializer target=command.Execute(message,message2,serverinfo,playerinfo)).start()
+                serverinfo, playerinfo = await multiprocessing.Process(initializer=command_process_initializer, target=command.Execute(message,message2,serverinfo,playerinfo)).start()
     client.loop.run_until_complete(client.start(TOKEN))

@@ -30,7 +30,6 @@ serverinfo={}
 playerinfo={}
 client=discord.Client()
 current_time=""
-os.nice(-10)
 async def background_loop():
     import datetime
     global current_time
@@ -61,6 +60,8 @@ async def background_loop():
                         except Exception:
                             print ("Voice client timeout, can't disconnect")
         await asyncio.sleep(1)
+def command_process_initializer():
+    os.nice(-10)
 print("KIPP starting up...")
 while True:
     @client.event
@@ -155,5 +156,5 @@ while True:
             c=message2
         for command in commands:
             if command.Name == c:
-                serverinfo, playerinfo = await multiprocessing.Process(target=command.Execute(message,message2,serverinfo,playerinfo)).start()
+                serverinfo, playerinfo = await multiprocessing.Process(initializer=command_process_initializer target=command.Execute(message,message2,serverinfo,playerinfo)).start()
     client.loop.run_until_complete(client.start(TOKEN))

@@ -154,5 +154,5 @@ while True:
             c=message2
         for command in commands:
             if command.Name == c:
-                serverinfo, playerinfo = await command.Execute(message,message2,serverinfo,playerinfo)
+                client.loop.create_task(command.Execute(message,message2,serverinfo,playerinfo))
     client.loop.run_until_complete(client.start(TOKEN))

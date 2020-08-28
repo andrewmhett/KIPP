@@ -46,8 +46,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options, before_options=b_options), data=data)
 class music_handler:
     def __init__(self,server,player,channel):
-        for pid in map(int,check_output(["pidof","ffmpeg"]).split()):
-            os.system("sudo renice -n -10 -p {0}".format(pid))
+        #for pid in map(int,check_output(["pidof","ffmpeg"]).split()):
+            #os.system("sudo renice -n -10 -p {0}".format(pid))
         self.server=server
         self.resend_timer=0
         self.channel=channel

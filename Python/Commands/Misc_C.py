@@ -2,7 +2,6 @@ from ESSENTIAL_PACKAGES import *
 from .Command_utils import *
 from Command import *
 import multiprocessing
-import ctypes
 
 async def FACEDETECT(message,message2,serverinfo,playerinfo):
     import subprocess
@@ -65,7 +64,7 @@ async def CORETEMP(message,message2,serverinfo,playerinfo):
     tmp.close()
     await message.channel.send( '{:.2f}'.format( float(cpu)/1000 ) + ' C')
 
-def locate_image(message2,image):
+def locate_image(message2,queue):
     url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(message2.split('|')[1].replace(' ','+').replace("'","%27"),message2.split('|')[1].replace(' ','+').replace("'","%27"))
     headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
     req = requests.get(url, headers=headers)
@@ -76,47 +75,27 @@ def locate_image(message2,image):
         try:
             i=i+1
             if cont>300:
-                image.value=""
+                queue.put("")
                 break
-            if ".JPEG" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper() or ".JPG" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper():
-                image.value = "https://"+str(req).split('https://')[i].split('"')[0]
-                if requests.get(image.value).status_code==200:
+            if ".JPEG" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper() or ".JPG" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper() and "File:" not in "https://"+str(req).split('https://')[i].split('"')[0]:
+                image="https://"+str(req).split('https://')[i].split('"')[0]
+                if requests.get(image).status_code==200:
+                    queue.put(image)
                     break
         except Exception:
             cont+=1
 
 async def IMAGE(message,message2,serverinfo,playerinfo):
     await message.channel.send("Processing image request...")
-    image=multiprocessing.Value(ctypes.c_wchar_p,"")
-    proc=multiprocessing.Process(target=locate_image,args=(message2,image))
+    queue=multiprocessing.Queue()
+    proc=multiprocessing.Process(target=locate_image,args=(message2,queue))
     proc.start()
     proc.join()
-    if image.value == "":
+    image=queue.get()
+    if image == "":
         await message.channel.send("No results for image search **{0}**".format(str(message.content).split('|')[1]))
     else:
-        await send_image(message,image.value,"Image")
-
-async def GIF(message,message2,serverinfo,playerinfo):
-    await message.channel.send( "Processing gif request...")
-    url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(message2.split('|')[1].replace(' ','+').replace("'","%27")+" gif",message2.split('|')[1].replace(' ','+').replace("'","%27")+"gif")
-    headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-    req = requests.get(url, headers=headers)
-    req=req.content
-    i=0
-    cont=0
-    while True:
-        try:
-            if cont>300:
-                await message.channel.send("No results for gif search **{0}**".format(str(message.content).split('|')[1]))
-                break
-            i=i+1
-            if ".GIF" in ("https://"+str(req).split('https://')[i].split('"')[0]).upper():
-                image = "https://"+str(req).split('https://')[i].split('"')[0]
-                if requests.get(image).status_code==200:
-                    await send_image(message,image,"Gif")
-                    break
-        except Exception:
-            cont=cont+1
+        await send_image(message,image,"Image")
 
 async def USERINFO(message,message2,serverinfo,playerinfo):
     description = "**Mutual servers with KIPP:** "+str(playerinfo[message.author].numkippservers)+"\n**Currently Playing:** "+str(playerinfo[message.author].game)+"\n**Highest role in Server:** "+str(playerinfo[message.author].highestrole)+"\n**Nickname in Server:** "+playerinfo[message.author].nickname+"\n**KIPPCOINS:** "+str(playerinfo[message.author].GET_KIPPCOINS())
@@ -184,7 +163,6 @@ command["!CODE"]=MISC("!CODE","This command will give information about KIPP's c
 command["!GRAPH"]=MISC("!GRAPH","This command will create a graph of a given function\n**Usage**\n`!GRAPH|function`",GRAPH)
 command["!CORETEMP"]=MISC("!CORETEMP","This command will return KIPP's Raspberry Pi's core temperature\n**Usage**\n`!CORETEMP`",CORETEMP)
 command["!IMAGE"]=MISC("!IMAGE","This command will return an image of the given search query\n**Usage**\n`!IMAGE|search`",IMAGE)
-command["!GIF"]=MISC("!GIF","This command will return a gif of the given search query\n**Usage**\n`!GIF|search`",GIF)
 command["!USERINFO"]=MISC("!USERINFO","This command will return useful user-specific information\n**Usage**\n`!USERINFO`",USERINFO)
 command["!STATUS"]=MISC("!STATUS","Shows KIPP's Daemon's current status\n**Usage**\n`!STATUS`",STATUS)
 command["!MATH"]=MISC("!MATH","This command will return the answer to any basic math problem given\n**Usage**\n`!MATH|problem`",MATH)

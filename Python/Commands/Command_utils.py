@@ -46,7 +46,6 @@ async def join_voice_channel(message,serverinfo):
 async def VerifyOwner(message):
     if message.author == message.guild.owner or message.author.id == CREATOR_ID:
         return True
-    await message.channel.send( "{0} is a Creator-Only command".format(str(message.content).split('|')[0].upper()))
     return False
 
 async def VerifyMusicUser(message,serverinfo):

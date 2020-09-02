@@ -10,7 +10,7 @@ import time
 import sys
 KIPP_DIR=os.environ['KIPP_DIR']
 def WebMonitor():
-    os.system('sudo -E python3.6 "{0}/WebServer/Webserver.py"'.format(KIPP_DIR))
+    os.system('sudo -E python3 "{0}/WebServer/Webserver.py"'.format(KIPP_DIR))
 def GitUpdate():
     while True:
         stdout = Popen(KIPP_DIR+"/Bash/GitUpdater.sh",stdout=PIPE).communicate()[0].decode()

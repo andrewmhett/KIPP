@@ -1,47 +1,37 @@
 import flask
-import json
-import time as t
 import os
+import psutil
 KIPP_DIR=os.environ['KIPP_DIR']
 app=flask.Flask(__name__)
-import datetime
-time=datetime.datetime.now().strftime("%H:%M")
-def get_time():
-    ampm="AM"
-    if int(time[0:2])>=12:
-        ampm="PM"
-    if int(time[0:2])>12:
-        ti=str(int(time[0:2])-12)+time[2:]+" "+ampm
-    else:
-        ti=time+" "+ampm
-    if ti[0:2]=="00":
-        ti="12:"+ti.split(":")[1]
-    return ti
-tmp = open('/sys/class/thermal/thermal_zone0/temp')
-oldcpu = tmp.read()
-tmp.close()
-oldcpu=str(int(oldcpu)/1000)
-def eventStream():
-    while True:
-        global time
-        if datetime.datetime.now().strftime("%H:%M") != time:
-            ti=get_time()
-            time=datetime.datetime.now().strftime("%H:%M")
-            yield "event:time_event\ndata:{}\n\n".format(ti)
-        tmp = open('/sys/class/thermal/thermal_zone0/temp')
-        cpu = tmp.read()
-        tmp.close()
-        cpu=str(int(cpu)/1000)
-        yield "event:cpu_event\ndata:{}\n\n".format(cpu)
-        t.sleep(1)
+temp_dir = '/sys/class/thermal/thermal_zone0/temp'
+
+def get_cpu_temp():
+    temp=0
+    with open(temp_dir,'r') as f:
+        temp=f.read()/1000
+        f.close()
+    return temp
+
+def get_system_usage():
+    cpu=psutil.cpu_percent()
+    mem=(psutil.virtual_memory().total-psutil.virtual_memory().available)*10**-9
+    return (cpu, mem)
+
 @app.route('/')
 def home():
-    global oldcpu
-    ti=get_time()
-    return flask.render_template('index.html',time=ti,cpu=oldcpu)
-@app.route('/stream')
-def stream():
-    return flask.Response(eventStream(),mimetype="text/event-stream")
-import socket
-ip = socket.gethostbyname(socket.gethostname())
-app.run(host=ip, port=80)
+    cpu_usage,mem_usage=get_system_usage()
+    return flask.render_template('index.html',temp=get_cpu_temp(),cpu=cpu_usage,total_mem=psutil.virtual_memory().total*10**-9,mem_in_use=mem_usage)
+
+@app.route('/api/temperature')
+def temperature():
+    return str(get_cpu_temp())
+
+@app.route('/api/cpu')
+def CPU():
+    return str(psutil.cpu_percent())
+
+@app.route('/api/memory')
+def MEM():
+    return str((psutil.virtual_memory().total-psutil.virtual_memory().available)*10**-9)
+
+app.run(host="0.0.0.0", port=80)

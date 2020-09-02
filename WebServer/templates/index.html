@@ -1,88 +1,116 @@
 <!DOCTYPE html>
 <html lang='en'>
 <head>
-<style>
-	#cblock{
-		border-radius:5px;
-		background: #2a2a2b;
-		padding: 20px;
-		width: 450px;
-	}
-	#flot-placeholder{
-            width:450px;
-            height:450px;
-        }
-</style>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="/static/styles.css" media="screen"/>	
+	<style>
+		.td {
+			display:inline-block;
+		}
+	</style>
 </head>
 <body bgcolor="000000#">
-	<div style="text-align:center;">
+	<div style="text-align:center;transform:scale(2);margin-top:120px">
 		<img src="/static/KIPP_1.png" alt="KIPP" width=640,height=360></img><br>
-		<h2>
-			<span id="time_text" style="font-family:arial;color:white"></span>
-		</h2>
-		<!--<audio src="/static/music.mp3" autoplay loop></audio>-->
-		<h2>
-			<span id="cpu_text" style="font-family:arial;color:white"></span><font color="white" style="font-family:arial">° C</font>
-		</h2>
-		<center>
-                    <div id="flot-placeholder"></div>
-                </center>
+		<table style="width:900px;margin-left:auto;margin-right:auto;table-layout:fixed;">
+			<tr>
+				<td style="text-align:right;width:100%;">
+					<span class=HeaderSpan>TEMP</span>
+					
+				</td>
+				<td style="width:100%;font-size:0">
+					<div>
+						<span class=GraphSpan>[</span>
+						<span class=GraphSpan style="color:Green;" id="temp_graph_text_0">|||||</span>
+						<span class=GraphSpan style="color:Yellow;" id="temp_graph_text_1">|||||</span>
+						<span class=GraphSpan style="color:Orange;" id="temp_graph_text_2">-----</span>
+						<span class=GraphSpan style="color:Red;" id="temp_graph_text_3">-----</span>
+						<span class=GraphSpan>]</span>
+					</div>
+				</td>
+				<td style="text-align:left;width:100%">
+					<span class=HeaderSpan id="temp_text"></span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:right;width:100%">
+					<span class=HeaderSpan>CPU</span>
+				<td style="width:100%;font-size:0">
+					<div>
+						<span class=GraphSpan>[</span>
+						<span class=GraphSpan style="color:Green;" id="cpu_graph_text_0">|||||</span>
+						<span class=GraphSpan style="color:Yellow;" id="cpu_graph_text_1">|||||</span>
+						<span class=GraphSpan style="color:Orange;" id="cpu_graph_text_2">-----</span>
+						<span class=GraphSpan style="color:Red;" id="cpu_graph_text_3">-----</span>
+						<span class=GraphSpan>]</span>
+					</div>
+				</td>
+				<td style="text-align:left;width:100%">
+					<span class=HeaderSpan id="cpu_text"></span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:right;width:100%">
+					<span class=HeaderSpan>MEM</span>
+				<td style="width:100%;font-size:0">
+					<div>
+						<span class=GraphSpan>[</span>
+						<span class=GraphSpan style="color:Green;" id="mem_graph_text_0">|||||</span>
+						<span class=GraphSpan style="color:Yellow;" id="mem_graph_text_1">|||||</span>
+						<span class=GraphSpan style="color:Orange;" id="mem_graph_text_2">-----</span>
+						<span class=GraphSpan style="color:Red;" id="mem_graph_text_3">-----</span>
+						<span class=GraphSpan>]</span>
+					</div>
+				</td>
+				<td style="text-align:left;width:100%">
+					<span class=HeaderSpan id="mem_text"></span>
+				</td>
+			</tr>
+		</table>
 	</div>
 	<script>
-                var options={
-                    series:{
-                        lines: {show: true,fill:true},
-                        points: {show: true}
-                    },
-                    xaxis:
-                    {
-                        show:false,
-                        min: 1,
-                        max: 20
-                    },
-                    yaxis:
-                    {
-                        min:25,
-                        max:40
-                    }
-                };
-                var data=[];
-                var x;
-                x=0;
-		$( document ).ready(function(){
-                        $.plot($("#flot-placeholder"),[],options);
-
-			document.getElementById("time_text").innerHTML="{{time}}";
-			document.getElementById("cpu_text").innerHTML="{{cpu}}";
-			var eventSource = new EventSource("/stream")
-                	eventSource.addEventListener("time_event",function(e){
-				document.getElementById("time_text").innerHTML=e.data;
-              		})
-			eventSource.addEventListener("cpu_event",function(e){
-				document.getElementById("cpu_text").innerHTML=e.data;
-                                x++;
-                                if (data.length==20){
-                                    var i;
-                                    for(i=0;i<20;i++){
-                                        if (i!=0){
-                                            data[i-1]=[data[i][0]-1,data[i][1]];
-                                        }
-                                    }
-                                    data[19]=[20,parseFloat(e.data)];
-                                }else{
-                                    data.push([x,parseFloat(e.data)]);
-                                }
-                                var dataset=[
-                                    {
-                                        label: "Temperature",
-                                        data:data
-                                    }
-                                ];
-                                $.plot($("#flot-placeholder"),dataset,options);
-              		})
-		})
+		var total_mem = {{total_mem}}
+		var mem_in_use = {{mem_in_use}}
+		temp_text.innerHTML={{temp}}+"° C";
+		cpu_text.innerHTML={{cpu}}+"%";
+		mem_text.innerHTML=mem_in_use.toFixed(1)+" / "+total_mem.toFixed(1)+" GB";
+		function createBarGraph(filled_fraction) {
+			var graph_string="";
+			for (var i=0;i<20;i++){
+				if (i<(20*filled_fraction)){
+					graph_string+="|";
+				}else{
+					graph_string+="-";
+				}
+			}
+			return graph_string;
+		}
+		function updateTemperature(temperature){
+			temp_text.innerHTML=temperature+"° C";
+			var graph=createBarGraph(temperature/45);
+			temp_graph_text_0.innerHTML=graph.substring(0,5);
+			temp_graph_text_1.innerHTML=graph.substring(5,10);
+			temp_graph_text_2.innerHTML=graph.substring(10,15);
+			temp_graph_text_3.innerHTML=graph.substring(15,20);
+		}
+		function updateCPU(usage){
+			cpu_text.innerHTML=usage+"%";
+			var graph=createBarGraph(usage/100);
+			cpu_graph_text_0.innerHTML=graph.substring(0,5);
+			cpu_graph_text_1.innerHTML=graph.substring(5,10);
+			cpu_graph_text_2.innerHTML=graph.substring(10,15);
+			cpu_graph_text_3.innerHTML=graph.substring(15,20);
+		}
+		function updateMEM(mem_in_use){
+			mem_text.innerHTML=parseFloat(mem_in_use).toFixed(1)+" / "+total_mem.toFixed(1)+" GB";
+			var graph=createBarGraph(mem_in_use/total_mem);
+			mem_graph_text_0.innerHTML=graph.substring(0,5);
+			mem_graph_text_1.innerHTML=graph.substring(5,10);
+			mem_graph_text_2.innerHTML=graph.substring(10,15);
+			mem_graph_text_3.innerHTML=graph.substring(15,20);
+		}
 	</script>
+	<script src="/static/dataPolling.js"></script>
 </body>
 </html>

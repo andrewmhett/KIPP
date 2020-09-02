@@ -8,7 +8,7 @@ temp_dir = '/sys/class/thermal/thermal_zone0/temp'
 def get_cpu_temp():
     temp=0
     with open(temp_dir,'r') as f:
-        temp=f.read()/1000
+        temp=int(f.read())/1000
         f.close()
     return temp
 

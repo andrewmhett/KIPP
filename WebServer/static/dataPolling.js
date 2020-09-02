@@ -5,8 +5,8 @@ function pollTemperature (){
 	xhttp.timeout=1000;
 	xhttp.send();
 	xhttp.onreadystatechange = function() {
-		if (this.readyState == 4){
-			if (this.status == 200) {
+		if (this.readyState === 4){
+			if (this.status === 200) {
 				updateTemperature(this.response);
 			}
 		}
@@ -20,8 +20,8 @@ function pollCPU (){
 	xhttp.timeout=1000;
 	xhttp.send();
 	xhttp.onreadystatechange = function() {
-		if (this.readyState == 4){
-			if (this.status == 200) {
+		if (this.readyState === 4){
+			if (this.status === 200) {
 				updateCPU(this.response);
 			}
 		}
@@ -35,8 +35,8 @@ function pollMEM (){
 	xhttp.timeout=1000;
 	xhttp.send();
 	xhttp.onreadystatechange = function() {
-		if (this.readyState == 4){
-			if (this.status == 200) {
+		if (this.readyState === 4){
+			if (this.status === 200) {
 				updateMEM(this.response);
 			}
 		}

@@ -101,8 +101,8 @@
 			position:"left",
 			axisLabel:"Temperature",
 			axisLabelUseCanvas:true,
-			min:0,
-			max:80
+			min:20,
+			max:50
 		    },
 		    {
 			position:"right",
@@ -156,7 +156,7 @@
 		}
 		function updateTemperature(temperature){
 			temp_text.innerHTML=parseFloat(temperature).toFixed(1)+"° C";
-			var graph=createBarGraph(temperature/80);
+			var graph=createBarGraph((temperature-20)/50);
 			temp_graph_text_0.innerHTML=graph.substring(0,5);
 			temp_graph_text_1.innerHTML=graph.substring(5,10);
 			temp_graph_text_2.innerHTML=graph.substring(10,15);
@@ -172,7 +172,6 @@
 			}else{
 				 temp_arr.push([temp_x_pos+1,temperature]);
 			}
-			
 		}
 		function updateCPU(usage){
 			cpu_text.innerHTML=usage+"%";
@@ -191,7 +190,6 @@
 			}else{
 				cpu_arr.push([cpu_x_pos+1,usage]);
 			}
-			
 			$.plot($("#flot-placeholder"),[],options);
 			$.plot($("#flot-placeholder"),[temp_dataset,cpu_dataset],options);
 		}

@@ -175,6 +175,8 @@
 			}else{
 				 temp_arr.push([temp_x_pos+1,temperature]);
 			}
+			$.plot($("#flot-placeholder"),[],options);
+			$.plot($("#flot-placeholder"),[temp_dataset,cpu_dataset],options);
 		}
 		function updateCPU(usage){
 			cpu_text.innerHTML=usage+"%";

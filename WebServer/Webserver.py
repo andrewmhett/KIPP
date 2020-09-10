@@ -34,4 +34,4 @@ def CPU():
 def MEM():
     return str((psutil.virtual_memory().total-psutil.virtual_memory().available)*10**-9)
 
-app.run(host="0.0.0.0", port=80)
+app.run(host="0.0.0.0", threaded=True, port=80)

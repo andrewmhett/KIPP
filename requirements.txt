@@ -3,3 +3,5 @@ discord.py
 defusedxml
 bs4
 flask
+websockets
+pynacl

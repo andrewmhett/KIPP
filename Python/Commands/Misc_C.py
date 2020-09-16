@@ -156,7 +156,14 @@ async def IQ(message,message2,serverinfo,playerinfo):
     description = str(InterstellarQuotes[quoteNum])
     em = discord.Embed(title="Interstellar Quote",description=description,colour=EMBEDCOLOR)
     em.set_footer(text=get_footer())
-    await message.channel.send( embed=em)
+    await message.channel.send(embed=em)
+    
+async def COINFLIP(message,message2,serverinfo,playerinfo):
+    rand=SystemRandom().randrange(0,2)
+    if rand==0:
+        await message.channel.send("Heads")
+    else:
+        await message.channel.send("Tails")
 
 command["!IQ"]=MISC("!IQ","IQ stands for Interstellar Quote. This command will send a random Interstellar quote\n**Usage**\n`!IQ`",IQ)
 command["!CODE"]=MISC("!CODE","This command will give information about KIPP's code\n**Usage**\n`!CODE`",CODE)
@@ -171,3 +178,4 @@ command["!ADDKIPP"]=MISC("!ADDKIPP","This command returns a link that anyone can
 command["!BLOCKEDLIST"]=MISC("!BLOCKEDLIST","This command will return a list of all blocked members of the server\n**Usage**\n`!BLOCKEDLIST`",BLOCKEDLIST)
 command["!AVATAR"]=MISC("!AVATAR","This command will return the full-size avatar picture of the given user\n**Usage**\n`!AVATAR|user`",AVATAR)
 command["!FACEDETECT"]=MISC("!FACEDETECT","This command utilizes an Intel Neural Compute Stick 2 in order to process an image to detect a face\n**Usage**\n`!FACEDETECT|link to image`",FACEDETECT)
+command["!COINFLIP"]=MISC("!COINFLIP","Flip a coin and return either Heads or Tails\n**Usage**\n`!COINFLIP`",COINFLIP)

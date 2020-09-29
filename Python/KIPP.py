@@ -141,12 +141,6 @@ while True:
             for member in server.members:
                 if member == message.author:
                     kippservers=kippservers+1
-        playerinfo[message.author].nickname = str(message.author.nick)
-        playerinfo[message.author].highestrole = message.author.top_role
-        role1 = discord.utils.get(message.author.guild.roles, name=str(playerinfo[message.author].highestrole))
-        playerinfo[message.author].hrolecolor = role1.colour
-        playerinfo[message.author].numkippservers = kippservers
-        playerinfo[message.author].game = message.author.activity
         message2 = str(message.content).upper()
         if "|" in message2:
             c=message2.split("|")[0]

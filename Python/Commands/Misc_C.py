@@ -98,7 +98,7 @@ async def IMAGE(message,message2,serverinfo,playerinfo):
         await send_image(message,image,"Image")
 
 async def USERINFO(message,message2,serverinfo,playerinfo):
-    description = "**Currently Playing:** "+message.author.activity+"\n**KIPPCOINS:** "+str(playerinfo[message.author].GET_KIPPCOINS())
+    description = "**Currently Playing:** "+str(message.author.activity)+"\n**KIPPCOINS:** "+str(playerinfo[message.author].GET_KIPPCOINS())
     em = discord.Embed(description=description,colour=EMBEDCOLOR)
     em.set_author(name=str(message.author), icon_url=message.author.avatar_url)
     em.set_footer(text=get_footer())

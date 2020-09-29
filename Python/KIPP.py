@@ -116,11 +116,8 @@ while True:
     @client.event
     async def on_join(member):
         server = member.server
-        try:
-            playerinfo[member].game
-        except KeyError:
+        if member not in playerinfo.keys():
             playerinfo[member] = Profile(member)
-            playerinfo[member].user = member
         if serverinfo[server].search_server_configs("WELCOME_CHANNEL") != None:
             try:
                 await client.get_channel(serverinfo[server].search_server_configs("WELCOME_CHANNEL")[1]).send("Welcome to **{0}**, {1}".format(server, member.mention))
@@ -136,11 +133,8 @@ while True:
             await client.delete_message(message)
             return
         serverinfo[message.guild].recentchannel = message.channel
-        kippservers = 0
-        for server in client.guilds:
-            for member in server.members:
-                if member == message.author:
-                    kippservers=kippservers+1
+        if message.author not in playerinfo.keys():
+            playerinfo[message.author] = Profile(message.author)
         message2 = str(message.content).upper()
         if "|" in message2:
             c=message2.split("|")[0]

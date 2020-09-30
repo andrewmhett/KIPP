@@ -1,7 +1,7 @@
 # KIPP
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4ff9da4213c241baa013284e6e6848bc)](https://www.codacy.com/app/LockdownDoom/KIPP?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=LockdownDoom/KIPP&amp;utm_campaign=Badge_Grade)
 ### Information
-KIPP is currently in development. KIPP's development started in December, 2018; I wanted to have a discord bot that I could fully customize, and thought that making one would be a good idea. Since the very early stages of development, KIPP has been developed on a Raspberry Pi, so running KIPP on any other OS than Linux may be difficult.
+KIPP is currently in development. KIPP's development started in December, 2018; I wanted to have a discord bot that I could fully customize, and thought that making one would be a good idea. Since the very early stages of development, KIPP has been developed on a Raspberry Pi, so running KIPP on any other OS than a Linux distribution may be difficult.
 
 ### Getting and Running KIPP
 ###### Python 3.x required

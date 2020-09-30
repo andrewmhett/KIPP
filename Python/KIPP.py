@@ -28,7 +28,9 @@ if len(sys.argv)>1:
         KIPP_ID=726545013064073277
 serverinfo={}
 playerinfo={}
-client=discord.Client()
+intents = discord.Intents.default()
+intents.members = True
+client=discord.Client(intents=intents)
 current_time=""
 async def background_loop():
     import datetime

@@ -31,10 +31,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
-        if data.get('filesize') != None:
-            if data.get('duration')==0 or data.get('filesize')>5000000:
-                stream=True
-        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
         cls.url=url
         if 'entries' in data:
             data = data['entries'][0]

@@ -165,10 +165,6 @@ class Server:
                         pass
                     self.queue.remove(self.queue[0])
                     self.mHandler.is_playing=False
-                    try:
-                        os.system('sudo rm "{0}"'.format(self.mHandler.player.file))
-                    except Exception:
-                        await self.music_channel.send("An error occurred while reading video data.")
                     self.mHandler=None
                     self.end_time=datetime.datetime.now()
                 else:

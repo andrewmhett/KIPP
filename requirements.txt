@@ -5,3 +5,4 @@ bs4
 flask
 websockets
 pynacl
+python-youtube

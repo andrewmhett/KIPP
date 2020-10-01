@@ -72,7 +72,7 @@ async def APPENDPLAYLIST(message,message2,serverinfo,playerinfo):
                 from pyyoutube import Api
                 api=Api(api_key=YOUTUBE_API_KEY)
                 for song in api.get_playlist_items(playlist_id=tag,count=None).items:
-                    arr.append("https://www.youtube.com/watch?v={0}".format(song.etag))
+                    arr.append("https://www.youtube.com/watch?v={0}".format(song.snippet.resourceId.videoId))
                     counter+=1
             else:
                 single=True

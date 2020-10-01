@@ -12,6 +12,7 @@ import logging
 import os
 import threading
 import subprocess
+import difflib
 KIPP_DIR=os.environ['KIPP_DIR']
 sys.path.append(KIPP_DIR+"/Python/Commands")
 from ESSENTIAL_PACKAGES import *
@@ -132,17 +133,26 @@ while True:
         if message.author == client.user or message.guild==None:
             return
         if message.author.id in serverinfo[message.guild].blocked:
-            await client.delete_message(message)
             return
         serverinfo[message.guild].recentchannel = message.channel
         if message.author not in playerinfo.keys():
             playerinfo[message.author] = Profile(message.author)
         message2 = str(message.content).upper()
-        if "|" in message2:
-            c=message2.split("|")[0]
-        else:
-            c=message2
-        for command in commands:
-            if command.Name == c:
-                client.loop.create_task(command.Execute(message,message2,serverinfo,playerinfo))
+        if message2[0]=='!' and len(message2)>1:
+            if "|" in message2:
+                c=message2.split("|")[0]
+            else:
+                c=message2
+            for command in commands:
+                if command.Name == c:
+                    client.loop.create_task(command.Execute(message,message2,serverinfo,playerinfo))
+                    return
+            recommendations=difflib.get_close_matches(c[1:],(c.Name[1:] for c in commands))
+            rec_msg="Unable to find and execute `{0}`.".format(c)
+            if len(recommendations)==1:
+                rec_msg+=" Did you mean `!{0}`?".format(recommendations[0])
+            elif len(recommendations)>1:
+                rec_msg+="Did you mean to use one of these commands?\n`!{0}`".format('\n!'.join(recommendations))
+            await message.channel.send(rec_msg)
+
     client.loop.run_until_complete(client.start(TOKEN))

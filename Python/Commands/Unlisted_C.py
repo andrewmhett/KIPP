@@ -74,7 +74,7 @@ async def PLAY(message,message2,serverinfo,playerinfo):
         playerinfo[message.author].bet=None
         playerinfo[message.author].color=None
         playerinfo[message.author].solo=False
-    else:
+    elif playerinfo[message.author].challenger != None:
         if playerinfo[message.author].bet == playerinfo[playerinfo[message.author].challenger].bet and playerinfo[message.author].betting==False:
             rand=SystemRandom().randrange(1,3)
             if rand==1:
@@ -87,6 +87,8 @@ async def PLAY(message,message2,serverinfo,playerinfo):
             playerinfo[winner].GIVE_KIPPCOINS(int(playerinfo[message.author].bet))
             playerinfo[playerinfo[winner].challenger].GIVE_KIPPCOINS(-1*int(playerinfo[message.author].bet))
             reset_gamblegame(message.author,playerinfo)
+    else:
+        await message.channel.send("Unable to find and execute `!PLAY`.\nDid you mean `!MUSIC`?")
 
 async def SELECT(message,message2,serverinfo,playerinfo):
     if playerinfo[message.author].solo == True:

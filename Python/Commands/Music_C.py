@@ -68,13 +68,12 @@ async def APPENDPLAYLIST(message,message2,serverinfo,playerinfo):
             single=False
             counter=0
             if "list" in music4:
-                from bs4 import BeautifulSoup
-                page=requests.get(music4).text
-                soup=BeautifulSoup(page,features='html.parser')
-                for link in soup.find_all("a", {"dir":"ltr"}):
-                    if "watch" in link['href']:
-                        arr.append("https://www.youtube.com"+link['href'].split("&list")[0])
-                        counter+=1
+                tag=music4.split("list=")[1]
+                from pyyoutube import Api
+                api=Api(api_key=YOUTUBE_API_KEY)
+                for song in api.get_playlist_items(playlist_id=tag,count=None).items:
+                    arr.append("www.youtube.com/watch?v={0}".format(song.etag))
+                    counter+=1
             else:
                 single=True
                 arr.append(music4)

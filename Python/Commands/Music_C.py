@@ -5,6 +5,7 @@ sys.path.append(KIPP_DIR+"/Python")
 from ESSENTIAL_PACKAGES import *
 from .Command_utils import *
 from Command import *
+
 async def find_valid_song(query, serverinfo):
     index=0
     ytdl = youtube_dl.YoutubeDL()
@@ -20,6 +21,7 @@ async def find_valid_song(query, serverinfo):
         except youtube_dl.utils.DownloadError:
             index+=1
     return music4
+
 async def NEWPLAYLIST(message,message2,serverinfo,playerinfo):
     name=message2.split("|")[1]
     if serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(name)) == None:
@@ -33,6 +35,18 @@ async def DELETEPLAYLIST(message,message2,serverinfo,playerinfo):
     if serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(name)) != None:
         serverinfo[message.guild].change_server_config("PLAYLIST:{0}".format(name),"")
         await message.channel.send("Deleted playlist `{0}`.".format(name))
+    else:
+        await message.channel.send( "There is no playlist named `{0}`. Please check spelling or refer to the list of playlists found at **!PLAYLISTS**.".format(name))
+
+async def RENAMEPLAYLIST(message,message2,serverinfo,playerinfo):
+    name=message2.split("|")[1]
+    new_name=message2.split("|")[2]
+    if serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(name)) != None:
+        line=["PLAYLIST:{0}".format(new_name)]
+        for link in serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(name))[0][1:]:
+            line.append(link)
+        serverinfo[message.guild].change_server_config("PLAYLIST:{0}".format(name),line)
+        await message.channel.send("Renamed playlist `{0}` to `{1}`.".format(name,new_name))
     else:
         await message.channel.send( "There is no playlist named `{0}`. Please check spelling or refer to the list of playlists found at **!PLAYLISTS**.".format(name))
 
@@ -266,6 +280,7 @@ async def SKIP(message,message2,serverinfo,playerinfo):
 command["!NEWPLAYLIST"]=MUSC("!NEWPLAYLIST","Creates a new music playlist of a given name\n**Usage**\n`!NEWPLAYLIST|name`",NEWPLAYLIST)
 command["!APPENDPLAYLIST"]=MUSC("!APPENDPLAYLIST","Adds a song to a playlist corresponding to either entered query, link to a song (YouTube or Soundcloud), or link to a youtube playlist.\n**Usage**\n`!APPENDPLAYLIST|playlist name|query or link`",APPENDPLAYLIST)
 command["!DELETEPLAYLIST"]=MUSC("!DELETEPLAYLIST","Deletes the music playlist of a given name\n**Usage**\n`!DELETEPLAYLIST|name`",DELETEPLAYLIST)
+command["!RENAMEPLAYLIST"]=MUSC("!RENAMEPLAYLIST","Renames a playlist\n**Usage**\n`!RENAMEPLAYLIST|original name|new name`",RENAMEPLAYLIST)
 command["!PLAYLISTS"]=MUSC("!PLAYLISTS","Displays a list of all playlists in the server\n**Usage**\n`!PLAYLISTS`",PLAYLISTS)
 command["!MFIX"]=MUSC("!MFIX","This command will reset KIPP's voice client and related variables in order to fix most problems with music\n**Usage**\n`!MFIX`",MFIX)
 command["!MUSIC"]=MUSC("!MUSIC","This command will cause KIPP to play music from youtube or spotify in your VC based on your entered link or query\n**Usage**\n`!MUSIC|query or link`",MUSIC)

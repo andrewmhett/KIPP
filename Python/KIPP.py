@@ -152,7 +152,7 @@ while True:
             if len(recommendations)==1:
                 rec_msg+=" Did you mean `!{0}`?".format(recommendations[0])
             elif len(recommendations)>1:
-                rec_msg+="Did you mean to use one of these commands?\n`!{0}`".format('\n!'.join(recommendations))
+                rec_msg+=" Did you mean to use one of these commands?\n`!{0}`".format('\n!'.join(recommendations))
             await message.channel.send(rec_msg)
 
     client.loop.run_until_complete(client.start(TOKEN))

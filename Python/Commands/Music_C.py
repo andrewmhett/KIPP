@@ -34,6 +34,15 @@ async def DELETEPLAYLIST(message,message2,serverinfo,playerinfo):
     name=message2.split("|")[1]
     if serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(name)) != None:
         serverinfo[message.guild].change_server_config("PLAYLIST:{0}".format(name),"")
+        counter=0
+        new_queue=[]
+        for song in serverinfo[message.guild].queue:
+            if song != "PLAYLIST: {0}".format(message2.split("|")[1]) or counter==0:
+                new_queue.append(serverinfo[message.guild].queue[counter])
+            elif song == "PLAYLIST: {0}".format(message2.split("|")[1]):
+                serverinfo[message.guild].playlist=None
+            counter+=1
+        serverinfo[message.guild].queue=new_queue
         await message.channel.send("Deleted playlist `{0}`.".format(name))
     else:
         await message.channel.send( "There is no playlist named `{0}`. Please check spelling or refer to the list of playlists found at **!PLAYLISTS**.".format(name))

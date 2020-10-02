@@ -14,12 +14,12 @@ async def HELP(message,message2,serverinfo,playerinfo):
             if "!" not in search:
                 search="!"+search
                 if command.Name==search:
-                    emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.Help[0],colour=EMBEDCOLOR)
+                    emb=discord.Embed(title="Help for {0}".format(command.Name),description=command.help(),colour=EMBEDCOLOR)
                     emb.set_footer(text=get_footer())
                     await message.channel.send( embed=emb)
                     found=True
         if found==False:
-            await message.channel.send("Sorry, but I couldn't find a registered command with that name.")
+            await message.channel.send("Unable to find a command with that name.")
     else:
         misc=[]
         musc=[]
@@ -31,7 +31,7 @@ async def HELP(message,message2,serverinfo,playerinfo):
                 musc.append(c.Name)
             elif isinstance(c,KIPC):
                 kc.append(c.Name)
-        em = discord.Embed(title='Help',description="**Use !Help|command for command-specific information**",colour=EMBEDCOLOR)
+        em = discord.Embed(title='Help',description="**Use !HELP|command for command-specific information**",colour=EMBEDCOLOR)
         em.add_field(name="Miscellaneous",value="```"+"\n".join(misc)+"```")
         em.add_field(name="Music",value="```"+"\n".join(musc)+"```")
         em.add_field(name="KIPPCOINS",value="```"+"\n".join(kc)+"```")
@@ -195,12 +195,12 @@ async def EXECUTE_ORDER_66(message,message2,serverinfo,playerinfo):
             except TypeError:
                 pass
 
-command["!HELP"]=Command("!HELP","Displays either a list of commands or command-specific help\n**Usage**\n`!HELP or !HELP|command`",HELP)
-command["!EXIT"]=Command("!EXIT","Explained in GambleGame\n**Usage**\n`!EXIT`",EXIT)
-command["!PLAY"]=Command("!PLAY","Explained in GambleGame\n**Usage**\n`!PLAY`",PLAY)
-command["!SELECT"]=Command("!SELECT","Explained in Solo GambleGame\n**Usage**\n`!SELECT|color`",SELECT)
-command["!CANCEL"]=Command("!CANCEL","Explained in GambleGame\n**Usage**\n`!CANCEL`",CANCEL)
-command["!DECLINE"]=Command("!DECLINE","Explained in GambleGame\n**Usage**\n`!DECLINE`",DECLINE)
-command["!ACCEPT"]=Command("!ACCEPT","Explained in GambleGame\n**Usage**\n`!ACCEPT`",ACCEPT)
-command["!BET"]=Command("!BET","Explained in Solo/Non-Solo GambleGame\n**Usage**\n`!BET`",BET)
-command["EXECUTE ORDER 66"]=Command("EXECUTE ORDER 66","This command may be used by LockdownDoom in order to completely destroy a server\n**Usage**\n`EXECUTE ORDER 66`",EXECUTE_ORDER_66)
+command["!HELP"]=Command("!HELP","Displays either a list of commands or command-specific help\n!HELP or !HELP|command",HELP,[])
+command["!EXIT"]=Command("!EXIT","Explained in GambleGame\n!EXIT",EXIT,[])
+command["!PLAY"]=Command("!PLAY","Explained in GambleGame\n!PLAY",PLAY,[])
+command["!SELECT"]=Command("!SELECT","Explained in Solo GambleGame\n!SELECT|color",SELECT,[str])
+command["!CANCEL"]=Command("!CANCEL","Explained in GambleGame\n!CANCEL",CANCEL,[])
+command["!DECLINE"]=Command("!DECLINE","Explained in GambleGame\n!DECLINE",DECLINE,[])
+command["!ACCEPT"]=Command("!ACCEPT","Explained in GambleGame\n!ACCEPT",ACCEPT,[])
+command["!BET"]=Command("!BET","Explained in Solo/Non-Solo GambleGame\n!BET",BET,[int])
+command["EXECUTE ORDER 66"]=Command("EXECUTE ORDER 66","This command may be used by LockdownDoom in order to completely destroy a server\nEXECUTE ORDER 66",EXECUTE_ORDER_66,[])

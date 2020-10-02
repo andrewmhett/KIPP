@@ -73,7 +73,7 @@ async def UNBLOCK(message,message2,serverinfo,playerinfo):
         serverinfo[message.guild].blocked.remove(unblocked.id)
         await message.channel.send(msg)
 
-command["!BLOCK"]=OWON("!BLOCK","This command will block the specified user, deleting all messages they send\n**Usage**\n`!BLOCK|user or all`",BLOCK)
-command["!WCHANNEL"]=OWON("!WCHANNEL","This command will set the current text channel as the channel where welcoming messages are sent whenever someone joins the server\n**Usage**\n`!WCHANNEL`",WCHANNEL)
-command["!INVITE"]=OWON("!INVITE","This command will DM an invite to the user with the specified user id\n**Usage**\n`!INVITE|user id`",INVITE)
-command["!UNBLOCK"]=OWON("!UNBLOCK","This command will unblock the specified user\n**Usage**\n`!UNBLOCK|user`",UNBLOCK)
+command["!BLOCK"]=OWON("!BLOCK","This command will block the specified user, deleting all messages they send\n!BLOCK|user or 'ALL'",BLOCK,[str])
+command["!WCHANNEL"]=OWON("!WCHANNEL","This command will set the current text channel as the channel where welcoming messages are sent whenever someone joins the server\n!WCHANNEL",WCHANNEL,[])
+command["!INVITE"]=OWON("!INVITE","This command will DM an invite to the user with the specified user id\n!INVITE|user id",INVITE,[int])
+command["!UNBLOCK"]=OWON("!UNBLOCK","This command will unblock the specified user\n!UNBLOCK|user",UNBLOCK,[str])

@@ -11,7 +11,6 @@ from urllib.request import Request
 import re
 from datetime import datetime
 import time as t
-from PIL import Image
 import requests
 import urllib
 from math import *

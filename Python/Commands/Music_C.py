@@ -46,6 +46,11 @@ async def RENAMEPLAYLIST(message,message2,serverinfo,playerinfo):
         for link in serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(name))[0][1:]:
             line.append(link)
         serverinfo[message.guild].change_server_config("PLAYLIST:{0}".format(name),line)
+        counter=0
+        for song in serverinfo[message.guild].queue:
+            if song == "PLAYLIST: {0}".format(name):
+                serverinfo[message.guild].queue[counter]="PLAYLIST: {0}".format(new_name)
+            counter+=1
         await message.channel.send("Renamed playlist `{0}` to `{1}`.".format(name,new_name))
     else:
         await message.channel.send( "There is no playlist named `{0}`. Please check spelling or refer to the list of playlists found at **!PLAYLISTS**.".format(name))

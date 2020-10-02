@@ -155,6 +155,7 @@ class Server:
                     self.mHandler.resend_timer=0
                     try:
                         await self.mHandler.message.delete()
+                        self.mHandler.message=None
                     except discord.DiscordException:
                         pass
                 if (self.mHandler.is_playing == False or c.seconds >= self.mHandler.duration) and self.mHandler.player.is_live == False:

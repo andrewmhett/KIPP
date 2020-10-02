@@ -38,32 +38,6 @@ async def CODE(message,message2,serverinfo,playerinfo):
     emb.description="{0} My code is backed up on GitHub [here](https://github.com/andrewmhett/KIPP)\nAlso, my code has been reviewed by Codacy [here](https://app.codacy.com/project/LockdownDoom/KIPP/dashboard?branchId=10423847)".format(commit_msg)
     await message.channel.send(embed=emb)
 
-async def GRAPH(message,message2,serverinfo,playerinfo):
-    img = Image.new('RGB', (1000,1000), "black")
-    new=img.load()
-    for x in range (0,1000):
-        for y in range (0,1000):
-            if x == 500:
-                new[x,y] = (255,0,0)
-            if y == 500:
-                new[x,y] = (255,0,0)
-    for curx in range(-500,501):
-        newfunc=str(message.content).split('|')[1].lower().replace('x','('+str(curx)+')')
-        try:
-            if eval(newfunc)<500 and eval(newfunc)>-500:
-                new[curx+500,(int(eval(newfunc)*-1))+500] = (255,255,255)
-        except Exception as err:
-            print(err)
-    img.save('graph.png')
-    with open ('graph.png','rb') as f:
-        await client.send_message_file(message.channel, f)
-
-async def CORETEMP(message,message2,serverinfo,playerinfo):
-    tmp = open('/sys/class/thermal/thermal_zone0/temp')
-    cpu = tmp.read()
-    tmp.close()
-    await message.channel.send( '{:.2f}'.format( float(cpu)/1000 ) + ' C')
-
 def locate_image(message2,queue):
     url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(message2.split('|')[1].replace(' ','+').replace("'","%27"),message2.split('|')[1].replace(' ','+').replace("'","%27"))
     headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
@@ -167,8 +141,6 @@ async def COINFLIP(message,message2,serverinfo,playerinfo):
 
 command["!IQ"]=MISC("!IQ","IQ stands for Interstellar Quote. This command will send a random Interstellar quote\n**Usage**\n`!IQ`",IQ)
 command["!CODE"]=MISC("!CODE","This command will give information about KIPP's code\n**Usage**\n`!CODE`",CODE)
-command["!GRAPH"]=MISC("!GRAPH","This command will create a graph of a given function\n**Usage**\n`!GRAPH|function`",GRAPH)
-command["!CORETEMP"]=MISC("!CORETEMP","This command will return KIPP's Raspberry Pi's core temperature\n**Usage**\n`!CORETEMP`",CORETEMP)
 command["!IMAGE"]=MISC("!IMAGE","This command will return an image of the given search query\n**Usage**\n`!IMAGE|search`",IMAGE)
 command["!USERINFO"]=MISC("!USERINFO","This command will return useful user-specific information\n**Usage**\n`!USERINFO`",USERINFO)
 command["!STATUS"]=MISC("!STATUS","Shows KIPP's Daemon's current status\n**Usage**\n`!STATUS`",STATUS)

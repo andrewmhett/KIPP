@@ -49,5 +49,3 @@ class KIPC(Command):
     pass
 class MUSC(Command):
     pass
-class SCIN(Command):
-    pass

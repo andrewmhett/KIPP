@@ -23,28 +23,17 @@ async def HELP(message,message2,serverinfo,playerinfo):
     else:
         misc=[]
         musc=[]
-        sc=[]
         kc=[]
-        oo=[]
         for c in commands:
             if isinstance(c,MISC):
                 misc.append(c.Name)
             elif isinstance(c,MUSC):
                 musc.append(c.Name)
-            elif isinstance(c,SCIN):
-                sc.append(c.Name)
             elif isinstance(c,KIPC):
                 kc.append(c.Name)
-            elif isinstance(c,OWON):
-                oo.append(c.Name)
         em = discord.Embed(title='Help',description="**Use !Help|command for command-specific information**",colour=EMBEDCOLOR)
         em.add_field(name="Miscellaneous",value="```"+"\n".join(misc)+"```")
         em.add_field(name="Music",value="```"+"\n".join(musc)+"```")
-        em.add_field(name="Scientific",value="```"+"\n".join(sc)+"```")
-        if str(message.guild.id) == '451227721545285649':
-            em.add_field(name="Meema Only",value="```"+"\n".join(oo)+"```")
-        else:
-            em.add_field(name="Owner Only",value="```"+"\n".join(oo)+"```")
         em.add_field(name="KIPPCOINS",value="```"+"\n".join(kc)+"```")
         em.set_footer(text=get_footer())
         await message.channel.send(embed=em)

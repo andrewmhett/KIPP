@@ -161,6 +161,8 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
     if (currentlyplaying == False) or (currentlyplaying == True and message.author.voice.channel == message.guild.get_member(KIPP_ID).voice.channel):
         try:
             if message2.split("|")[1].startswith("PLAYLIST:")==False:
+                if len(serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(message2.split("|")[1])))>0:
+                    await message.channel.send("Command usage note -- this syntax will find music matching the query `{0}` on YouTube. If you meant to play the playlist named `{0}`, use the command `!MUSIC|PLAYLIST:{0}`.".format(message2.split("|")[1]))
                 if (message2.split('!MUSIC')[1]).startswith('|') == True:
                     if serverinfo[message.guild].loading == False:
                         serverinfo[message.guild].loading = True

@@ -170,7 +170,10 @@ class Server:
                     self.end_time=datetime.datetime.now()
                 else:
                     if self.mHandler.message != None:
-                        await self.mHandler.message.edit(embed=self.mHandler.em)
+                        try:
+                            await self.mHandler.message.edit(embed=self.mHandler.em)
+                        except discord.errors.NotFound:
+                            self.mHandler.message = await self.mHandler.channel.send(embed=self.mHandler.em)
                     else:
                         self.mHandler.message = await self.mHandler.channel.send(embed=self.mHandler.em)
             await asyncio.sleep(1)

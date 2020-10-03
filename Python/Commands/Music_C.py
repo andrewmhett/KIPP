@@ -290,7 +290,7 @@ async def SHUFFLE(message,message2,serverinfo,playerinfo):
         import random
         end=None
         new_queue=serverinfo[message.guild].queue[1:]
-        if serverinfo[message.guild].queue[len(serverinfo[message.guild].queue)-1].startswith("PLAYLIST: "):
+        if serverinfo[message.guild].queue[len(serverinfo[message.guild].queue)-1][0].startswith("PLAYLIST: "):
             end=serverinfo[message.guild].queue[len(serverinfo[message.guild].queue)-1]
             new_queue=serverinfo[message.guild].queue[1:-1]
         random.shuffle(new_queue)

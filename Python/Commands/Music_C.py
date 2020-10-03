@@ -330,6 +330,7 @@ async def MOVESONG(message,message2,serverinfo,playerinfo):
             if index2>0 and index2<len(serverinfo[message.guild].queue):
                 if not serverinfo[message.guild].queue[index1][0].startswith("PLAYLIST: "):
                     serverinfo[message.guild].queue.insert(index2-1,serverinfo[message.guild].queue.pop(index1))
+                    await message.channel.send("Moved song at position {0} to position {1}".format(index1,index2))
                 else:
                     await message.channel.send("Cannot move playlists in the queue.")
             else:

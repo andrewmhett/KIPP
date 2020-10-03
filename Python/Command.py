@@ -67,7 +67,7 @@ class Command:
             if valid:
                 await self.exe[0](message,message2,serverinfo,playerinfo)
         elif arg_valid_out==-1:
-            await message.channel.send("Invalid syntax: (invalid type). Argument `{0}`. Expected `<{1}>`.".format(counter,self.arg_types[arg_num].__name__))
+            await message.channel.send("Invalid syntax: (invalid type). Argument `{0}`. Expected `<{1}>`.".format(count,self.arg_types[arg_num].__name__))
         elif arg_valid_out==-2:
             await message.channel.send("Invalid syntax: (invalid number of arguments). Expected `{0}`, got `{1}`.".format(str(len(self.arg_types))+(" or 1" if self.Name=="!HELP" else ""),len(self.args)))
         elif arg_valid_out==-3:

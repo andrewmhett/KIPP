@@ -183,8 +183,6 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                         music4 = music4.split('&index')
                         music4 = music4[0]
                     if "playlist" not in music4:
-                        music4=music4.split("watch&v=")[1]
-                        music4 = "https://www.youtube.com/watch?v="+music4
                         notsearched=False
                         if not music4.startswith("https://www.youtube.com") and "soundcloud.com" not in music4:
                             if str(message.author.voice.channel) != "None":
@@ -195,6 +193,8 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                                 if music4==None:
                                     notsearched=True
                                     await message.channel.send("Could not find music matching query `{0}`".format(query))
+                        music4=music4.split("watch?v=")[1]
+                        music4 = "https://www.youtube.com/watch?v="+music4
                         server = message.guild
                         if notsearched == False:
                             if ("channel" not in music4 and "youtube.com" in music4) or ("soundcloud.com" in music4):
@@ -285,6 +285,25 @@ async def CLEARQUEUE(message,message2,serverinfo,playerinfo):
     serverinfo[message.guild].queue=[serverinfo[message.guild].queue[0]]
     await message.channel.send("Removed all songs from the queue.")
 
+async def SHUFFLE(message,message2,serverinfo,playerinfo):
+    if len(serverinfo[message.guild].queue)>1:
+        import random
+        end=None
+        new_queue=serverinfo[message.guild].queue[1:]
+        if serverinfo[message.guild].queue[len(serverinfo[message.guild].queue)-1].startswith("PLAYLIST: "):
+            end=serverinfo[message.guild].queue[len(serverinfo[message.guild].queue)-1]
+            new_queue=serverinfo[message.guild].queue[1:-1]
+        random.shuffle(new_queue)
+        i=1
+        for song in new_queue:
+            serverinfo[message.guild].queue[i]=song
+            i+=1
+        if end != None:
+            serverinfo[message.guild].queue[i]=end
+        await message.channel.send("Shuffled the queue.")
+    else:
+        await message.channel.send("There are no songs in the queue to shuffle.")
+
 async def PAUSE(message,message2,serverinfo,playerinfo):
     if await VerifyMusicUser(message,serverinfo):
         if serverinfo[message.guild].mHandler.paused == False:
@@ -293,7 +312,7 @@ async def PAUSE(message,message2,serverinfo,playerinfo):
             serverinfo[message.guild].mHandler.paused=True
             message.guild.voice_client.pause()
         else:
-            await message.channel.send( "Music already is paused. To resume, use the **!resume** command.")
+            await message.channel.send( "Music already is paused. To resume, use the `!RESUME` command.")
 
 async def RESUME(message,message2,serverinfo,playerinfo):
     if await VerifyMusicUser(message,serverinfo):
@@ -343,3 +362,4 @@ command["!REMOVESONG"]=MUSC("!REMOVESONG","This command will remove the specifie
 command["!CLEARQUEUE"]=MUSC("!CLEARQUEUE","This command will clear all songs from the queue.\n!CLEARQUEUE",CLEARQUEUE,[])
 command["!SKIP"]=MUSC("!SKIP","This command will skip the current song, and play the next song in queue.\n!SKIP",SKIP,[])
 command["!QUEUE"]=MUSC("!QUEUE","Displays a larger version of the queue list displayed in KIPP's music message.\n!QUEUE",QUEUE,[])
+command["!SHUFFLE"]=MUSC("!SHUFFLE","Shuffles the queue.\n!SHUFFLE",SHUFFLE,[])

@@ -172,20 +172,19 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
             if message2.split("|")[1].startswith("PLAYLIST:")==False:
                 if serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(message2.split("|")[1])) != None:
                     await message.channel.send("Command usage note -- this syntax will find music matching the query `{0}` on YouTube. If you meant to play the playlist named `{0}`, use the command `!MUSIC|PLAYLIST:{0}`.".format(message2.split("|")[1]))
-                if (message2.split('!MUSIC')[1]).startswith('|') == True:
-                    if serverinfo[message.guild].loading == False:
-                        serverinfo[message.guild].loading = True
-                        music2 = str(message.content)
-                        music3 = music2.split('|')
-                        music4= music3[1]
-                        serverinfo[server].musictextchannel = message.channel
-                        serverinfo[message.guild].paused = False
-                        if "&index" in music4:
-                            music4 = music4.split('&index')
-                            music4 = music4[0]
-                        if music4.startswith("https://youtu.be"):
-                            music4 = music4.split('youtu.be/')[1]
-                            music4 = "https://www.youtube.com/watch?v="+music4
+                if serverinfo[message.guild].loading == False:
+                    serverinfo[message.guild].loading = True
+                    music2 = str(message.content)
+                    music3 = music2.split('|')
+                    music4= music3[1]
+                    serverinfo[server].musictextchannel = message.channel
+                    serverinfo[message.guild].paused = False
+                    if "&index" in music4:
+                        music4 = music4.split('&index')
+                        music4 = music4[0]
+                    if "playlist" not in music4:
+                        music4=music4.split("watch&v=")[1]
+                        music4 = "https://www.youtube.com/watch?v="+music4
                         notsearched=False
                         if not music4.startswith("https://www.youtube.com") and "soundcloud.com" not in music4:
                             if str(message.author.voice.channel) != "None":
@@ -198,36 +197,44 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                                     await message.channel.send("Could not find music matching query `{0}`".format(query))
                         server = message.guild
                         if notsearched == False:
-                            if ((music3[0]).upper() == "!MUSIC"):
-                                if ("channel" not in music4 and "youtube.com" in music4) or ("soundcloud.com" in music4):
-                                    serverinfo[message.guild].musiccolor=playerinfo[message.author].hrolecolor
-                                    await join_voice_channel(message,serverinfo)
-                                    if serverinfo[message.guild].playlist != None:
-                                        serverinfo[message.guild].queue=serverinfo[message.guild].queue[:-1]
-                                        add_to_queue(message.guild, music4, serverinfo)
-                                        serverinfo[message.guild].queue.append("PLAYLIST: {0}".format(serverinfo[message.guild].playlist))
-                                    else:
-                                        add_to_queue(message.guild, music4, serverinfo)
-                                    if serverinfo[message.guild].mHandler != None:
-                                        if len(serverinfo[message.guild].queue)>1:
-                                            if serverinfo[message.guild].playlist != None:
-                                                await message.channel.send( "Song added to queue. #"+str(len(serverinfo[message.guild].queue)-2))
-                                            else:
-                                                await message.channel.send( "Song added to queue. #"+str(len(serverinfo[message.guild].queue)-1))
-                                            serverinfo[message.guild].loading=False
-                                    if len(serverinfo[message.guild].queue) == 1:
-                                        serverinfo[message.guild].musicchannel=message.channel
-                                        serverinfo[message.guild].loading = False
-                                elif "channel" in music4 and "youtube.com" in music4:
-                                    await message.channel.send( "Please do not try to play an entire youtube channel. Get one specific song you would like to hear, and play that.")
+                            if ("channel" not in music4 and "youtube.com" in music4) or ("soundcloud.com" in music4):
+                                serverinfo[message.guild].musiccolor=playerinfo[message.author].hrolecolor
+                                await join_voice_channel(message,serverinfo)
+                                if serverinfo[message.guild].playlist != None:
+                                    serverinfo[message.guild].queue=serverinfo[message.guild].queue[:-1]
+                                    add_to_queue(message.guild, music4, serverinfo)
+                                    serverinfo[message.guild].queue.append("PLAYLIST: {0}".format(serverinfo[message.guild].playlist))
+                                else:
+                                    add_to_queue(message.guild, music4, serverinfo)
+                                if serverinfo[message.guild].mHandler != None:
+                                    if len(serverinfo[message.guild].queue)>1:
+                                        if serverinfo[message.guild].playlist != None:
+                                            await message.channel.send( "Song added to queue. #"+str(len(serverinfo[message.guild].queue)-2))
+                                        else:
+                                            await message.channel.send( "Song added to queue. #"+str(len(serverinfo[message.guild].queue)-1))
+                                        serverinfo[message.guild].loading=False
+                                if len(serverinfo[message.guild].queue) == 1:
+                                    serverinfo[message.guild].musicchannel=message.channel
                                     serverinfo[message.guild].loading = False
+                            elif "channel" in music4 and "youtube.com" in music4:
+                                await message.channel.send( "Please do not try to play an entire YouTube channel. Get one specific song you would like to hear, and play that.")
+                                serverinfo[message.guild].loading = False
                         else:
                             serverinfo[message.guild].loading=False
                     else:
-                        await message.delete()
+                        await join_voice_channel(message,serverinfo)
+                        if len(serverinfo[message.guild].queue) == 0:
+                            serverinfo[message.guild].musicchannel=message.channel
+                        from pyyoutube import Api
+                        api=Api(api_key=YOUTUBE_API_KEY)
+                        counter=0
+                        for song in api.get_playlist_items(playlist_id=music4.split("playlist?list=")[1],count=None).items:
+                            serverinfo[message.guild].queue.append([song.snippet.title,"https://www.youtube.com/watch?v={0}".format(song.snippet.resourceId.videoId)])
+                            counter+=1
+                        await message.channel.send("Added `{0}` songs to queue.".format(counter))
+                        loading=False
                 else:
-                    await message.channel.send( "Please use the correct syntax. Use !music|youtubelink/soundcloudlink or !music|youtubesearch to use the music command.")
-                    serverinfo[message.guild].loading = False
+                    await message.delete()
             else:
                 if serverinfo[message.guild].playlist == None:
                     if serverinfo[message.guild].search_server_configs(message2.split("|")[1]) != None:
@@ -247,6 +254,36 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
             raise
     elif (currentlyplaying == True) and (message.author.voice.channel != message.guild.get_member(KIPP_ID).voice.channel):
         await message.channel.send( "There is a song currently playing in another voice channel ("+str(message.guild.get_member(KIPP_ID).voice.channel)+"). Join that voice channel in order to change the music, or you can wait for that music to end, and run this command again.")
+
+async def QUEUE(message,message2,serverinfo,playerinfo):
+    queuelist="\nNo songs in queue"
+    char_counter=0
+    if len(serverinfo[message.guild].queue)>1:
+        queuelist=""
+        i=0
+        for song in serverinfo[message.guild].queue[1:]:
+            i=i+1
+            if len(song)>2:
+                if char_counter+len("\n`#{0}` {1}".format(i,song))<=1000:
+                    queuelist=queuelist+"\n`#{0}` {1}".format(i,song)
+                    char_counter+=len("\n`#{0}` {1}".format(i,song))
+                else:
+                    break
+            else:
+                if char_counter+len("\n`#{0}` {1}".format(i,song[1]))<=1000:
+                    queuelist=queuelist+"\n`#{0}` {1}".format(i,"["+(''.join(song[0]))+"]("+song[1]+")")
+                    char_counter+=len("\n`#{0}` {1}".format(i,"["+(''.join(song[0]))+"]("+song[1]+")"))
+                else:
+                    break
+        if len(serverinfo[message.guild].queue)-i>1:
+            queuelist+=("\n`...and {0} more songs`".format(len(serverinfo[message.guild].queue)-i) if len(serverinfo[message.guild].queue)-i>2 else "\n`...and 1 more song`")
+    em=discord.Embed(title="Queue",description=queuelist)
+    em.color=EMBEDCOLOR
+    await message.channel.send(embed=em)
+
+async def CLEARQUEUE(message,message2,serverinfo,playerinfo):
+    serverinfo[message.guild].queue=[serverinfo[message.guild].queue[0]]
+    await message.channel.send("Removed all songs from the queue.")
 
 async def PAUSE(message,message2,serverinfo,playerinfo):
     if await VerifyMusicUser(message,serverinfo):
@@ -303,4 +340,6 @@ command["!MUSIC"]=MUSC("!MUSIC","This command will cause KIPP to play music from
 command["!PAUSE"]=MUSC("!PAUSE","This command will pause KIPP, if playing\n!PAUSE",PAUSE,[])
 command["!RESUME"]=MUSC("!RESUME","This command will resume KIPP, if paused\n!RESUME",RESUME,[])
 command["!REMOVESONG"]=MUSC("!REMOVESONG","This command will remove the specified song from the queue\n!REMOVESONG|queue position",REMOVESONG,[int])
+command["!CLEARQUEUE"]=MUSC("!CLEARQUEUE","This command will clear all songs from the queue.\n!CLEARQUEUE",CLEARQUEUE,[])
 command["!SKIP"]=MUSC("!SKIP","This command will skip the current song, and play the next song in queue.\n!SKIP",SKIP,[])
+command["!QUEUE"]=MUSC("!QUEUE","Displays a larger version of the queue list displayed in KIPP's music message.\n!QUEUE",QUEUE,[])

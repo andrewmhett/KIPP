@@ -9,6 +9,7 @@ ffmpeg_options = {
     'options': '-vn'
 }
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+
 def search_music(query, serverinfo, index):
     music=None
     try:
@@ -19,6 +20,7 @@ def search_music(query, serverinfo, index):
     except IndexError:
         print("Not found")
     return music
+
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=1.0):
         super().__init__(source, volume)
@@ -36,6 +38,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
             data = data['entries'][0]
         b_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
         return cls(discord.FFmpegPCMAudio(data["url"], **ffmpeg_options, before_options=b_options), data=data)
+
 class music_handler:
     def __init__(self,server,player,channel):
         self.server=server

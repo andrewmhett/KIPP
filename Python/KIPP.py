@@ -57,7 +57,6 @@ async def background_loop():
                         serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
                         break
                     except youtube_dl.utils.DownloadError:
-                        await serverinfo[server].musicchannel.send("Unable to play this song. Skipping...")
                         serverinfo[server].queue=serverinfo[server].queue[1:]
                         if serverinfo[server].playlist != None:
                             music=serverinfo[server].pick_playlist_song()

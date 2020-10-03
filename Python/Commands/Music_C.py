@@ -26,9 +26,9 @@ async def NEWPLAYLIST(message,message2,serverinfo,playerinfo):
     name=message2.split("|")[1]
     if serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(name)) == None:
         serverinfo[message.guild].add_server_config(["PLAYLIST:{0}".format(name)])
-        await message.channel.send("Created a new playlist named `{0}`.".format(name))
+        await message.channel.send("Created a new playlist named `{0}`. Before playing the playlist, you must use the `!APPENDPLAYLIST` command to add at least one song to the playlist. After this, you can play it with the `!MUSIC|PLAYLIST:{0}` command.".format(name))
     else:
-        await message.channel.send( "There is already a playlist named `{0}`. If you would like to make a new playlist of that name, please delete the current playlist.".format(name))
+        await message.channel.send( "There is already a playlist named `{0}`. If you would like to make a new playlist of that name, please delete or rename the existing playlist.".format(name))
 
 async def DELETEPLAYLIST(message,message2,serverinfo,playerinfo):
     name=message2.split("|")[1]

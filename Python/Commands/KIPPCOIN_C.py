@@ -22,7 +22,7 @@ async def TRANSFER(message,message2,serverinfo,playerinfo):
     if int(amount)<=int(playerinfo[patron].GET_KIPPCOINS()) and int(amount)>0:
         playerinfo[patron].GIVE_KIPPCOINS(-1*int(amount))
         playerinfo[receiver].GIVE_KIPPCOINS(int(amount))
-        emb = discord.Embed(title="Transfer",description="Transferred **{0}** KIPPCOINS to **{1}**'s account.\n You now have **{2}** KIPPCOINS.".format(amount,str(receiver),int(playerinfo[patron].GET_KIPPCOINS())),colour=EMBEDCOLOR)
+        emb = discord.Embed(title="Transfer",description="Transferred `{0}` KIPPCOINS to **{1}**'s account.\n You now have `{2}` KIPPCOINS.".format(amount,str(receiver),int(playerinfo[patron].GET_KIPPCOINS())),colour=EMBEDCOLOR)
         emb.set_footer(text=get_footer())
         await message.channel.send(embed=emb)
     else:

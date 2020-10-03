@@ -32,8 +32,8 @@ async def HELP(message,message2,serverinfo,playerinfo):
             elif isinstance(c,KIPC):
                 kc.append(c.Name)
         em = discord.Embed(title='Help',description="**Use !HELP|command for command-specific information**",colour=EMBEDCOLOR)
-        em.add_field(name="Miscellaneous",value="```"+"\n".join(misc)+"```")
         em.add_field(name="Music",value="```"+"\n".join(musc)+"```")
+        em.add_field(name="Miscellaneous",value="```"+"\n".join(misc)+"```")
         em.add_field(name="KIPPCOINS",value="```"+"\n".join(kc)+"```")
         em.set_footer(text=get_footer())
         await message.channel.send(embed=em)

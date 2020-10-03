@@ -51,8 +51,18 @@ async def background_loop():
                     music=serverinfo[server].pick_playlist_song()
                     if serverinfo[server].playlist != None:
                         serverinfo[server].queue.append(serverinfo[server].queue[0])
-                player = await YTDLSource.from_url(music, loop=client.loop)
-                serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
+                while len(serverinfo[server].queue)>0:
+                    try:
+                        player = await YTDLSource.from_url(music, loop=client.loop)
+                        serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
+                        break
+                    except youtube_dl.utils.DownloadError:
+                        await serverinfo[server].musicchannel.send("Unable to play this song. Skipping...")
+                        serverinfo[server].queue=serverinfo[server].queue[1:]
+                        if serverinfo[server].playlist != None:
+                            music=serverinfo[server].pick_playlist_song()
+                        else:
+                            music=serverinfo[server].queue[0][1]
             if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
                 c=datetime.datetime.now()-serverinfo[server].end_time
                 b=datetime.datetime.now()-serverinfo[server].jointime

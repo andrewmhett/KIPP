@@ -6,22 +6,6 @@ from ESSENTIAL_PACKAGES import *
 from .Command_utils import *
 from Command import *
 
-async def find_valid_song(query, serverinfo):
-    index=0
-    ytdl = youtube_dl.YoutubeDL()
-    music4=""
-    while index<=10:
-        try:
-            music4=search_music(query, serverinfo, index)
-            if music4 != None:
-                ytdl.extract_info(music4, download=False)
-                break
-            else:
-                index+=1
-        except youtube_dl.utils.DownloadError:
-            index+=1
-    return music4
-
 async def NEWPLAYLIST(message,message2,serverinfo,playerinfo):
     name=message2.split("|")[1]
     if serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(name)) == None:
@@ -82,7 +66,7 @@ async def APPENDPLAYLIST(message,message2,serverinfo,playerinfo):
                 music4 = "https://www.youtube.com/watch?v="+music4
             if not music4.startswith("https://www.youtube.com") and not music4.startswith("https://www.soundcloud.com"):
                 query=music4
-                music4=await find_valid_song(query,serverinfo)
+                music4=search_music(query,serverinfo)
             if music4 == None:
                 await message.channel.send("Could not find song with query `{0}`".format(query))
                 return
@@ -187,7 +171,7 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                         if not music4.startswith("https://www.youtube.com") and "soundcloud.com" not in music4:
                             if str(message.author.voice.channel) != "None":
                                 query=music4
-                                music4=await find_valid_song(query,serverinfo[message.guild])
+                                music4=search_music(query,serverinfo[message.guild])
                                 serverinfo[message.guild].loading = False
                                 notsearched=False
                                 if music4==None:

@@ -10,15 +10,17 @@ ffmpeg_options = {
 }
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
-def search_music(query, serverinfo, index):
+def search_music(query, serverinfo):
     music=None
-    try:
-        query_string = urllib.parse.urlencode({"search_query" : query})
-        req = "http://www.youtube.com/results?"+query_string
-        searchresults=re.findall("watch\?v=(.{11})", requests.get(req).text)
-        music="http://www.youtube.com/watch?v="+searchresults[index]
-    except IndexError:
-        print("Not found")
+    from pyyoutube import Api
+    api=Api(api_key=YOUTUBE_API_KEY)
+    for song in api.search_by_keywords(q=query,search_type=["video"],count=10).items:
+        try:
+            api.get_video_by_id(video_id=song.id.videoId)
+            music="https://www.youtube.com/watch?v={0}".format(song.id.videoId)
+            break
+        except RuntimeWarning:
+            pass
     return music
 
 class YTDLSource(discord.PCMVolumeTransformer):

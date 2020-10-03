@@ -267,6 +267,7 @@ async def QUEUE(message,message2,serverinfo,playerinfo):
 
 async def CLEARQUEUE(message,message2,serverinfo,playerinfo):
     serverinfo[message.guild].queue=[serverinfo[message.guild].queue[0]]
+    serverinfo[message.guild].playlist=None
     await message.channel.send("Removed all songs from the queue.")
 
 async def SHUFFLE(message,message2,serverinfo,playerinfo):
@@ -309,12 +310,9 @@ async def RESUME(message,message2,serverinfo,playerinfo):
 
 async def REMOVESONG(message,message2,serverinfo,playerinfo):
     if await VerifyMusicUser(message,serverinfo):
-        try:
-            index = int(message2.split("|")[1])
-        except Exception:
-            await message.channel.send( "Song index must be an integer.")
+        index = int(message2.split("|")[1])
         if len(serverinfo[message.guild].queue)>1:
-            if index >0 and index <= len(serverinfo[message.guild].queue):
+            if index >0 and index < len(serverinfo[message.guild].queue):
                 if serverinfo[message.guild].playlist != None and len(serverinfo[message.guild].queue[index])>2:
                     serverinfo[message.guild].playlist = None
                 serverinfo[message.guild].queue.pop(index)
@@ -323,6 +321,22 @@ async def REMOVESONG(message,message2,serverinfo,playerinfo):
                 await message.channel.send("Invalid song index")
         else:
             await message.channel.send("There are no songs in the queue.")
+
+async def MOVESONG(message,message2,serverinfo,playerinfo):
+    if await VerifyMusicUser(message,serverinfo):
+        index1=int(message2.split("|")[1])
+        index2=int(message2.split("|")[2])
+        if index1>0 and index1<len(serverinfo[message.guild].queue):
+            if index2>0 and index2<len(serverinfo[message.guild].queue):
+                if not serverinfo[message.guild].queue[index1][0].startswith("PLAYLIST: "):
+                    serverinfo[message.guild].queue.insert(index2-1,serverinfo[message.guild].queue.pop(index1))
+                else:
+                    await message.channel.send("Cannot move playlists in the queue.")
+            else:
+                await message.channel.send("Invalid argument: index to move to is out of bounds")
+        else:
+            await message.channel.send("Invalid argument: index to move from out of bounds")
+                    
 
 async def SKIP(message,message2,serverinfo,playerinfo):
     if await VerifyMusicUser(message,serverinfo):
@@ -343,6 +357,7 @@ command["!MUSIC"]=MUSC("!MUSIC","This command will cause KIPP to play music from
 command["!PAUSE"]=MUSC("!PAUSE","This command will pause KIPP, if playing\n!PAUSE",PAUSE,[])
 command["!RESUME"]=MUSC("!RESUME","This command will resume KIPP, if paused\n!RESUME",RESUME,[])
 command["!REMOVESONG"]=MUSC("!REMOVESONG","This command will remove the specified song from the queue\n!REMOVESONG|queue position",REMOVESONG,[int])
+command["!MOVESONG"]=MUSC("!MOVESONG","This command will move the song at the 'from index' to the 'to index'\n!MOVESONG|from position|to position",MOVESONG,[int,int])
 command["!CLEARQUEUE"]=MUSC("!CLEARQUEUE","This command will clear all songs from the queue.\n!CLEARQUEUE",CLEARQUEUE,[])
 command["!SKIP"]=MUSC("!SKIP","This command will skip the current song, and play the next song in queue.\n!SKIP",SKIP,[])
 command["!QUEUE"]=MUSC("!QUEUE","Displays a larger version of the queue list displayed in KIPP's music message.\n!QUEUE",QUEUE,[])

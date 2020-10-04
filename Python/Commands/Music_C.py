@@ -193,9 +193,9 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                                 if serverinfo[message.guild].mHandler != None:
                                     if len(serverinfo[message.guild].queue)>1:
                                         if serverinfo[message.guild].playlist != None:
-                                            await message.channel.send( "Song added to queue. #"+str(len(serverinfo[message.guild].queue)-2))
+                                            await message.channel.send( "Song added to queue. `#"+str(len(serverinfo[message.guild].queue)-2)+"`")
                                         else:
-                                            await message.channel.send( "Song added to queue. #"+str(len(serverinfo[message.guild].queue)-1))
+                                            await message.channel.send( "Song added to queue. `#"+str(len(serverinfo[message.guild].queue)-1)+"`")
                                         serverinfo[message.guild].loading=False
                                 if len(serverinfo[message.guild].queue) == 1:
                                     serverinfo[message.guild].musicchannel=message.channel
@@ -241,22 +241,19 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
 
 async def QUEUE(message,message2,serverinfo,playerinfo):
     queuelist="\nNo songs in queue"
-    char_counter=0
     if len(serverinfo[message.guild].queue)>1:
         queuelist=""
         i=0
         for song in serverinfo[message.guild].queue[1:]:
             i=i+1
             if len(song)>2:
-                if char_counter+len("\n`#{0}` {1}".format(i,song))+2<=2000:
+                if len(queuelist)+len("\n`#{0}` {1}".format(i,song))<=2000:
                     queuelist=queuelist+"\n`#{0}` {1}".format(i,song)
-                    char_counter+=len("\n`#{0}` {1}".format(i,song))+2
                 else:
                     break
             else:
-                if char_counter+len("\n`#{0}` {1}".format(i,song[1]))+2<=2000:
+                if len(queuelist)+len("\n`#{0}` {1}".format(i,song[0]))<=2000:
                     queuelist=queuelist+"\n`#{0}` {1}".format(i,"["+(''.join(song[0]))+"]("+song[1]+")")
-                    char_counter+=len("\n`#{0}` {1}".format(i,song[1]))+2
                 else:
                     break
         if len(serverinfo[message.guild].queue)-i>1:
@@ -316,7 +313,7 @@ async def REMOVESONG(message,message2,serverinfo,playerinfo):
                 if serverinfo[message.guild].playlist != None and len(serverinfo[message.guild].queue[index])>2:
                     serverinfo[message.guild].playlist = None
                 serverinfo[message.guild].queue.pop(index)
-                await message.channel.send( "Removed song #{0} from queue".format(index))
+                await message.channel.send( "Removed song at queue position `{0}`".format(index))
             else:
                 await message.channel.send("Invalid song index")
         else:
@@ -329,8 +326,8 @@ async def MOVESONG(message,message2,serverinfo,playerinfo):
         if index1>0 and index1<len(serverinfo[message.guild].queue):
             if index2>0 and index2<len(serverinfo[message.guild].queue):
                 if not serverinfo[message.guild].queue[index1][0].startswith("PLAYLIST: "):
-                    serverinfo[message.guild].queue.insert(index2-1,serverinfo[message.guild].queue.pop(index1))
-                    await message.channel.send("Moved song at position {0} to position {1}".format(index1,index2))
+                    serverinfo[message.guild].queue.insert(index2,serverinfo[message.guild].queue.pop(index1))
+                    await message.channel.send("Moved song at position `{0}` to position `{1}`".format(index1,index2))
                 else:
                     await message.channel.send("Cannot move playlists in the queue.")
             else:

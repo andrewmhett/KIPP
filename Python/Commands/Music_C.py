@@ -177,8 +177,9 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                                 if music4==None:
                                     notsearched=True
                                     await message.channel.send("Could not find music matching query `{0}`".format(query))
-                        music4=music4.split("watch?v=")[1]
-                        music4 = "https://www.youtube.com/watch?v="+music4
+                        if "youtube.com" in music4:
+                            music4=music4.split("watch?v=")[1]
+                            music4 = "https://www.youtube.com/watch?v="+music4
                         server = message.guild
                         if notsearched == False:
                             if ("channel" not in music4 and "youtube.com" in music4) or ("soundcloud.com" in music4):

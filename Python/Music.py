@@ -2,12 +2,23 @@ from ESSENTIAL_PACKAGES import *
 from Footer import get_footer
 from subprocess import check_output
 EMBEDCOLOR=0x36393E
-ytdl_format_options = {
+
+ytdl_format_options={
     'format': 'bestaudio/best',
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'opus',
+    }],
+    'postprocessor_args':[
+        '-ar', '48000'
+    ],
+    'keepvideo': False
 }
+
 ffmpeg_options = {
     'options': '-vn'
 }
+
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
 def search_music(query, serverinfo):
@@ -35,6 +46,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
+        #data["url"]="https://www.youtube.com/watch?v={0}".format(data["id"])
         cls.url=url
         if 'entries' in data:
             data = data['entries'][0]

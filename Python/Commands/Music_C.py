@@ -216,7 +216,7 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                             serverinfo[message.guild].queue.append([song.snippet.title,"https://www.youtube.com/watch?v={0}".format(song.snippet.resourceId.videoId)])
                             counter+=1
                         await message.channel.send("Added `{0}` songs to queue.".format(counter))
-                        loading=False
+                    serverinfo[message.guild].loading=False
                 else:
                     await message.delete()
             else:

@@ -248,15 +248,15 @@ async def QUEUE(message,message2,serverinfo,playerinfo):
         for song in serverinfo[message.guild].queue[1:]:
             i=i+1
             if len(song)>2:
-                if char_counter+len("\n`#{0}` {1}".format(i,song))<=1000:
+                if char_counter+len("\n`#{0}` {1}".format(i,song))<=2000:
                     queuelist=queuelist+"\n`#{0}` {1}".format(i,song)
                     char_counter+=len("\n`#{0}` {1}".format(i,song))
                 else:
                     break
             else:
-                if char_counter+len("\n`#{0}` {1}".format(i,song[1]))<=1000:
+                if char_counter+len("\n`#{0}` {1}".format(i,song[1]))<=2000:
                     queuelist=queuelist+"\n`#{0}` {1}".format(i,"["+(''.join(song[0]))+"]("+song[1]+")")
-                    char_counter+=len("\n`#{0}` {1}".format(i,"["+(''.join(song[0]))+"]("+song[1]+")"))
+                    char_counter+=len("\n`#{0}` {1}".format(i,song[1]))
                 else:
                     break
         if len(serverinfo[message.guild].queue)-i>1:

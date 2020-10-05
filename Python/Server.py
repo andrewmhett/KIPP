@@ -159,7 +159,7 @@ class Server:
                 volume_graph="`"+((21-len(self.mHandler.volume_array))*' ')+volume_graph+"`"
                 if self.mHandler.paused:
                     pauseStr=" (paused)"
-                self.mHandler.desc=self.mHandler.bar+"\n{0}".format(volume_graph)
+                self.mHandler.desc=self.mHandler.bar+"\n"
                 if self.mHandler.hours>0:
                     if len(str(self.mHandler.minutedelta))==1:
                         self.mHandler.minutedelta="0"+str(self.mHandler.minutedelta)
@@ -169,6 +169,7 @@ class Server:
                 else:
                     self.mHandler.desc= self.mHandler.desc+"\n`"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr
                 self.mHandler.em.clear_fields()
+                self.mHandler.em.description=self.mHandler.em.description.split("\n")[0]+"\n{0}".format(volume_graph)
                 self.mHandler.em.add_field(name="Progress",value=self.mHandler.desc,inline=True)
                 self.mHandler.em.add_field(name="Queue",value=queuelist,inline=True)
                 self.mHandler.em.set_footer(text=self.mHandler.footer)

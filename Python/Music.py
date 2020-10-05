@@ -4,15 +4,7 @@ from subprocess import check_output
 EMBEDCOLOR=0x36393E
 
 ytdl_format_options={
-    'format': 'mp3/bestaudio/best',
-    'postprocessors': [{
-        'key': 'FFmpegExtractAudio',
-        'preferredcodec': 'opus',
-    }],
-    'postprocessor_args':[
-        '-ar', '48000'
-    ],
-    'keepvideo': False
+    'format': 'bestaudio/best',
 }
 
 ffmpeg_options = {
@@ -48,7 +40,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
-        #data["url"]="https://www.youtube.com/watch?v={0}".format(data["id"])
         cls.url=url
         if 'entries' in data:
             data = data['entries'][0]
@@ -60,8 +51,10 @@ class music_handler:
         self.server=server
         self.resend_timer=0
         self.channel=channel
-        server.voice_client.play(player)
         self.player=player
+        player.do_read=player.read
+        player.read=self.read
+        server.voice_client.play(player)
         self.paused=False
         self.message=None
         self.starttime=datetime.now()
@@ -70,6 +63,8 @@ class music_handler:
         self.link=player.url
         self.footer=get_footer()
         self.hours=0
+        self.volume_data=[]
+        self.volume_array=[]
         if self.player.is_live == False:
             mins=int(self.duration/60)
             seconds=int(self.duration-(mins*60))
@@ -99,6 +94,12 @@ class music_handler:
         self.is_playing=True
         self.pausedatetime=None
         self.pausetime=None
+    def read(self):
+        data=self.player.do_read()
+        self.volume_data.append(data)
+        if len(self.volume_data)>50:
+            self.volume_data.pop(0)
+        return data 
     def skip(self):
         self.server.voice_client.stop()
         self.player.is_live=False

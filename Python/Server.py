@@ -88,14 +88,14 @@ class Server:
                 if len(self.queue)>1:
                     queuelist=""
                     i=0
-                    for song in self.queue[1:4]:
+                    for song in self.queue[1:3]:
                         i=i+1
                         if len(song)>2:
                             queuelist=queuelist+"\n`#{0}` {1}".format(i,song)
                         else:
                             queuelist=queuelist+"\n`#{0}` {1}".format(i,"["+(''.join(song[0]))+"]("+song[1]+")")
-                    if len(self.queue)-4>0:
-                        queuelist+=("\n`...and {0} more songs`".format(len(self.queue)-4) if len(self.queue)-4>1 else "\n`...and 1 more song`")
+                    if len(self.queue)-3>0:
+                        queuelist+=("\n`...and {0} more songs`".format(len(self.queue)-3) if len(self.queue)-3>1 else "\n`...and 1 more song`")
                 if self.mHandler.paused:
                     self.mHandler.pausetime=datetime.datetime.now()-self.mHandler.pausedatetime
                 if self.mHandler.pausetime==None:

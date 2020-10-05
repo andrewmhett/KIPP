@@ -4,7 +4,7 @@ from subprocess import check_output
 EMBEDCOLOR=0x36393E
 
 ytdl_format_options={
-    'format': 'bestaudio/best',
+    'format': 'mp3/bestaudio/best',
     'postprocessors': [{
         'key': 'FFmpegExtractAudio',
         'preferredcodec': 'opus',

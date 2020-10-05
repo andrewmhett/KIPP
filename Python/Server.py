@@ -159,7 +159,7 @@ class Server:
                 volume_graph="`"+((21-len(self.mHandler.volume_array))*' ')+volume_graph+"`"
                 if self.mHandler.paused:
                     pauseStr=" (paused)"
-                self.mHandler.desc=self.mHandler.bar+"\n"
+                self.mHandler.desc=self.mHandler.bar
                 if self.mHandler.hours>0:
                     if len(str(self.mHandler.minutedelta))==1:
                         self.mHandler.minutedelta="0"+str(self.mHandler.minutedelta)

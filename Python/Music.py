@@ -28,6 +28,8 @@ def search_music(query, serverinfo):
     for song in api.search_by_keywords(q=query,search_type=["video"],count=10).items:
         try:
             api.get_video_by_id(video_id=song.id.videoId)
+            if song.snippet.channelId == "UCkrik6-x73z1n21wbjim3nQ":
+                raise RuntimeWarning
             music="https://www.youtube.com/watch?v={0}".format(song.id.videoId)
             break
         except RuntimeWarning:

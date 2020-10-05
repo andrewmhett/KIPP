@@ -139,16 +139,34 @@ class Server:
                     else:
                         self.mHandler.bar="`"+(" "*5)+"Live Stream"+(" "*5)+"`"
                 pauseStr=""
+                volume_blocks=['▁','▂','▃','▄','▅','▆','▇','█']
+                volume=0
+                for sample in self.mHandler.volume_data:
+                    volume+=audioop.rms(sample,2)
+                volume/=50
+                self.mHandler.volume_array.append(volume)
+                if len(self.mHandler.volume_array)>21:
+                    self.mHandler.volume_array.pop(0)
+                max_volume=max(self.mHandler.volume_array)
+                vol_increment=max_volume/8
+                volume_graph=""
+                for volume in self.mHandler.volume_array:
+                    if vol_increment>0:
+                        volume_graph+=volume_blocks[int(volume/vol_increment)-1]
+                    else:
+                        volume_graph+=' '
+                volume_graph="`"+((21-len(self.mHandler.volume_array))*' ')+volume_graph+"`"
                 if self.mHandler.paused:
                     pauseStr=" (paused)"
+                self.mHandler.desc=self.mHandler.bar+"\n{0}".format(volume_graph)
                 if self.mHandler.hours>0:
                     if len(str(self.mHandler.minutedelta))==1:
                         self.mHandler.minutedelta="0"+str(self.mHandler.minutedelta)
                     else:
                         self.mHandler.minutedelta=str(self.mHandler.minutedelta)
-                    self.mHandler.desc = self.mHandler.bar+"\n`"+str(self.mHandler.hours)+":"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr
+                    self.mHandler.desc = self.mHandler.desc+"`"+str(self.mHandler.hours)+":"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr
                 else:
-                    self.mHandler.desc= self.mHandler.bar+"\n`"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr
+                    self.mHandler.desc= self.mHandler.desc+"\n`"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr
                 self.mHandler.em.clear_fields()
                 self.mHandler.em.add_field(name="Progress",value=self.mHandler.desc,inline=True)
                 self.mHandler.em.add_field(name="Queue",value=queuelist,inline=True)

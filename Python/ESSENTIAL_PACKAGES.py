@@ -11,6 +11,7 @@ from urllib.request import Request
 import re
 from datetime import datetime
 import time as t
+import threading 
 import requests
 import urllib
 from math import *
@@ -20,6 +21,7 @@ from defusedxml import lxml
 import logging
 import youtube_dl
 import subprocess
+import audioop
 EMBEDCOLOR=0x36393E
 logging.getLogger().setLevel(logging.INFO)
 try:

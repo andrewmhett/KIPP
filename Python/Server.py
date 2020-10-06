@@ -157,7 +157,7 @@ class Server:
                     else:
                         volume_graph+=' '
                 volume_graph[0]="▁"
-                volume_graph="`"+((21-len(volume_graph))*'▁')+volume_graph+"`"
+                volume_graph="`"+((21-len(volume_graph))*' ')+volume_graph+"`"
                 if self.mHandler.paused:
                     pauseStr=" (paused)"
                 self.mHandler.desc=self.mHandler.bar+"\n{0}".format(volume_graph)

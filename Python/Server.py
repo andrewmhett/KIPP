@@ -139,24 +139,24 @@ class Server:
                     else:
                         self.mHandler.bar="`"+(" "*5)+"Live Stream"+(" "*5)+"`"
                 pauseStr=""
-                volume_blocks=[' ','▂','▃','▅','▆','▇']
+                volume_blocks=[' ','▁','▂','▃','▅','▆','▇']
                 if not self.mHandler.paused:
                     volume=0
                     for sample in self.mHandler.volume_data:
                         volume+=audioop.rms(sample,2)
                     volume/=50
                     self.mHandler.volume_array.append(volume)
-                    if len(self.mHandler.volume_array)>10:
+                    if len(self.mHandler.volume_array)>11:
                         self.mHandler.volume_array.pop(0)
                 max_volume=max(self.mHandler.volume_array)
-                vol_increment=max_volume/5
+                vol_increment=max_volume/6
                 volume_graph=""
                 for volume in self.mHandler.volume_array:
                     if vol_increment>0:
                         volume_graph+=volume_blocks[int(volume/vol_increment)]
                     else:
                         volume_graph+=' '
-                volume_graph="`"+((10-len(volume_graph))*' ')+volume_graph+"`"
+                volume_graph="`"+((11-len(volume_graph))*' ')+volume_graph+"`"
                 if self.mHandler.paused:
                     pauseStr=" (paused)"
                 self.mHandler.desc=self.mHandler.bar+"\n{0}".format(volume_graph)

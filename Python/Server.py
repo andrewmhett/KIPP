@@ -146,7 +146,7 @@ class Server:
                         volume+=audioop.rms(sample,2)
                     volume/=50
                     self.mHandler.volume_array.append(volume)
-                    if len(self.mHandler.volume_array)>9:
+                    if len(self.mHandler.volume_array)>10:
                         self.mHandler.volume_array.pop(0)
                 max_volume=max(self.mHandler.volume_array)
                 vol_increment=max_volume/5
@@ -156,7 +156,7 @@ class Server:
                         volume_graph+=volume_blocks[int(volume/vol_increment)]
                     else:
                         volume_graph+=' '
-                volume_graph="`"+((9-len(volume_graph))*' ')+volume_graph+"`"
+                volume_graph="`"+((10-len(volume_graph))*' ')+volume_graph+"`"
                 if self.mHandler.paused:
                     pauseStr=" (paused)"
                 self.mHandler.desc=self.mHandler.bar+"\n{0}".format(volume_graph)

@@ -149,7 +149,7 @@ class Server:
                     if len(self.mHandler.volume_array)>17:
                         self.mHandler.volume_array.pop(0)
                 max_volume=max(self.mHandler.volume_array)
-                vol_increment=max_volume/6
+                vol_increment=max_volume/5
                 volume_graph=""
                 for volume in self.mHandler.volume_array:
                     if vol_increment>0:

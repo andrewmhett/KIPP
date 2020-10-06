@@ -139,7 +139,7 @@ class Server:
                     else:
                         self.mHandler.bar="`"+(" "*5)+"Live Stream"+(" "*5)+"`"
                 pauseStr=""
-                volume_blocks=['▁','▃','▅','▆','▇']
+                volume_blocks=['▁','▅','▇']
                 if not self.mHandler.paused:
                     volume=0
                     for sample in self.mHandler.volume_data:
@@ -149,7 +149,7 @@ class Server:
                     if len(self.mHandler.volume_array)>21:
                         self.mHandler.volume_array.pop(0)
                 max_volume=max(self.mHandler.volume_array)
-                vol_increment=max_volume/4
+                vol_increment=max_volume/3
                 volume_graph=""
                 for volume in self.mHandler.volume_array:
                     if vol_increment>0:

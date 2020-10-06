@@ -156,7 +156,7 @@ class Server:
                         volume_graph+=volume_blocks[int(volume/vol_increment)]
                     else:
                         volume_graph+=' '
-                volume_graph[0]="▁"
+                volume_graph="▁"+volume_graph[1:]
                 volume_graph="`"+((21-len(volume_graph))*' ')+volume_graph+"`"
                 if self.mHandler.paused:
                     pauseStr=" (paused)"

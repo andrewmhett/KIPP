@@ -139,7 +139,7 @@ class Server:
                     else:
                         self.mHandler.bar="`"+(" "*5)+"Live Stream"+(" "*5)+"`"
                 pauseStr=""
-                volume_blocks=['▁','▅','▇']
+                volume_blocks=[' ','▁','▅','▇']
                 if not self.mHandler.paused:
                     volume=0
                     for sample in self.mHandler.volume_data:
@@ -155,8 +155,8 @@ class Server:
                     if vol_increment>0:
                         volume_graph+=volume_blocks[int(volume/vol_increment)]
                     else:
-                        volume_graph+='▁'
-                volume_graph="`"+((21-len(volume_graph))*'▁')+volume_graph+"`"
+                        volume_graph+=' '
+                volume_graph="`"+((21-len(volume_graph))*' ')+volume_graph+"`"
                 if self.mHandler.paused:
                     pauseStr=" (paused)"
                 self.mHandler.desc=self.mHandler.bar

@@ -155,7 +155,7 @@ class Server:
                     if vol_increment>0:
                         volume_graph+=volume_blocks[int(volume/vol_increment)]
                     else:
-                        volume_graph+=' '
+                        volume_graph+='▁'
                 volume_graph="`"+((17-len(volume_graph))*'▁')+volume_graph+"`"
                 volume_graph="`▁"+volume_graph[2:]
                 if self.mHandler.paused:

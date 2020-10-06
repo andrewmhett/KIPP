@@ -139,7 +139,7 @@ class Server:
                     else:
                         self.mHandler.bar="`"+(" "*5)+"Live Stream"+(" "*5)+"`"
                 pauseStr=""
-                volume_blocks=[' ','▁','▂','▃','▅','▆','▇']
+                volume_blocks=['▁','▂','▃','▅','▆','▇']
                 if not self.mHandler.paused:
                     volume=0
                     for sample in self.mHandler.volume_data:

@@ -6,3 +6,4 @@ flask
 websockets
 pynacl
 python-youtube
+baseconvert

@@ -8,6 +8,7 @@ import logging
 import threading
 import time
 import sys
+import datetime
 KIPP_DIR=os.environ['KIPP_DIR']
 def WebMonitor():
     os.system('sudo -E python3 "{0}/WebServer/Webserver.py"'.format(KIPP_DIR))
@@ -42,7 +43,5 @@ while True:
     try:
         os.system("sudo -E python3 {0}/Python/KIPP.py".format(KIPP_DIR))
     except Exception as e:
-        #if type(e) in KIPP_RESET_ERRORS:
-            #pass
-        logging.log(50, "ERROR: {0}".format(e))
+        os.system('sudo echo "{0} {1}" >> $KIPP_DIR/log.txt'.format(datetime.datetime.strftime(datetime.datetime.now(),"[%m/%d/%Y %H:%M:%S]"), e))
     logging.log(50,"KIPP restarting...")

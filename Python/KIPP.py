@@ -37,40 +37,43 @@ async def background_loop():
     import datetime
     global current_time
     while True:
-        if get_clock() != current_time:
-            try:
-                await client.change_presence(activity=discord.Game(name=get_clock()))
-                current_time=get_clock()
-            except discord.DiscordException:
-                print("Binary clock rate limited...")
-        for server in client.guilds:
-            if serverinfo[server].mHandler == None and len(serverinfo[server].queue)>=1:
-                music=serverinfo[server].queue[0][1]
-                if len(serverinfo[server].queue[0])>2:
-                    serverinfo[server].playlist=serverinfo[server].queue[0].split("PLAYLIST:")[1][1:]
-                    music=serverinfo[server].pick_playlist_song()
-                    if serverinfo[server].playlist != None:
-                        serverinfo[server].queue.append(serverinfo[server].queue[0])
-                while len(serverinfo[server].queue)>0:
-                    try:
-                        player = await YTDLSource.from_url(music, loop=client.loop)
-                        serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
-                        break
-                    except youtube_dl.utils.DownloadError:
-                        serverinfo[server].queue=serverinfo[server].queue[1:]
+        try:
+            if get_clock() != current_time:
+                try:
+                    await client.change_presence(activity=discord.Game(name=get_clock()))
+                    current_time=get_clock()
+                except discord.DiscordException:
+                    print("Binary clock rate limited...")
+            for server in client.guilds:
+                if serverinfo[server].mHandler == None and len(serverinfo[server].queue)>=1:
+                    music=serverinfo[server].queue[0][1]
+                    if len(serverinfo[server].queue[0])>2:
+                        serverinfo[server].playlist=serverinfo[server].queue[0].split("PLAYLIST:")[1][1:]
+                        music=serverinfo[server].pick_playlist_song()
                         if serverinfo[server].playlist != None:
-                            music=serverinfo[server].pick_playlist_song()
-                        else:
-                            music=serverinfo[server].queue[0][1]
-            if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
-                c=datetime.datetime.now()-serverinfo[server].end_time
-                b=datetime.datetime.now()-serverinfo[server].jointime
-                if c.seconds/60 >= 5 and b.seconds/60 >= 5:
-                    if server.voice_client != None:
+                            serverinfo[server].queue.append(serverinfo[server].queue[0])
+                    while len(serverinfo[server].queue)>0:
                         try:
-                            await server.voice_client.disconnect()
-                        except Exception:
-                            print ("Voice client timeout, can't disconnect")
+                            player = await YTDLSource.from_url(music, loop=client.loop)
+                            serverinfo[server].mHandler=music_handler(server,player,serverinfo[server].musicchannel)
+                            break
+                        except youtube_dl.utils.DownloadError:
+                            serverinfo[server].queue=serverinfo[server].queue[1:]
+                            if serverinfo[server].playlist != None:
+                                music=serverinfo[server].pick_playlist_song()
+                            else:
+                                music=serverinfo[server].queue[0][1]
+                if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
+                    c=datetime.datetime.now()-serverinfo[server].end_time
+                    b=datetime.datetime.now()-serverinfo[server].jointime
+                    if c.seconds/60 >= 5 and b.seconds/60 >= 5:
+                        if server.voice_client != None:
+                            try:
+                                await server.voice_client.disconnect()
+                            except Exception:
+                                print ("Voice client timeout, can't disconnect")
+        except Exception as e:
+            os.system('sudo echo "{0} {1}" >> log.txt'.format(datetime.datetime.strftime(datetime.datetime.now(),"[%m/%d/%Y %H:%M:%S]"), e))
         await asyncio.sleep(1)
 print("KIPP starting up...")
 while True:

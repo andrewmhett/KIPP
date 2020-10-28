@@ -73,7 +73,7 @@ async def background_loop():
                             except Exception:
                                 print ("Voice client timeout, can't disconnect")
         except Exception as e:
-            os.system('sudo echo "{0} {1}" >> log.txt'.format(datetime.datetime.strftime(datetime.datetime.now(),"[%m/%d/%Y %H:%M:%S]"), e))
+            os.system('sudo echo "{0} {1}" >> $KIPP_DIR/log.txt'.format(datetime.datetime.strftime(datetime.datetime.now(),"[%m/%d/%Y %H:%M:%S]"), e))
         await asyncio.sleep(1)
 print("KIPP starting up...")
 while True:

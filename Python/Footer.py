@@ -46,5 +46,5 @@ def get_footer():
         ending=endings.get(int(day))
     else:
         ending="th"
-    footer = ("KIPP | "+weekday+" "+month+" "+str(day)+ending+", "+str(year)+" at "+str(hour)+":"+minute+" "+ampm)
+    footer = ("KIPP | "+weekday+" "+month+" "+str(day)+ending+", "+str(year)+" at "+str(hour)+":"+minute+" "+ampm+" PST")
     return footer

@@ -5,7 +5,7 @@ KIPP is currently in development. KIPP's development started in December, 2018; 
 
 ### Getting and Running KIPP
 ###### Python 3.x required
-###### Linux Distribution required
+###### UNIX-based OS required
 ###### Raspberry Pi optional
 #### Step 1: Cloning KIPP
 In order to run KIPP, KIPP's program and its dependencies must be on your computer. Cloning this repository onto a Linux distribution is very simple, and can be done through this command in a terminal. For this set of instructions, we're going to clone KIPP into the home (~) directory.

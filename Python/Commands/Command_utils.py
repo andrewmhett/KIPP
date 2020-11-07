@@ -12,6 +12,32 @@ if len(sys.argv)>1:
         KIPP_ID=726545013064073277
 InterstellarQuotes = ["'Do not go gentle into that good night'\n**Professor Brand**", "'Come on, TARS!'\n**Cooper**", "'Cooper, this is no time for caution!'\n**TARS**", "'You tell that to Doyle.'\n**Cooper**", "'Newton's third law. You gotta leave something behind.'\n**Cooper**", "'Step back, professor, step back!'\n**TARS**","'No, it's necessary.'\n**Cooper**"]
 
+safe_domains=[
+    "www.youtube.com",
+    "www.youtu.be",
+    "soundcloud.com"
+]
+
+def sanitize_url(url):
+    invalid_link=False
+    url_domain=""
+    try:
+        request=requests.get(url)
+        if request.url.split("https://")[1].split("/")[0] not in safe_domains:
+            invalid_link=True
+        else:
+            for domain in safe_domains:
+                if request.url.split("https://")[1].split("/")[0] == domain:
+                    url_domain=domain
+        for redirect in request.history:
+            if redirect.url.split("https://")[1].split("/")[0] not in safe_domains:
+                invalid_link=True
+    except requests.exceptions.ConnectionError:
+        invalid_link=True
+    if invalid_link:
+        return -1
+    return url_domain
+
 async def send_image(message,url,ext):
     emb=discord.Embed(title=("{0} result for '{1}'".format(ext,str(message.content).split('|')[1])),colour=EMBEDCOLOR)
     emb.set_image(url=url)

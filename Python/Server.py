@@ -166,7 +166,7 @@ class Server:
                         self.mHandler.minutedelta="0"+str(self.mHandler.minutedelta)
                     else:
                         self.mHandler.minutedelta=str(self.mHandler.minutedelta)
-                    self.mHandler.desc = self.mHandler.desc+"`"+str(self.mHandler.hours)+":"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr
+                    self.mHandler.desc = self.mHandler.desc+"\n`"+str(self.mHandler.hours)+":"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr
                 else:
                     self.mHandler.desc= self.mHandler.desc+"\n`"+str(self.mHandler.minutedelta)+':'+str(self.mHandler.seconddelta)+' / '+self.mHandler.length+'`'+pauseStr
                 self.mHandler.em.clear_fields()

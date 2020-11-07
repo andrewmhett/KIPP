@@ -6,6 +6,11 @@ from ESSENTIAL_PACKAGES import *
 from .Command_utils import *
 from Command import *
 
+safe_domains=[
+    "youtube.com",
+    "soundcloud.com"
+]
+
 async def NEWPLAYLIST(message,message2,serverinfo,playerinfo):
     name=message2.split("|")[1]
     if serverinfo[message.guild].search_server_configs("PLAYLIST:{0}".format(name)) == None:
@@ -55,6 +60,10 @@ async def APPENDPLAYLIST(message,message2,serverinfo,playerinfo):
             await message.channel.send("Processing...")
             serverinfo[message.guild].loading = True
             music4=str(message.content).split("|")[2]
+            for redirect in requests.get(music4).history:
+                if redirect.url.split("https://")[1].split("/")[0] not in safe_domains:
+                    await message.channel.send("Unsafe or unsupported URL domain. Aborting.")
+                    return
             if "list" in music4 and "watch" in music4:
                 await message.channel.send("Invalid link.")
                 return
@@ -201,7 +210,7 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                                 if len(serverinfo[message.guild].queue) == 1:
                                     serverinfo[message.guild].musicchannel=message.channel
                                     serverinfo[message.guild].loading = False
-                            elif "channel" in music4 and "youtube.com" in music4:
+                            elif "channel" in music4 and music4.startswith("https://www.youtube.com"):
                                 await message.channel.send( "Please do not try to play an entire YouTube channel. Get one specific song you would like to hear, and play that.")
                                 serverinfo[message.guild].loading = False
                         else:

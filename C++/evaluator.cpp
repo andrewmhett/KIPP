@@ -133,6 +133,9 @@ queue<string> parse_input(string input){
 					top_precedence = operator_info.at(op_stack.top()).first;
 				}
 				while (!op_stack.empty() && (precedence<top_precedence || (precedence==top_precedence && direction==-1))){
+					if (op_stack.top()=='('){
+						break;
+					}
 					out_queue.push(string(1,op_stack.top()));
 					op_stack.pop();
 					if (!op_stack.empty() && op_stack.top() != '('){

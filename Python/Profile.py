@@ -2,9 +2,8 @@ from ESSENTIAL_PACKAGES import *
 KIPP_DIR=os.environ['KIPP_DIR']
 class Profile:
     def __init__(self,user):
-        """
-        Class used to keep track of user-specific data
-        
+        """Class used to keep track of user-specific data
+
         :param user: the discord.py member object to track data for
         :type user: <discord.member.Member>
         """

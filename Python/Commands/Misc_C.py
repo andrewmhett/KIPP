@@ -86,15 +86,28 @@ async def STATUS(message,message2,serverinfo,playerinfo):
     await message.channel.send("```"+stdout.split('ago')[0]+"ago```")
 
 async def MATH(message,message2,serverinfo,playerinfo):
-    mathP = str(message.content)
-    mathP2 = mathP.split('|')
-    math = str(mathP2[1])
-    try:
-        mathT = eval(math)
-    except SyntaxError:
-        await message.channel.send( "Sorry, KIPP failed to process this request.")
-    msg = str(math)+" = "+str(mathT)
-    await message.channel.send( msg)
+    infix = str(message.content.split("|")[1])
+    value_dict={"(":1,")":-1}
+    valid_parens=True
+    counter=0
+    for char in infix:
+        if char == "(" or char == ")":
+            counter+=value_dict[char]
+            if counter<0:
+                valid_parens=False
+    if counter != 0:
+        valid_parens=False
+    if valid_parens:
+        output = subprocess.Popen([KIPP_DIR+"/C++/evaluate",infix],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode()
+        arr=output.split(": ")
+        try:
+            desc=arr[0]+": `"+arr[1].split(" \n")[0]+"`\n"+arr[1].split(" \n")[1]+": `"+arr[2].split(" \n")[0]+"`\n"+"RESULT: `"+arr[2].split(" \n")[1]+"`"
+            em=discord.Embed(title="Math Evaluator",description=desc,color=EMBEDCOLOR)
+            await message.channel.send(embed=em)
+        except IndexError:
+            await message.channel.send("This expression evaluates to nothing")
+    else:
+        await message.channel.send("Invalid parentheses")
 
 async def CLEAR(message,message2,serverinfo,playerinfo):
     await message.channel.purge(limit=100)

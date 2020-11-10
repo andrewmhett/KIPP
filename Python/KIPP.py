@@ -76,95 +76,94 @@ async def background_loop():
             os.system('sudo echo "{0} {1}" >> $KIPP_DIR/log.txt'.format(datetime.datetime.strftime(datetime.datetime.now(),"[%m/%d/%Y %H:%M:%S]"), e))
         await asyncio.sleep(1)
 print("KIPP starting up...")
-while True:
-    @client.event
-    async def on_voice_state_update(member,before, after):
+@client.event
+async def on_voice_state_update(member,before, after):
+    try:
+        server = after.channel.guild
+    except AttributeError:
+        server = before.channel.guild
+    user = server.get_member(KIPP_ID)
+    users = []
+    if before != None and server.get_member(KIPP_ID).voice != None:
+        if before.channel != server.get_member(KIPP_ID).voice.channel:
+            return
+    try:
+        for user in server.get_member(KIPP_ID).voice.channel.members:
+            if user.bot == False:
+                users.append(user)
+        if len(users)==0:
+            currentlyplaying=False
+            if serverinfo[server].mHandler != None:
+                currentlyplaying=serverinfo[server].mHandler.is_playing
+            if currentlyplaying:
+                if serverinfo[server].mHandler.paused == False:
+                    await serverinfo[server].musictextchannel.send("Nobody is listening to KIPP. Pausing music...")
+                    server.voice_client.pause()
+                    serverinfo[server].mHandler.paused = True
+                    serverinfo[server].mHandler.pausedatetime=datetime.now()
+    except AttributeError:
+        print(e)
+@client.event
+async def on_guild_join(server):
+    for member in server.members:
         try:
-            server = after.channel.guild
-        except AttributeError:
-            server = before.channel.guild
-        user = server.get_member(KIPP_ID)
-        users = []
-        if before != None and server.get_member(KIPP_ID).voice != None:
-            if before.channel != server.get_member(KIPP_ID).voice.channel:
-                return
-        try:
-            for user in server.get_member(KIPP_ID).voice.channel.members:
-                if user.bot == False:
-                    users.append(user)
-            if len(users)==0:
-                currentlyplaying=False
-                if serverinfo[server].mHandler != None:
-                    currentlyplaying=serverinfo[server].mHandler.is_playing
-                if currentlyplaying:
-                    if serverinfo[server].mHandler.paused == False:
-                        await serverinfo[server].musictextchannel.send("Nobody is listening to KIPP. Pausing music...")
-                        server.voice_client.pause()
-                        serverinfo[server].mHandler.paused = True
-                        serverinfo[server].mHandler.pausedatetime=datetime.now()
-        except AttributeError:
-            print(e)
-    @client.event
-    async def on_guild_join(server):
-        for member in server.members:
-            try:
-                playerinfo[member]
-            except KeyError:
-                playerinfo[member] = Profile(member)
-        try:
-            serverinfo[server]
+            playerinfo[member]
         except KeyError:
-            serverinfo[server] = Server(server)
-        serverinfo[server].task = client.loop.create_task(serverinfo[server].update_loop())
-    @client.event
-    async def on_guild_remove(server):
-        serverinfo[server].task.cancel()
-    @client.event
-    async def on_ready():
-        client.loop.create_task(background_loop())
-        logging.log(5,"KIPP started.")
-        for server in client.guilds:
-            serverinfo[server] = Server(server)
-            for member in server.members:
-                playerinfo[member] = Profile(member)
-            client.loop.create_task(serverinfo[server].update_loop())
-    @client.event
-    async def on_join(member):
-        server = member.server
-        if member not in playerinfo.keys():
             playerinfo[member] = Profile(member)
-        if serverinfo[server].search_server_configs("WELCOME_CHANNEL") != None:
-            try:
-                await client.get_channel(serverinfo[server].search_server_configs("WELCOME_CHANNEL")[1]).send("Welcome to **{0}**, {1}".format(server, member.mention))
-            except discord.DiscordException:
-               print("Welcome channel was deleted, couldn't send message to welcome channel")
-    @client.event
-    async def on_message(message):
-        global serverinfo
-        global playerinfo
-        if message.author == client.user or message.guild==None:
-            return
-        if message.author.id in serverinfo[message.guild].blocked:
-            return
-        serverinfo[message.guild].recentchannel = message.channel
-        if message.author not in playerinfo.keys():
-            playerinfo[message.author] = Profile(message.author)
-        message2 = str(message.content).upper()
-        if message2[0]=='!' and len(message2)>1:
-            if "|" in message2:
-                c=message2.split("|")[0]
-            else:
-                c=message2
-            for command in commands:
-                if command.Name == c:
-                    client.loop.create_task(command.Execute(message,message2,serverinfo,playerinfo))
-                    return
-            recommendations=difflib.get_close_matches(c[1:],(c.Name[1:] for c in commands))
-            rec_msg="Unable to find and execute `{0}`.".format(c)
-            if len(recommendations)==1:
-                rec_msg+=" Did you mean `!{0}`?".format(recommendations[0])
-            elif len(recommendations)>1:
-                rec_msg+=" Did you mean to use one of these commands?\n`!{0}`".format('\n!'.join(recommendations))
-            await message.channel.send(rec_msg)
+    try:
+        serverinfo[server]
+    except KeyError:
+        serverinfo[server] = Server(server)
+    serverinfo[server].task = client.loop.create_task(serverinfo[server].update_loop())
+@client.event
+async def on_guild_remove(server):
+    serverinfo[server].task.cancel()
+@client.event
+async def on_ready():
+    client.loop.create_task(background_loop())
+    logging.log(5,"KIPP started.")
+    for server in client.guilds:
+        serverinfo[server] = Server(server)
+        for member in server.members:
+            playerinfo[member] = Profile(member)
+        client.loop.create_task(serverinfo[server].update_loop())
+@client.event
+async def on_join(member):
+    server = member.server
+    if member not in playerinfo.keys():
+        playerinfo[member] = Profile(member)
+    if serverinfo[server].search_server_configs("WELCOME_CHANNEL") != None:
+        try:
+            await client.get_channel(serverinfo[server].search_server_configs("WELCOME_CHANNEL")[1]).send("Welcome to **{0}**, {1}".format(server, member.mention))
+        except discord.DiscordException:
+           print("Welcome channel was deleted, couldn't send message to welcome channel")\
+@client.event
+async def on_message(message):
+    global serverinfo
+    global playerinfo
+    if message.author == client.user or message.guild==None:
+        return
+    if message.author.id in serverinfo[message.guild].blocked:
+        return
+    serverinfo[message.guild].recentchannel = message.channel
+    if message.author not in playerinfo.keys():
+        playerinfo[message.author] = Profile(message.author)
+    message2 = str(message.content).upper()
+    if message2[0]=='!' and len(message2)>1:
+        if "|" in message2:
+            c=message2.split("|")[0]
+        else:
+            c=message2
+        for command in commands:
+            if command.Name == c:
+                client.loop.create_task(command.Execute(message,message2,serverinfo,playerinfo))
+                return
+        recommendations=difflib.get_close_matches(c[1:],(c.Name[1:] for c in commands))
+        rec_msg="Unable to find and execute `{0}`.".format(c)
+        if len(recommendations)==1:
+            rec_msg+=" Did you mean `!{0}`?".format(recommendations[0])
+        elif len(recommendations)>1:
+            rec_msg+=" Did you mean to use one of these commands?\n`!{0}`".format('\n!'.join(recommendations))
+        await message.channel.send(rec_msg)
 
-    client.loop.run_until_complete(client.start(TOKEN))
+client.run(TOKEN)

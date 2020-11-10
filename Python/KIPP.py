@@ -136,7 +136,7 @@ async def on_join(member):
         try:
             await client.get_channel(serverinfo[server].search_server_configs("WELCOME_CHANNEL")[1]).send("Welcome to **{0}**, {1}".format(server, member.mention))
         except discord.DiscordException:
-           print("Welcome channel was deleted, couldn't send message to welcome channel")\
+           print("Welcome channel was deleted, couldn't send message to welcome channel")
 @client.event
 async def on_message(message):
     global serverinfo

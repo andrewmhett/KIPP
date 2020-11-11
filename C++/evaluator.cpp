@@ -29,7 +29,7 @@ float evaluate_postfix(queue<string> postfix_queue){
 		postfix_queue.pop();
 		is_operator=false;
 		for (int i=0;i<5;i++){
-			if (operators[i]==token[0]){
+			if (operators[i]==token[0] && token.length()==1){
 				is_operator=true;
 			}
 		}
@@ -66,9 +66,15 @@ queue<string> tokenize_input(string input){
 	queue<string> out_queue;
 	for (int i=0;i<input.length();i++){
 		string token="";
-		if (!isdigit(input[i]) && input[i] != ' '){
+		bool negative_number=false;
+		if (input.length()>i){
+			if (input[i] == '-' && input[i+1] != ' ' && isdigit(input[i+1])){
+				negative_number=true;
+			}
+		}
+		if (!isdigit(input[i]) && input[i] != ' ' && !negative_number){
 			token=input[i];
-		}else if (input[i] != ' '){
+		}else if (input[i] != ' ' || negative_number){
 			while (i<input.length()){
 				token+=input[i];
 				if (i+1==input.length()){
@@ -102,7 +108,7 @@ queue<string> parse_input(string input){
 	while (!token_queue.empty()){
 		string token=token_queue.front();
 		token_queue.pop();
-		if (isdigit(token[0])){
+		if (isdigit(token[0]) || (token[0]=='-' && token.length()>1)){
 			out_queue.push(token);
 		}
 		if (token[0]=='('){
@@ -117,7 +123,7 @@ queue<string> parse_input(string input){
 		}
 		bool is_operator=false;
 		for (int i=0;i<5;i++){
-			if (operators[i]==token[0]){
+			if (operators[i]==token[0] && token.length()==1){
 				is_operator=true;
 				break;
 			}

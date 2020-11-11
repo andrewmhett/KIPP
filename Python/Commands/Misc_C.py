@@ -100,7 +100,7 @@ async def MATH(message,message2,serverinfo,playerinfo):
     if valid_parens:
         output = subprocess.Popen([KIPP_DIR+"/C++/evaluate",infix],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode()
         arr=output.split(": ")
-        if "Segmentation fault" not in arr:
+        if "Segmentation fault" not in output:
             desc=arr[0]+": `"+arr[1].split(" \n")[0]+"`\n"+arr[1].split(" \n")[1]+": `"+arr[2].split(" \n")[0]+"`\n"+"RESULT: `"+arr[2].split(" \n")[1]+"`"
             em=discord.Embed(title="Math Evaluator",description=desc,color=EMBEDCOLOR)
             await message.channel.send(embed=em)

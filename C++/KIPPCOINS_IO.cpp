@@ -16,7 +16,7 @@ struct Account{
 
 void map_data(){
 	ifstream input;
-	input.open("/home/pi/KIPP/C++/KIPPCOINS.bin", ios::binary);		
+	input.open("KIPPCOINS.bin", ios::binary);		
 	vector<Account> accounts_v;
 	char char_buf;
 	while (input >> char_buf){
@@ -33,7 +33,7 @@ void map_data(){
 }
 void write_data(){
 	ofstream output;
-	output.open("/home/pi/KIPP/C++/KIPPCOINS.bin", ios::binary);
+	output.open("KIPPCOINS.bin", ios::binary);
 	for (map<long long, unsigned int>::iterator it = accounts.begin(); it != accounts.end(); ++it){
 		Account write_struct;
 		pair<long long, unsigned int> account = *it;

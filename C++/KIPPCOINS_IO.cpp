@@ -2,6 +2,7 @@
 #include <fstream>
 #include <map>
 #include <vector>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -16,7 +17,9 @@ struct Account{
 
 void map_data(){
 	ifstream input;
-	input.open("$KIPP_DIR/C++/KIPPCOINS.bin", ios::binary);		
+	char* KIPP_PATH;
+	KIPP_PATH=getenv("KIPP_DIR");
+	input.open(KIPP_PATH+"/C++/KIPPCOINS.bin", ios::binary);		
 	vector<Account> accounts_v;
 	char char_buf;
 	while (input >> char_buf){
@@ -32,8 +35,10 @@ void map_data(){
 	}
 }
 void write_data(){
+	char* KIPP_PATH;
+	KIPP_PATH=getenv("KIPP_DIR");
 	ofstream output;
-	output.open("$KIPP_DIR/C++/KIPPCOINS.bin", ios::binary);
+	output.open(KIPP_PATH+"/C++/KIPPCOINS.bin", ios::binary);
 	for (map<long long, unsigned int>::iterator it = accounts.begin(); it != accounts.end(); ++it){
 		Account write_struct;
 		pair<long long, unsigned int> account = *it;

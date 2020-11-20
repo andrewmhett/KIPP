@@ -17,7 +17,7 @@ struct Account{
 
 void map_data(){
 	ifstream input;
-	char* KIPP_PATH;
+	string KIPP_PATH;
 	KIPP_PATH=getenv("KIPP_DIR");
 	input.open(KIPP_PATH+"/C++/KIPPCOINS.bin", ios::binary);		
 	vector<Account> accounts_v;
@@ -35,7 +35,7 @@ void map_data(){
 	}
 }
 void write_data(){
-	char* KIPP_PATH;
+	string KIPP_PATH;
 	KIPP_PATH=getenv("KIPP_DIR");
 	ofstream output;
 	output.open(KIPP_PATH+"/C++/KIPPCOINS.bin", ios::binary);

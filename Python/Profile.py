@@ -24,7 +24,7 @@ class Profile:
         self.instore=False
         self.storepage=None
     def GET_KIPPCOINS(self):
-        return int(subprocess.Popen([KIPP_DIR+"/C++/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])
+        return int(subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])
     def GIVE_KIPPCOINS(self, KC):
-       balance=int(subprocess.Popen([KIPP_DIR+"/C++/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])+KC
+       balance=int(subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])+KC
        subprocess.Popen([KIPP_DIR+"/C++/KIPPCOINS_IO","w",str(self.user.id),str(balance)])

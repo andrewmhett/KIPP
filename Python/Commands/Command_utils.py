@@ -15,7 +15,8 @@ InterstellarQuotes = ["'Do not go gentle into that good night'\n**Professor Bran
 safe_domains=[
     "www.youtube.com",
     "www.youtu.be",
-    "soundcloud.com"
+    "soundcloud.com",
+    "open.spotify.com"
 ]
 
 def sanitize_url(url):

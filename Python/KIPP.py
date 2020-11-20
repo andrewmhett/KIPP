@@ -160,10 +160,14 @@ async def on_message(message):
                 return
         recommendations=difflib.get_close_matches(c[1:],(c.Name[1:] for c in commands))
         rec_msg="Unable to find and execute `{0}`.".format(c)
+        rec=False
         if len(recommendations)==1:
+            rec=True
             rec_msg+=" Did you mean `!{0}`?".format(recommendations[0])
         elif len(recommendations)>1:
+            rec=True
             rec_msg+=" Did you mean to use one of these commands?\n`!{0}`".format('\n!'.join(recommendations))
-        await message.channel.send(rec_msg)
+        if rec:
+            await message.channel.send(rec_msg)
 
 client.run(TOKEN)

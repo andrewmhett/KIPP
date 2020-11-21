@@ -234,7 +234,7 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                         await message.channel.send( "There is no playlist named `{0}`. Use **!PLAYLISTS** to see a list of all playlists in this server.".format(message2.split("PLAYLIST:")[1]))
                 else:
                     await message.channel.send("There is already a playlist playing. In order to play another playlist, please remove the current playlist from the queue.")
-        except Exception as err:
+        except Exception:
             raise
     elif (currentlyplaying == True) and (message.author.voice.channel != message.guild.get_member(KIPP_ID).voice.channel):
         await message.channel.send( "There is a song currently playing in another voice channel ("+str(message.guild.get_member(KIPP_ID).voice.channel)+"). Join that voice channel in order to change the music, or you can wait for that music to end, and run this command again.")
@@ -334,7 +334,6 @@ async def MOVESONG(message,message2,serverinfo,playerinfo):
                 await message.channel.send("Invalid argument: index to move to is out of bounds")
         else:
             await message.channel.send("Invalid argument: index to move from out of bounds")
-                    
 
 async def SKIP(message,message2,serverinfo,playerinfo):
     if await VerifyMusicUser(message,serverinfo):

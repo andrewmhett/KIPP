@@ -104,8 +104,8 @@ class Server:
                     c = datetime.datetime.now()-(self.mHandler.starttime+datetime.timedelta(seconds=self.mHandler.pausetime.seconds))
                 if self.mHandler.paused == False:
                     progress = divmod(c.days * 86400 + c.seconds, 60)
-                    self.mHandler.minutedelta=str(progress).split('(')[1].split(')')[0].split(',')[0]
-                    self.mHandler.seconddelta=str(progress).split('(')[1].split(')')[0].split(', ')[1]
+                    self.mHandler.minutedelta=progress[0]
+                    self.mHandler.seconddelta=progress[1]
                     if len(str(self.mHandler.seconddelta)) == 1:
                         self.mHandler.seconddelta='0'+str(self.mHandler.seconddelta)
                     self.mHandler.hours=int(int(self.mHandler.minutedelta)/60)

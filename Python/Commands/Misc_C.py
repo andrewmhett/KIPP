@@ -16,7 +16,7 @@ async def FACEDETECT(message,message2,serverinfo,playerinfo):
             else:
                 await message.channel.send("1 face was detected.")
             file = discord.File("out_0.bmp", filename="out.png")
-            await message.channel.send(file=file) 
+            await message.channel.send(file=file)
         else:
             await message.channel.send("No faces were detected.")
     else:
@@ -35,9 +35,9 @@ async def CODE(message,message2,serverinfo,playerinfo):
     except discord.DiscordException:
         commit_msg = 'The newest commit was too large to be displayed here.\n'
     emb.color=EMBEDCOLOR
-    emb.description="{0} My code is backed up on GitHub [here](https://github.com/andrewmhett/KIPP)\nAlso, my code has been reviewed by Codacy [here](https://app.codacy.com/project/LockdownDoom/KIPP/dashboard?branchId=10423847)".format(commit_msg)
+    emb.description="{0} My code is backed up on GitHub [here](https://github.com/andrewmhett/KIPP)\nAlso, my code has been reviewed by Codacy [here](https://app.codacy.com/gh/andrewmhett/KIPP/dashboard?branch=master)".format(commit_msg)
     await message.channel.send(embed=emb)
-    
+
 def locate_image(message2,queue):
     url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(message2.split('|')[1].replace(' ','+').replace("'","%27"),message2.split('|')[1].replace(' ','+').replace("'","%27"))
     headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
@@ -86,15 +86,28 @@ async def STATUS(message,message2,serverinfo,playerinfo):
     await message.channel.send("```"+stdout.split('ago')[0]+"ago```")
 
 async def MATH(message,message2,serverinfo,playerinfo):
-    mathP = str(message.content)
-    mathP2 = mathP.split('|')
-    math = str(mathP2[1])
-    try:
-        mathT = eval(math)
-    except SyntaxError:
-        await message.channel.send( "Sorry, KIPP failed to process this request.")
-    msg = str(math)+" = "+str(mathT)
-    await message.channel.send( msg)
+    infix = str(message.content.split("|")[1])
+    value_dict={"(":1,")":-1}
+    valid_parens=True
+    counter=0
+    for char in infix:
+        if char == "(" or char == ")":
+            counter+=value_dict[char]
+            if counter<0:
+                valid_parens=False
+    if counter != 0:
+        valid_parens=False
+    if valid_parens:
+        output = subprocess.Popen([KIPP_DIR+"/C++/evaluate",infix],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode()
+        arr=output.split(": ")
+        desc=arr[0]+": `"+arr[1].split(" \n")[0]+"`\n"+arr[1].split(" \n")[1]+": `"+arr[2].split(" \n")[0]+"`\n"+"RESULT: `"+arr[2].split(" \n")[1]+"`"
+        if arr[2].split(" \n")[1] != "":
+            em=discord.Embed(title="Math Evaluator",description=desc,color=EMBEDCOLOR)
+            await message.channel.send(embed=em)
+        else:
+            await message.channel.send("Unable to evaluate this expression.")
+    else:
+        await message.channel.send("Invalid parentheses")
 
 async def CLEAR(message,message2,serverinfo,playerinfo):
     await message.channel.purge(limit=100)

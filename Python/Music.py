@@ -99,7 +99,7 @@ class music_handler:
         self.volume_data.append(data)
         if len(self.volume_data)>50:
             self.volume_data.pop(0)
-        return data 
+        return data
     def skip(self):
         self.server.voice_client.stop()
         self.player.is_live=False

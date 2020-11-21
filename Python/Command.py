@@ -16,6 +16,20 @@ playerinfo={}
 
 class Command:
     def __init__(self,n,h,e,a_types):
+        """Wrapper class for KIPP's commands
+
+        :param n: the name of the command
+        :type n: <str>
+
+        :param h: the help string of the command
+        :type n: <str>
+
+        :param e: the command's executable function
+        :type e: <method>
+
+        :param a_types: a list of the expected argument types
+        :type a_types: <list>
+        """
         self.Help=h,
         self.exe=e,
         self.Name=n

@@ -7,7 +7,16 @@ from .Command_utils import *
 from Command import *
 
 async def MINE(message,message2,serverinfo,playerinfo):
-    playerinfo[message.author].GIVE_KIPPCOINS(1)
+    amount_mined=1
+    if playerinfo[message.author].HAS_ITEM(1):
+        amount_mined*=2
+    if playerinfo[message.author].HAS_ITEM(2):
+        amount_mined*=4
+    if playerinfo[message.author].HAS_ITEM(3):
+        amount_mined*=8
+    if playerinfo[message.author].HAS_ITEM(4):
+        amount_mined*=16
+    playerinfo[message.author].GIVE_KIPPCOINS(amount_mined) 
 
 async def TRANSFER(message,message2,serverinfo,playerinfo):
     try:
@@ -51,6 +60,97 @@ async def GAMBLEGAME(message,message2,serverinfo,playerinfo):
             playerinfo[message.author].gamblemessage=message1
             playerinfo[opponent].gamblemessage=message1
 
+async def INVENTORY(message,message2,serverinfo,playerinfo):
+    items=subprocess.Popen(["sudo","cat",KIPP_DIR+"/C++/SHOP_ITEMS.txt"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+    item_index=0
+    em=discord.Embed(title="Inventory",color=EMBEDCOLOR,description="")
+    for item in items:
+        if len(item)>0:
+            item_index+=1
+            if playerinfo[message.author].HAS_ITEM(item_index):
+                em.description+="\n`{0}`".format(item.split(":")[0])
+    if len(em.description)==0:
+        em.description="You don't own any items."
+    await message.channel.send(embed=em)
+
+async def BUY(message,message2,serverinfo,playerinfo):
+    item_dict={}
+    items=subprocess.Popen(["sudo","cat",KIPP_DIR+"/C++/SHOP_ITEMS.txt"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+    for item in items:
+        if len(item)>0:
+            item_dict[item.split(":")[0]]=int(item.split(":")[1])
+    item_index=0
+    purchase_index=int(message2.split("|")[1])
+    if purchase_index<0 or purchase_index>len(items):
+        await message.channel.send("Invalid item index.")
+        return
+    if playerinfo[message.author].HAS_ITEM(purchase_index):
+        await message.channel.send("You already own this item.")
+        return
+    playerinfo[message.author].shop_message=None
+    for item in items:
+        if len(item)>0:
+            item_index+=1
+            name=item.split(":")[0]
+            if item_dict[name]<=playerinfo[message.author].GET_KIPPCOINS() and purchase_index==item_index:
+                playerinfo[message.author].GIVE_ITEM(item_index)
+                playerinfo[message.author].GIVE_KIPPCOINS(-1*item_dict[name])
+                await message.channel.send("Successfully purchased `{0}`. Your new KC balance stands at `{1} KC`".format(name,playerinfo[message.author].GET_KIPPCOINS()))
+                if playerinfo[message.author].shop_message != None:
+                    await message.channel.delete(playerinfo[message.author].shop_message)
+                return
+    await message.channel.send("You cannot afford this item. Use `!MINE` in order to mine KC.")
+
+async def SHOP(message,message2,serverinfo,playerinfo):
+    item_dict={}
+    items=subprocess.Popen(["sudo","cat",KIPP_DIR+"/C++/SHOP_ITEMS.txt"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+    in_budget=[]
+    out_of_budget=[]
+    for item in items:
+        if len(item)>0:
+            item_dict[item.split(":")[0]]=int(item.split(":")[1])
+    em=discord.Embed(title="Shop",color=EMBEDCOLOR)
+    em.description="```#  NAME                      PRICE\n"
+    item_index=0
+    for item in items:
+        if len(item)>0:
+            item_index+=1
+            name=item.split(":")[0]
+            if item_dict[name]<=playerinfo[message.author].GET_KIPPCOINS():
+                if not playerinfo[message.author].HAS_ITEM(item_index):
+                    in_budget.append([name,item_index])
+            else:
+                if not playerinfo[message.author].HAS_ITEM(item_index):
+                    out_of_budget.append([name,item_index])
+    if len(in_budget)>0:
+        em.description+="-------------IN BUDGET------------"
+        for item in in_budget:
+            em.description+="\n{0}".format(item[1])+"  "
+            em.description+="{0}".format(item[0])+(" "*(26-len(item[0])))
+            em.description+="{0}".format(item_dict[item[0]])
+        em.description+="\n"
+    if len(out_of_budget)>0:
+        em.description+="-----------OUT OF BUDGET----------"
+        for item in out_of_budget:
+            em.description+="\n{0}".format(item[1])+"  "
+            em.description+="{0}".format(item[0])+(" "*(26-len(item[0])))
+            em.description+="{0}".format(item_dict[item[0]])
+        em.description+="\n"
+    em.description+="```In order to buy an item, use `!BUY|item number`\n(the item number is listed in the left column)"
+    if len(in_budget)==0 and len(out_of_budget)==0:
+        em.description="You have purchased every item in the shop."
+    elif len(in_budget)==0:
+        em.description+="\n__It looks like you can't afford any items in the shop.__\nUse `!MINE` to mine KC."
+    playerinfo[message.author].shop_message = await message.channel.send(embed=em)
+
+async def BALANCE(message,message2,serverinfo,playerinfo):
+    em=discord.Embed(title="KIPPCOIN Balance",description="Balance: `{0} KC`".format(playerinfo[message.author].GET_KIPPCOINS()),color=EMBEDCOLOR)
+    await message.channel.send(embed=em)
+
 command["!MINE"]=KIPC("!MINE","This command stacks all of your KIPPCOIN multipliers and adds that amount of KIPPCOINS to your account. This command will not return any message\n!MINE",MINE,[])
 command["!TRANSFER"]=KIPC("!TRANSFER","This command will transfer a given amount of KIPPCOINS from your account to another account\n!TRANSFER|amount|receiver",TRANSFER,[int,str])
 command["!GAMBLEGAME"]=KIPC("!GAMBLEGAME","This command will start either a solo or multiplayer gambling game involving KIPPCOINS\n!GAMBLEGAME|'SOLO' or opponent user",GAMBLEGAME,[str])
+command["!SHOP"]=KIPC("!SHOP","Opens the KIPPCOIN shop\n!SHOP",SHOP,[])
+command["!BUY"]=KIPC("!BUY","Purchases an item from the shop\n!BUY|item number",BUY,[int])
+command["!INVENTORY"]=KIPC("!INVENTORY","Displays your inventory\n!INVENTORY",INVENTORY,[])
+command["!BALANCE"]=KIPC("!BALANCE","Displays your KIPPCOIN balance\n!BALANCE",BALANCE,[])

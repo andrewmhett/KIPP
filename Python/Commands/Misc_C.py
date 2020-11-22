@@ -71,13 +71,6 @@ async def IMAGE(message,message2,serverinfo,playerinfo):
     else:
         await send_image(message,image,"Image")
 
-async def USERINFO(message,message2,serverinfo,playerinfo):
-    description = "**Currently Playing:** "+str(message.author.activity)+"\n**KIPPCOINS:** "+str(playerinfo[message.author].GET_KIPPCOINS())
-    em = discord.Embed(description=description,colour=EMBEDCOLOR)
-    em.set_author(name=str(message.author), icon_url=message.author.avatar_url)
-    em.set_footer(text=get_footer())
-    await message.channel.send( embed=em)
-
 async def STATUS(message,message2,serverinfo,playerinfo):
     from subprocess import Popen, PIPE
     p=Popen(KIPP_DIR+'/Bash/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)
@@ -155,7 +148,6 @@ async def COINFLIP(message,message2,serverinfo,playerinfo):
 command["!IQ"]=MISC("!IQ","IQ stands for Interstellar Quote. This command will send a random Interstellar quote\n!IQ",IQ,[])
 command["!CODE"]=MISC("!CODE","This command will give information about KIPP's code\n!CODE",CODE,[])
 command["!IMAGE"]=MISC("!IMAGE","This command will return an image of the given search query\n!IMAGE|search",IMAGE,[str])
-command["!USERINFO"]=MISC("!USERINFO","This command will return useful user-specific information\n!USERINFO",USERINFO,[])
 command["!STATUS"]=MISC("!STATUS","Shows KIPP's Daemon's current status\n!STATUS",STATUS,[])
 command["!MATH"]=MISC("!MATH","This command will return the answer to any basic math problem given\n!MATH|problem",MATH,[str])
 command["!CLEAR"]=MISC("!CLEAR","This command will clear the last 100 messages sent in the channel\n!CLEAR",CLEAR,[])

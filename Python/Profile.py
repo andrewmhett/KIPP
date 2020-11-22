@@ -14,17 +14,31 @@ class Profile:
         self.gamblerequest=False
         self.challenger=None
         self.betting=False
-        self.numkippservers = 0
-        self.game = ""
-        self.highestrole = ""
-        self.nickname = ""
-        self.hrolecolor = None
-        self.streaming = False
         self.user = user
-        self.instore=False
-        self.storepage=None
+        self.shop_message=None
     def GET_KIPPCOINS(self):
         return int(subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])
     def GIVE_KIPPCOINS(self, KC):
        balance=int(subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])+KC
        subprocess.Popen([KIPP_DIR+"/C++/KIPPCOINS_IO","w",str(self.user.id),str(balance)])
+    def GIVE_ITEM(self, shop_index):
+        bin_data=str(bin(int(subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/ITEMS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])))
+        bin_data=bin_data.split("0b")[1]
+        bin_data[::-1]
+        while shop_index>len(bin_data):
+            bin_data=bin_data+'0'
+        out_bin=""
+        for i in range(len(bin_data)):
+            if i == shop_index-1:
+                out_bin+='1'
+            else:
+                out_bin+=bin_data[i]
+        out_bin[::-1]
+        subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/ITEMS_IO","w",str(self.user.id),str(int(out_bin,2))],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    def HAS_ITEM(self, shop_index):
+        bin_data=str(bin(int(subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/ITEMS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])))
+        bin_data=bin_data.split("0b")[1]
+        if (shop_index>len(bin_data)):
+            return False
+        bin_data[::-1]
+        return bool(int(bin_data[shop_index-1]))

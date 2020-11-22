@@ -5,9 +5,8 @@ sys.path.append(KIPP_DIR+"/Python")
 from ESSENTIAL_PACKAGES import *
 from .Command_utils import *
 from Command import *
-import threading
 
-def mine_kippcoins(message,message2,serverinfo,playerinfo):
+async def MINE(message,message2,serverinfo,playerinfo):
     amount_mined=1
     if playerinfo[message.author].HAS_ITEM(1):
         amount_mined*=2
@@ -18,9 +17,6 @@ def mine_kippcoins(message,message2,serverinfo,playerinfo):
     if playerinfo[message.author].HAS_ITEM(4):
         amount_mined*=16
     playerinfo[message.author].GIVE_KIPPCOINS(amount_mined) 
-
-async def MINE(message,message2,serverinfo,playerinfo):
-    threading.Thread(target=mine_kippcoins,args=[message,message2,serverinfo,playerinfo]).start()
 
 async def TRANSFER(message,message2,serverinfo,playerinfo):
     try:

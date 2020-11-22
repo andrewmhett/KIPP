@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Quake Champions
-Comment=Play this game on Steam
-Exec=steam steam://rungameid/611500
-Icon=steam_icon_611500
-Terminal=false
-Type=Application
-Categories=Game;

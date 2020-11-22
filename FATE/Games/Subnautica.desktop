@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Subnautica
-Comment=Play this game on Steam
-Exec=steam steam://rungameid/264710
-Icon=steam_icon_264710
-Terminal=false
-Type=Application
-Categories=Game;

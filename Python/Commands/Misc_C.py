@@ -145,6 +145,21 @@ async def COINFLIP(message,message2,serverinfo,playerinfo):
     else:
         await message.channel.send("Tails")
 
+async def FATE(message,message2,serverinfo,playerinfo):
+    imgs=os.listdir(KIPP_DIR+"/FATE")
+    arrlen = int(len(imgs))
+    picNum = SystemRandom().randrange(0,arrlen)
+    yakub=False
+    if "YAKUB" in imgs[picNum].upper():
+        yakub=True
+    await message.channel.send(file=discord.File(KIPP_DIR+"/FATE/"+imgs[picNum]))
+    if yakub==True or message.author.id==289985985243119616:
+        msg = "You will see Yakub. You will live."
+        await message.channel.send(msg)
+    else:
+        msg = "You will die."
+        await message.channel.send(msg)
+
 command["!IQ"]=MISC("!IQ","IQ stands for Interstellar Quote. This command will send a random Interstellar quote\n!IQ",IQ,[])
 command["!CODE"]=MISC("!CODE","This command will give information about KIPP's code\n!CODE",CODE,[])
 command["!IMAGE"]=MISC("!IMAGE","This command will return an image of the given search query\n!IMAGE|search",IMAGE,[str])
@@ -156,3 +171,4 @@ command["!BLOCKEDLIST"]=MISC("!BLOCKEDLIST","This command will return a list of 
 command["!AVATAR"]=MISC("!AVATAR","This command will return the full-size avatar picture of the given user\n!AVATAR|user",AVATAR,[str])
 command["!FACEDETECT"]=MISC("!FACEDETECT","This command utilizes an Intel Neural Compute Stick 2 in order to process an image to detect a face\n!FACEDETECT|link to image",FACEDETECT,[str])
 command["!COINFLIP"]=MISC("!COINFLIP","Flip a coin and return either Heads or Tails\n!COINFLIP",COINFLIP,[])
+command["FATE"]=MISC("!FATE","Shows your fate. A very low chance of getting Yakub.\n!FATE",FATE,[])

@@ -1,0 +1,7 @@
+
+[Desktop Entry]
+Type=Application
+Name=Origin
+Icon=lutris_origin
+Exec=lutris lutris:rungameid/1
+Categories=Game

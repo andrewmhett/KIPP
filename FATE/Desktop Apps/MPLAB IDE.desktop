@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Type=Application
+Name=MPLAB_IDE
+Exec="/opt/microchip/mplabx/v5.40/mplab_platform/bin/mplab_ide"
+Icon=/opt/microchip/mplab.png
+Categories=Application;
+Name[en_US]=MPLAB IDE

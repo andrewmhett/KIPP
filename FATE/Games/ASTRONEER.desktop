@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=ASTRONEER
+Comment=Play this game on Steam
+Exec=steam steam://rungameid/361420
+Icon=steam_icon_361420
+Terminal=false
+Type=Application
+Categories=Game;

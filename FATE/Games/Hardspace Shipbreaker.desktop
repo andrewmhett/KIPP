@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Hardspace: Shipbreaker
+Comment=Play this game on Steam
+Exec=steam steam://rungameid/1161580
+Icon=steam_icon_1161580
+Terminal=false
+Type=Application
+Categories=Game;

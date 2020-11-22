@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Type=Application
+Name=Visual_Paradigm_16.1
+Exec="/home/andrew/Visual_Paradigm_16.1/bin/Visual_Paradigm" %U
+Icon=/home/andrew/Visual_Paradigm_16.1/.install4j/Visual_Paradigm.png
+Categories=Application;
+StartupWMClass=install4j-RV
+Name[en_US]=Visual Paradigm

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Alien: Isolation
+Comment=Play this game on Steam
+Exec=steam steam://rungameid/214490
+Icon=steam_icon_214490
+Terminal=false
+Type=Application
+Categories=Game;

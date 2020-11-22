@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=The Talos Principle VR
+Comment=Play this game on Steam
+Exec=steam steam://rungameid/552440
+Icon=steam_icon_552440
+Terminal=false
+Type=Application
+Categories=Game;

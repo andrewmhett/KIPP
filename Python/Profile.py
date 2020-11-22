@@ -23,7 +23,8 @@ class Profile:
        subprocess.Popen([KIPP_DIR+"/C++/KIPPCOINS_IO","w",str(self.user.id),str(balance)])
     def GIVE_ITEM(self, shop_index):
         bin_data=str(bin(int(subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/ITEMS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])))
-        bin_data=bin_data.split("0b")[1]
+        print(bin_data)
+        bin_data=bin_data.split("0b")[1][::-1]
         while shop_index>len(bin_data):
             bin_data=bin_data+'0'
         out_bin=""

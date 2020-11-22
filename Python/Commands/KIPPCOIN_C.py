@@ -5,8 +5,9 @@ sys.path.append(KIPP_DIR+"/Python")
 from ESSENTIAL_PACKAGES import *
 from .Command_utils import *
 from Command import *
+import threading
 
-async def MINE(message,message2,serverinfo,playerinfo):
+def mine_kippcoins(message,message2,serverinfo,playerinfo):
     amount_mined=1
     if playerinfo[message.author].HAS_ITEM(1):
         amount_mined*=2
@@ -17,6 +18,9 @@ async def MINE(message,message2,serverinfo,playerinfo):
     if playerinfo[message.author].HAS_ITEM(4):
         amount_mined*=16
     playerinfo[message.author].GIVE_KIPPCOINS(amount_mined) 
+
+async def MINE(message,message2,serverinfo,playerinfo):
+    threading.Thread(target=mine_kippcoins,args=[message,message2,serverinfo,playerinfo]).start()
 
 async def TRANSFER(message,message2,serverinfo,playerinfo):
     try:
@@ -40,7 +44,7 @@ async def TRANSFER(message,message2,serverinfo,playerinfo):
 async def GAMBLEGAME(message,message2,serverinfo,playerinfo):
     if message2.split('|')[1] == "SOLO":
         playerinfo[message.author].solo = True
-        emb = discord.Embed(title="Solo GambleGame",description="Use **!SELECT|color** to choose a color:\n**Red**\n**Blue**\n**Green**\n**Black**",colour=EMBEDCOLOR)
+        emb = discord.Embed(title="Solo GambleGame",description="Use `!SELECT|color` to choose a color:\n`Red`\n`Blue`\n`Green`\n`Black`",colour=EMBEDCOLOR)
         emb.set_footer(text=get_footer())
         message1=await message.channel.send(embed=emb)
         playerinfo[message.author].gamblemessage=message1
@@ -60,16 +64,56 @@ async def GAMBLEGAME(message,message2,serverinfo,playerinfo):
             playerinfo[message.author].gamblemessage=message1
             playerinfo[opponent].gamblemessage=message1
 
+def to_roman_numeral(num):
+    numeralMap = {
+      1:"I",
+      4:"IV",
+      5:"V",
+      9:"IX",
+      10:"X",
+      40:"XL",
+      45:"XLV",
+      50:"L",
+      90:"XC",
+      100:"C",
+      400:"CD",
+      500:"D",
+      900:"CM",
+      1000:"M"
+    }
+    keys=list(numeralMap.keys())
+    index=13
+    output=""
+    while num != 0:
+        while (num/keys[index])>=1:
+          num-=keys[index];
+          output+=numeralMap[keys[index]];
+        index-=1;
+    return output
+
 async def INVENTORY(message,message2,serverinfo,playerinfo):
     items=subprocess.Popen(["sudo","cat",KIPP_DIR+"/C++/SHOP_ITEMS.txt"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
     item_index=0
     em=discord.Embed(title="Inventory",color=EMBEDCOLOR,description="")
+    plaques=[]
     for item in items:
         if len(item)>0:
             item_index+=1
             if playerinfo[message.author].HAS_ITEM(item_index):
-                em.description+="\n`{0}`".format(item.split(":")[0])
-    if len(em.description)==0:
+                if "PLAQUE" in item:
+                    plaques.append(item.split("KIPP YEAR ")[1].split(" PLAQUE")[0])
+                else:
+                    em.description+="\n`{0}`".format(item.split(":")[0])
+    if len(plaques)>0:
+        plaque_str=""
+        for plaque_num in plaques:
+            roman_numeral_row="YEAR {0}".format(to_roman_numeral(int(plaque_num)))
+            padding="="*int((20-len(roman_numeral_row))/2)
+            roman_numeral_row=padding+roman_numeral_row+padding
+            roman_numeral_row+="="*(20-len(roman_numeral_row))
+            plaque_str+="\n```+--------------------+\n|========KIPP========|\n|{0}|\n|=December 1st, {1}=|\n+--------------------+```".format(roman_numeral_row,str(2017+int(plaque_num)))
+        em.add_field(name="Plaques",value=plaque_str)
+    if len(em.description)==0 and len(plaques)==0:
         em.description="You don't own any items."
     await message.channel.send(embed=em)
 
@@ -81,7 +125,7 @@ async def BUY(message,message2,serverinfo,playerinfo):
             item_dict[item.split(":")[0]]=int(item.split(":")[1])
     item_index=0
     purchase_index=int(message2.split("|")[1])
-    if purchase_index<0 or purchase_index>len(items):
+    if purchase_index<0 or purchase_index>len(items) or items[purchase_index-1].split(":")[2]=='0':
         await message.channel.send("Invalid item index.")
         return
     if playerinfo[message.author].HAS_ITEM(purchase_index):
@@ -110,17 +154,16 @@ async def SHOP(message,message2,serverinfo,playerinfo):
         if len(item)>0:
             item_dict[item.split(":")[0]]=int(item.split(":")[1])
     em=discord.Embed(title="Shop",color=EMBEDCOLOR)
-    em.description="```#  NAME                      PRICE\n"
+    em.description="Current balance: `{0} KC`\n```#  NAME                      PRICE\n".format(playerinfo[message.author].GET_KIPPCOINS())
     item_index=0
     for item in items:
         if len(item)>0:
             item_index+=1
             name=item.split(":")[0]
-            if item_dict[name]<=playerinfo[message.author].GET_KIPPCOINS():
-                if not playerinfo[message.author].HAS_ITEM(item_index):
+            if not playerinfo[message.author].HAS_ITEM(item_index) and items[item_index-1].split(":")[2]=='1':
+                if item_dict[name]<=playerinfo[message.author].GET_KIPPCOINS():
                     in_budget.append([name,item_index])
-            else:
-                if not playerinfo[message.author].HAS_ITEM(item_index):
+                else:
                     out_of_budget.append([name,item_index])
     if len(in_budget)>0:
         em.description+="-------------IN BUDGET------------"

@@ -24,7 +24,6 @@ class Profile:
     def GIVE_ITEM(self, shop_index):
         bin_data=str(bin(int(subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/ITEMS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])))
         bin_data=bin_data.split("0b")[1]
-        bin_data[::-1]
         while shop_index>len(bin_data):
             bin_data=bin_data+'0'
         out_bin=""
@@ -33,12 +32,13 @@ class Profile:
                 out_bin+='1'
             else:
                 out_bin+=bin_data[i]
-        out_bin[::-1]
+        out_bin=out_bin[::-1]
+        print(out_bin)
         subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/ITEMS_IO","w",str(self.user.id),str(int(out_bin,2))],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
     def HAS_ITEM(self, shop_index):
         bin_data=str(bin(int(subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/ITEMS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])))
         bin_data=bin_data.split("0b")[1]
         if (shop_index>len(bin_data)):
             return False
-        bin_data[::-1]
+        bin_data=bin_data[::-1]
         return bool(int(bin_data[shop_index-1]))

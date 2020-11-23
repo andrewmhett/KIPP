@@ -190,6 +190,36 @@ async def BALANCE(message,message2,serverinfo,playerinfo):
     em=discord.Embed(title="KIPPCOIN Balance",description="Balance: `{0} KC`".format(playerinfo[message.author].GET_KIPPCOINS()),color=EMBEDCOLOR)
     await message.channel.send(embed=em)
 
+async def STOCKS(message,message2,serverinfo,playerinfo):
+    em=discord.Embed(title="KIPPCOIN Stocks",color=EMBEDCOLOR)
+    markets=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/STOCKS_IO","r","a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode()
+    markets=markets.split("\n")
+    markets_string="```NAME    CHANGE          KC/SHARE    # SHARES"
+    stock_deltas=subprocess.Popen(["sudo","cat",KIPP_DIR+"/STOCKS.txt"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+    market_change_map={}
+    for stock in stock_deltas:
+        if len(stock)>0:
+            market_change_map[stock.split(":")[0]]=int(stock.split(":")[1])
+    for market in markets:
+        if len(market)>0:
+            market_row="\n"+market.split(":")[0]+"    "
+            per_share_price=market.split(":")[1].split(" ")[2]
+            kc_change=market_change_map[market.split(":")[0]]
+            if int(kc_change)>0:
+                kc_change="+"+str(kc_change)
+            try:
+                percent_change=round(100*(int(kc_change)/(int(per_share_price)-int(kc_change))),1)
+            except ZeroDivisionError:
+                percent_change=0
+            change_string=str(kc_change)+(" "*(7-len(str(kc_change))))+"("+('+' if percent_change>0 else '')+str(percent_change)+"%)"
+            market_row+=change_string+(" "*(16-len(change_string)))
+            market_row+=per_share_price+(" "*(12-len(per_share_price)))
+            market_row+=market.split(" ")[1]
+            markets_string+=market_row
+    markets_string+="```"
+    em.add_field(name="Markets",value=markets_string)
+    await message.channel.send(embed=em)
+
 command["!MINE"]=KIPC("!MINE","This command stacks all of your KIPPCOIN multipliers and adds that amount of KIPPCOINS to your account. This command will not return any message\n!MINE",MINE,[])
 command["!TRANSFER"]=KIPC("!TRANSFER","This command will transfer a given amount of KIPPCOINS from your account to another account\n!TRANSFER|amount|receiver",TRANSFER,[int,str])
 command["!GAMBLEGAME"]=KIPC("!GAMBLEGAME","This command will start either a solo or multiplayer gambling game involving KIPPCOINS\n!GAMBLEGAME|'SOLO' or opponent user",GAMBLEGAME,[str])
@@ -197,3 +227,4 @@ command["!SHOP"]=KIPC("!SHOP","Opens the KIPPCOIN shop\n!SHOP",SHOP,[])
 command["!BUY"]=KIPC("!BUY","Purchases an item from the shop\n!BUY|item number",BUY,[int])
 command["!INVENTORY"]=KIPC("!INVENTORY","Displays your inventory\n!INVENTORY",INVENTORY,[])
 command["!BALANCE"]=KIPC("!BALANCE","Displays your KIPPCOIN balance\n!BALANCE",BALANCE,[])
+command["!STOCKS"]=KIPC("!STOCKS","Displays relevant stock market information\n!STOCKS",STOCKS,[])

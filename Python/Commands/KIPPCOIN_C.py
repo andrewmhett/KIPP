@@ -205,13 +205,13 @@ async def STOCKS(message,message2,serverinfo,playerinfo):
             market_row="\n"+market.split(":")[0]+"    "
             per_share_price=market.split(":")[1].split(" ")[2]
             kc_change=market_change_map[market.split(":")[0]]
-            if int(kc_change)>0:
+            if int(kc_change)>=0:
                 kc_change="+"+str(kc_change)
             try:
                 percent_change=round(100*(int(kc_change)/(int(per_share_price)-int(kc_change))),1)
             except ZeroDivisionError:
                 percent_change=0
-            change_string=str(kc_change)+(" "*(7-len(str(kc_change))))+"("+('+' if percent_change>0 else '')+str(percent_change)+"%)"
+            change_string=str(kc_change)+(" "*(7-len(str(kc_change))))+"("+('+' if percent_change>=0 else '')+str(percent_change)+"%)"
             market_row+=change_string+(" "*(16-len(change_string)))
             market_row+=per_share_price+(" "*(12-len(per_share_price)))
             market_row+=market.split(" ")[1]

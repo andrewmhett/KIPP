@@ -328,6 +328,51 @@ async def SHARES(message,message2,serverinfo,playerinfo):
     em.add_field(name="Shares You can Afford",value=afford_string,inline=False)
     await message.channel.send(embed=em)
 
+async def STONKS(message,message2,serverinfo,playerinfo):
+    await STOCKS(message,message2,serverinfo,playerinfo)
+
+async def LEADERBOARD(message,message2,serverinfo,playerinfo):
+    net_worth_dict={}
+    market_value_map={}
+    for member in message.guild.members:
+        if not member.bot:
+            shares=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/SHARES_IO","r",str(message.author.id),"a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+            markets=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/STOCKS_IO","r","a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+            for market in markets:
+                if len(market)>0:
+                    market_value_map[market.split(":")[0]]=int(market.split(":")[1].split(" ")[2])
+            net_worth=0
+            net_worth+=playerinfo[member].GET_KIPPCOINS()
+            for share in shares:
+                if len(share)>0:
+                    net_worth+=market_value_map[share.split(":")[0]]*int(share.split(": ")[1])
+            net_worth_dict[member.id]=[str(member),net_worth]
+    net_worth_dict=sorted(net_worth_dict.items(), key=lambda item: item[1])
+    position=0
+    leaderboard_string="```#  USERNAME            KC NET WTH\n---------------------------------"
+    for pair in net_worth_dict:
+        if position<10:
+            position+=1
+            leaderboard_string+="\n{0}".format(position)+(" "*(3-len(str(position))))
+            display_name=pair[1][0]
+            if len(display_name)>17:
+                name_sections=["#".join(display_name.split("#")[0:-1]),display_name.split("#")[-1]]
+                name_sections[0]=name_sections[0][0:7]+"...#"
+                display_name="".join(name_sections)
+            leaderboard_string+=display_name
+            leaderboard_string+=" "*(20-len(display_name))
+            leaderboard_string+=str(pair[1][1])
+        else:
+            break
+    if len(net_worth_dict)<10:
+        num=len(net_worth_dict)
+        for i in range(10-num):
+            leaderboard_string+="\n{0}".format(num+i+1)+(" "*(3-len(str(num+i+1))))+"_____               _____"
+    leaderboard_string+="```"
+    em=discord.Embed(title="KIPPCOIN Leaderboard",color=EMBEDCOLOR)
+    em.description=leaderboard_string
+    await message.channel.send(embed=em)
+
 command["!MINE"]=KIPC("!MINE","This command stacks all of your KIPPCOIN multipliers and adds that amount of KIPPCOINS to your account. This command will not return any message\n!MINE",MINE,[])
 command["!TRANSFER"]=KIPC("!TRANSFER","This command will transfer a given amount of KIPPCOINS from your account to another account\n!TRANSFER|amount|receiver",TRANSFER,[int,str])
 command["!GAMBLEGAME"]=KIPC("!GAMBLEGAME","This command will start either a solo or multiplayer gambling game involving KIPPCOINS\n!GAMBLEGAME|'SOLO' or opponent user",GAMBLEGAME,[str])
@@ -336,6 +381,8 @@ command["!BUY"]=KIPC("!BUY","Purchases an item from the shop\n!BUY|item number",
 command["!INVENTORY"]=KIPC("!INVENTORY","Displays your inventory\n!INVENTORY",INVENTORY,[])
 command["!BALANCE"]=KIPC("!BALANCE","Displays your KIPPCOIN balance\n!BALANCE",BALANCE,[])
 command["!STOCKS"]=KIPC("!STOCKS","Displays relevant stock market information\n!STOCKS",STOCKS,[])
+command["!STONKS"]=KIPC("!STONKS","An alias for `!STOCKS`\n!STONKS",STONKS,[])
 command["!SHARES"]=KIPC("!SHARES","Displays information about the stock shares you own\n!SHARES",SHARES,[])
 command["!BUYSHARES"]=KIPC("!BUYSHARES","Buys a specified number of shares from a specified market\n!BUYSHARES|market name|number of shares",BUYSHARES,[str,int])
 command["!SELLSHARES"]=KIPC("!SELLSHARES","Sells a specified number of shares from a specified market\n!SELLSHARES|market name|number of shares",SELLSHARES,[str,int])
+command["!LEADERBOARD"]=KIPC("!LEADERBOARD","Displays a KIPPCOIN net worth leaderboard\n!LEADERBOARD",LEADERBOARD,[])

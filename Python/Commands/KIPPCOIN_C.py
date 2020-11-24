@@ -340,7 +340,7 @@ async def LEADERBOARD(message,message2,serverinfo,playerinfo):
             market_value_map[market.split(":")[0]]=int(market.split(":")[1].split(" ")[2])
     for member in message.guild.members:
         if not member.bot:
-            shares=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/SHARES_IO","r",str(message.author.id),"a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+            shares=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/SHARES_IO","r",str(member.id),"a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
             net_worth=0
             net_worth+=playerinfo[member].GET_KIPPCOINS()
             for share in shares:

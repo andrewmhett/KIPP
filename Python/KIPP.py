@@ -33,31 +33,27 @@ intents = discord.Intents.default()
 intents.members = True
 client=discord.Client(intents=intents)
 current_time=""
-stocks_updated=False
 stock_deltas=[-.1,-.08,-.06,-.04,-.02,0,.02,.04,.06,.08,.1]
 
 def update_stocks():
-    stocks=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/STOCKS_IO","r","a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
-    os.system("sudo truncate -s 0 {0}/STOCKS.txt".format(KIPP_DIR))
-    for stock in stocks:
-        if len(stock)>0:
-            delta=int(int(stock.split(" ")[2])*(SystemRandom().choices(stock_deltas,weights=(1,2,4,9,12,7,12,9,4,2,1),k=1)[0]+(SystemRandom().randint(-9,9)/1000)))
-            os.system('sudo echo "{0}:{1}" >> {2}/STOCKS.txt'.format(stock.split(":")[0],str(delta),KIPP_DIR))
-            os.system('sudo -E {0}/C++/STOCKS_IO wp {1} {2}'.format(KIPP_DIR,stock.split(":")[0],str(delta+int(stock.split(" ")[2]))))
+    if datetime.strftime(datetime.now(),format("%m/%d/%Y")) not in subprocess.Popen(["sudo","cat",KIPP_DIR+"/STOCKS.txt"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode():
+        if int(datetime.strftime(datetime.now(),format("%H")))>=10:
+            stocks=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/STOCKS_IO","r","a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+            os.system("sudo truncate -s 0 {0}/STOCKS.txt".format(KIPP_DIR))
+            for stock in stocks:
+                if len(stock)>0:
+                    delta=int(int(stock.split(" ")[2])*(SystemRandom().choices(stock_deltas,weights=(10,12,22,57,250,150,250,57,22,12,10),k=1)[0]+(SystemRandom().randint(-9,9)/1000)))
+                    os.system('sudo echo "{0}:{1}" >> {2}/STOCKS.txt'.format(stock.split(":")[0],str(delta),KIPP_DIR))
+                    os.system('sudo -E {0}/C++/STOCKS_IO wp {1} {2}'.format(KIPP_DIR,stock.split(":")[0],str(delta+int(stock.split(" ")[2]))))
+            os.system('sudo echo "LAST UPDATED:{0}" >> {1}/STOCKS.txt'.format(datetime.strftime(datetime.now(),format("%m/%d/%Y")),KIPP_DIR))
 
 async def background_loop():
     import datetime
     global current_time
-    global stocks_updated
     while True:
         try:
-            if datetime.datetime.strftime(datetime.datetime.now(),"%H")=='10':
-                if not stocks_updated:
-                    update_stocks()
-                    stocks_updated=True
-            else:
-                stocks_updated=False
             if get_clock() != current_time:
+                update_stocks()
                 try:
                     await client.change_presence(activity=discord.Game(name=get_clock()))
                     current_time=get_clock()

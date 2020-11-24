@@ -7,7 +7,7 @@ from .Command_utils import *
 from Command import *
 import threading
 
-def mine_kippcoins(message,message2,serverinfo,playerinfo):
+async def MINE(message,message2,serverinfo,playerinfo):
     amount_mined=1
     if playerinfo[message.author].HAS_ITEM(1):
         amount_mined*=2
@@ -17,10 +17,7 @@ def mine_kippcoins(message,message2,serverinfo,playerinfo):
         amount_mined*=8
     if playerinfo[message.author].HAS_ITEM(4):
         amount_mined*=16
-    playerinfo[message.author].GIVE_KIPPCOINS(amount_mined) 
-
-async def MINE(message,message2,serverinfo,playerinfo):
-    threading.Thread(target=mine_kippcoins,args=[message,message2,serverinfo,playerinfo]).start()
+    playerinfo[message.author].GIVE_KIPPCOINS(amount_mined)
 
 async def TRANSFER(message,message2,serverinfo,playerinfo):
     try:
@@ -194,8 +191,8 @@ async def STOCKS(message,message2,serverinfo,playerinfo):
     em=discord.Embed(title="KIPPCOIN Stocks",color=EMBEDCOLOR)
     markets=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/STOCKS_IO","r","a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode()
     markets=markets.split("\n")
-    markets_string="```NAME  CHANGE          KC/SHARE  # SHARES"
-    markets_string+="\n"+"-"*(len(markets_string)-3)
+    markets_string="```NAME  CHANGE         KC/SHARE NUM"
+    markets_string+="\n"+"-"*(len(markets_string)-2)
     stock_deltas=subprocess.Popen(["sudo","cat",KIPP_DIR+"/STOCKS.txt"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
     market_change_map={}
     for stock in stock_deltas:
@@ -212,9 +209,9 @@ async def STOCKS(message,message2,serverinfo,playerinfo):
                 percent_change=round(100*(int(kc_change)/(int(per_share_price)-int(kc_change))),1)
             except ZeroDivisionError:
                 percent_change=0
-            change_string=str(kc_change)+(" "*(7-len(str(kc_change))))+"("+('+' if percent_change>=0 else '')+str(percent_change)+"%)"
-            market_row+=change_string+(" "*(16-len(change_string)))
-            market_row+=per_share_price+(" "*(10-len(per_share_price)))
+            change_string=str(kc_change)+(" "*(6-len(str(kc_change))))+"("+('+' if percent_change>=0 else '')+str(percent_change)+"%)"
+            market_row+=change_string+(" "*(15-len(change_string)))
+            market_row+=per_share_price+(" "*(9-len(per_share_price)))
             market_row+=market.split(" ")[1]
             markets_string+=market_row
     markets_string+="```"
@@ -227,7 +224,7 @@ async def STOCKS(message,message2,serverinfo,playerinfo):
             if int(share.split(": ")[1])>0:
                 has_shares=True
     if not has_shares:
-        shares_string="__You don't own any shares.__\nSee `!HELP|BUYSHARES`"
+        shares_string="__You don't own any shares.__\nSee `!HELP|BUYSHARES` and `!SHARES`"
     else:
         shares_string="Use `!SHARES` for information about your shares."
     em.add_field(name="Your Shares",value=shares_string,inline=False)
@@ -294,7 +291,7 @@ async def SELLSHARES(message,message2,serverinfo,playerinfo):
 async def SHARES(message,message2,serverinfo,playerinfo):
     markets=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/STOCKS_IO","r","a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
     shares=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/SHARES_IO","r",str(message.author.id),"a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
-    em=discord.Embed(title="Your Shares",color=EMBEDCOLOR)
+    em=discord.Embed(title="Shares",color=EMBEDCOLOR)
     market_value_map={}
     shares_string=""
     for market in markets:
@@ -306,18 +303,30 @@ async def SHARES(message,message2,serverinfo,playerinfo):
             if int(share.split(": ")[1])>0 and has_shares==False:
                 has_shares=True
     if has_shares:
-        shares_string="```NAME  SHARES    KC VALUE\n------------------------"
+        shares_string="```NAME  SHARES   KC VALUE\n-----------------------"
         for share in shares:
             if len(share)>0:
                 if int(share.split(": ")[1])>0:
                     value_string="{0}  {1}".format(share.split(":")[0],share.split(": ")[1])
                     shares_string+="\n"+value_string
-                    shares_string+=" "*(16-len(value_string))
+                    shares_string+=" "*(15-len(value_string))
                     shares_string+=str(market_value_map[share.split(":")[0]]*int(share.split(": ")[1]))
         shares_string+="```\nSee `!HELP|SELLSHARES`"
     else:
         shares_string="You don't own any shares."
-    em.description=shares_string
+    em.add_field(name="Your Shares",value=shares_string)
+    afford_string=""
+    can_afford=False
+    for market in markets:
+        if len(market)>0:
+            price_per_share=int(market.split(":")[1].split(" ")[2])
+            within_budget=int(playerinfo[message.author].GET_KIPPCOINS()/price_per_share)
+            if within_budget>0:
+                can_afford=True
+                afford_string+="\n`{0} share{1} of {2}`".format(within_budget,("s" if within_budget != 1 else ""),market.split(":")[0])
+    if not can_afford:
+        afford_string="You cannot afford any shares."
+    em.add_field(name="Shares You can Afford",value=afford_string,inline=False)
     await message.channel.send(embed=em)
 
 command["!MINE"]=KIPC("!MINE","This command stacks all of your KIPPCOIN multipliers and adds that amount of KIPPCOINS to your account. This command will not return any message\n!MINE",MINE,[])

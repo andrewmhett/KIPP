@@ -334,20 +334,20 @@ async def STONKS(message,message2,serverinfo,playerinfo):
 async def LEADERBOARD(message,message2,serverinfo,playerinfo):
     net_worth_dict={}
     market_value_map={}
+    markets=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/STOCKS_IO","r","a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+    for market in markets:
+        if len(market)>0:
+            market_value_map[market.split(":")[0]]=int(market.split(":")[1].split(" ")[2])
     for member in message.guild.members:
         if not member.bot:
             shares=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/SHARES_IO","r",str(message.author.id),"a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
-            markets=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/STOCKS_IO","r","a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
-            for market in markets:
-                if len(market)>0:
-                    market_value_map[market.split(":")[0]]=int(market.split(":")[1].split(" ")[2])
             net_worth=0
             net_worth+=playerinfo[member].GET_KIPPCOINS()
             for share in shares:
                 if len(share)>0:
                     net_worth+=market_value_map[share.split(":")[0]]*int(share.split(": ")[1])
             net_worth_dict[member.id]=[str(member),net_worth]
-    net_worth_dict=sorted(net_worth_dict.items(), key=lambda item: item[1])
+    net_worth_dict=sorted(net_worth_dict.items(), key=lambda item: item[0])
     position=0
     leaderboard_string="```#  USERNAME            KC NET WTH\n---------------------------------"
     for pair in net_worth_dict:

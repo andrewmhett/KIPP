@@ -5,7 +5,6 @@ sys.path.append(KIPP_DIR+"/Python")
 from ESSENTIAL_PACKAGES import *
 from .Command_utils import *
 from Command import *
-import threading
 
 async def MINE(message,message2,serverinfo,playerinfo):
     amount_mined=1

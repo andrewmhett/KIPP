@@ -191,7 +191,6 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                         music4 = "https://www.youtube.com/watch?v="+music4
                     server = message.guild
                     if "channel" not in music4:
-                        serverinfo[message.guild].musiccolor=playerinfo[message.author].hrolecolor
                         await join_voice_channel(message,serverinfo)
                         if serverinfo[message.guild].playlist != None:
                             serverinfo[message.guild].queue=serverinfo[message.guild].queue[:-1]

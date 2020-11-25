@@ -35,14 +35,25 @@ client=discord.Client(intents=intents)
 current_time=""
 stock_deltas=[-.1,-.08,-.06,-.04,-.02,0,.02,.04,.06,.08,.1]
 
+def fluctuate(prev_delta):
+    fluctuation=SystemRandom().choices([-1.5*prev_delta,-prev_delta,-prev_delta/2,-prev_delta/5,-prev_delta/7,0,prev_delta/7,prev_delta/5,prev_delta/2,prev_delta,1.5*prev_delta],weights=(10,25,30,35,40,50,40,35,30,25,10),k=1)[0] if prev_delta != 0 else SystemRandom().randrange(-2,2)/100
+    return fluctuation+prev_delta
+
 def update_stocks():
     if datetime.strftime(datetime.now(),format("%m/%d/%Y")) not in subprocess.Popen(["sudo","cat",KIPP_DIR+"/STOCKS.txt"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode():
         if int(datetime.strftime(datetime.now(),format("%H")))>=10:
             stocks=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/STOCKS_IO","r","a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+            prev_data=subprocess.Popen(["sudo","cat",KIPP_DIR+"/STOCKS.txt"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+            delta_dict={}
+            for datum in prev_data:
+                if len(datum)>0:
+                    if not datum.startswith("LAST UPDATED"):
+                        delta_dict[datum.split(":")[0]]=int(datum.split(":")[1])
             os.system("sudo truncate -s 0 {0}/STOCKS.txt".format(KIPP_DIR))
             for stock in stocks:
                 if len(stock)>0:
-                    delta=int(int(stock.split(" ")[2])*(SystemRandom().choices(stock_deltas,weights=(10,12,22,57,250,150,250,57,22,12,10),k=1)[0]+(SystemRandom().randint(-9,9)/1000)))
+                    last_percent=delta_dict[stock.split(":")[0]]/int(stock.split(" ")[2])
+                    delta=int(int(stock.split(" ")[2])*fluctuate(last_percent))
                     os.system('sudo echo "{0}:{1}" >> {2}/STOCKS.txt'.format(stock.split(":")[0],str(delta),KIPP_DIR))
                     os.system('sudo -E {0}/C++/STOCKS_IO wp {1} {2}'.format(KIPP_DIR,stock.split(":")[0],str(delta+int(stock.split(" ")[2]))))
             os.system('sudo echo "LAST UPDATED:{0}" >> {1}/STOCKS.txt'.format(datetime.strftime(datetime.now(),format("%m/%d/%Y")),KIPP_DIR))

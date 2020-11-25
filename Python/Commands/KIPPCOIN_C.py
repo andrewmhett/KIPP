@@ -338,6 +338,7 @@ async def LEADERBOARD(message,message2,serverinfo,playerinfo):
     for market in markets:
         if len(market)>0:
             market_value_map[market.split(":")[0]]=int(market.split(":")[1].split(" ")[2])
+    await message.channel.send("Calculating values...")
     for member in message.guild.members:
         if not member.bot:
             shares=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/SHARES_IO","r",str(message.author.id),"a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
@@ -347,6 +348,7 @@ async def LEADERBOARD(message,message2,serverinfo,playerinfo):
                 if len(share)>0:
                     net_worth+=market_value_map[share.split(":")[0]]*int(share.split(": ")[1])
             net_worth_dict[member.id]=[str(member),net_worth]
+    await message.channel.send("Sorting...")
     net_worth_dict=sorted(net_worth_dict.items(), key=lambda item: item[0])
     position=0
     leaderboard_string="```#  USERNAME            KC NET WTH\n---------------------------------"
@@ -357,7 +359,7 @@ async def LEADERBOARD(message,message2,serverinfo,playerinfo):
             display_name=pair[1][0]
             if len(display_name)>17:
                 name_sections=["#".join(display_name.split("#")[0:-1]),display_name.split("#")[-1]]
-                name_sections[0]=name_sections[0][0:7]+"...#"
+                name_sections[0]=name_sections[0][0:9]+"...#"
                 display_name="".join(name_sections)
             leaderboard_string+=display_name
             leaderboard_string+=" "*(20-len(display_name))

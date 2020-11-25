@@ -349,7 +349,7 @@ async def LEADERBOARD(message,message2,serverinfo,playerinfo):
                     net_worth+=market_value_map[share.split(":")[0]]*int(share.split(": ")[1])
             net_worth_dict[member.id]=[str(member),net_worth]
     await message.channel.send("Sorting...")
-    net_worth_pairs=sorted(net_worth_dict.values(), key=lambda item: item[0])[::-1]
+    net_worth_pairs=sorted(net_worth_dict.values(), key=lambda item: item[1])[::-1]
     position=0
     leaderboard_string="```#  USERNAME            KC NET WTH\n---------------------------------"
     for pair in net_worth_pairs:

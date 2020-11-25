@@ -341,7 +341,7 @@ async def LEADERBOARD(message,message2,serverinfo,playerinfo):
     await message.channel.send("Calculating values...")
     for member in message.guild.members:
         if not member.bot:
-            shares=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/SHARES_IO","r",str(message.author.id),"a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+            shares=subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/SHARES_IO","r",str(member.id),"a"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
             net_worth=0
             net_worth+=playerinfo[member].GET_KIPPCOINS()
             for share in shares:
@@ -356,14 +356,14 @@ async def LEADERBOARD(message,message2,serverinfo,playerinfo):
         if position<10:
             position+=1
             leaderboard_string+="\n{0}".format(position)+(" "*(3-len(str(position))))
-            display_name=pair[1][0]
+            display_name=pair[0]
             if len(display_name)>17:
                 name_sections=["#".join(display_name.split("#")[0:-1]),display_name.split("#")[-1]]
                 name_sections[0]=name_sections[0][0:9]+"...#"
                 display_name="".join(name_sections)
             leaderboard_string+=display_name
             leaderboard_string+=" "*(20-len(display_name))
-            leaderboard_string+=str(pair[1][1])
+            leaderboard_string+=str(pair[1])
         else:
             break
     if len(net_worth_dict)<10:

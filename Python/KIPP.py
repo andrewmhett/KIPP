@@ -22,6 +22,7 @@ from Profile import Profile
 import Commands
 from Command import commands
 from Base4Clock import get_clock
+import random
 CREATOR_ID=289920025077219328
 KIPP_ID=386352783550447628
 if len(sys.argv)>1:
@@ -33,10 +34,9 @@ intents = discord.Intents.default()
 intents.members = True
 client=discord.Client(intents=intents)
 current_time=""
-stock_deltas=[-.1,-.08,-.06,-.04,-.02,0,.02,.04,.06,.08,.1]
 
 def fluctuate(prev_delta):
-    fluctuation=SystemRandom().choices([-1.5*prev_delta,-prev_delta,-prev_delta/2,-prev_delta/5,-prev_delta/7,0,prev_delta/7,prev_delta/5,prev_delta/2,prev_delta,1.5*prev_delta],weights=(10,25,30,35,40,50,40,35,30,25,10),k=1)[0] if prev_delta != 0 else SystemRandom().randrange(-2,2)/100
+    fluctuation=SystemRandom().choices([.1,.05,.03,.01,0,-.01,-.03,-.05,-.1],weights=(15,25,30,35,20,35,30,25,15),k=1)[0] if prev_delta > 0.01 or prev_delta < 0.01 else SystemRandom().randrange(-5,5)/1000
     return fluctuation+prev_delta
 
 def update_stocks():
@@ -50,13 +50,38 @@ def update_stocks():
                     if not datum.startswith("LAST UPDATED"):
                         delta_dict[datum.split(":")[0]]=int(datum.split(":")[1])
             os.system("sudo truncate -s 0 {0}/STOCKS.txt".format(KIPP_DIR))
+            prev_trends=subprocess.Popen(["sudo","cat",KIPP_DIR+"/TRENDS.txt"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+            os.system("sudo truncate -s 0 {0}/TRENDS.txt".format(KIPP_DIR))
+            trend_dict={}
+            for trend in prev_trends:
+                if len(trend)>0:
+                    trend_dict[trend.split(":")[0]]=[]
+                    for prev in trend.split(":")[1].split(" "):
+                        trend_dict[trend.split(":")[0]].append(prev)
             for stock in stocks:
                 if len(stock)>0:
                     last_percent=delta_dict[stock.split(":")[0]]/int(stock.split(" ")[2])
-                    delta=int(int(stock.split(" ")[2])*fluctuate(last_percent))
+                    new_percent=fluctuate(last_percent)
+                    random_perc=random.SystemRandom().randint(0,50)/1000
+                    if new_percent>0:
+                        new_percent=max(random_perc/10,min(new_percent,random_perc))
+                    else:
+                        new_percent=max(-random_perc,min(new_percent,-random_perc/10))
+                    delta=int(int(stock.split(" ")[2])*new_percent)
+                    if int(stock.split(" ")[2])<20000:
+                        delta+=500
+                    if int(stock.split(" ")[2])>150000:
+                        delta-=int(int(stock.split(" ")[2])*.08)
+                    for i in range(9):
+                        trend_dict[stock.split(":")[0]][i]=trend_dict[stock.split(":")[0]][i+1]
+                    trend_dict[stock.split(":")[0]][9]=str(int(stock.split(" ")[2])+delta)
                     os.system('sudo echo "{0}:{1}" >> {2}/STOCKS.txt'.format(stock.split(":")[0],str(delta),KIPP_DIR))
+                    os.system('sudo echo "{0}:{1}" >> {2}/TRENDS.txt'.format(stock.split(":")[0]," ".join(trend_dict[stock.split(":")[0]]),KIPP_DIR))
                     os.system('sudo -E {0}/C++/STOCKS_IO wp {1} {2}'.format(KIPP_DIR,stock.split(":")[0],str(delta+int(stock.split(" ")[2]))))
             os.system('sudo echo "LAST UPDATED:{0}" >> {1}/STOCKS.txt'.format(datetime.strftime(datetime.now(),format("%m/%d/%Y")),KIPP_DIR))
+
+for i in range(10):
+    update_stocks()
 
 async def background_loop():
     import datetime

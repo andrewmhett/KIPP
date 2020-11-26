@@ -5,18 +5,33 @@ sys.path.append(KIPP_DIR+"/Python")
 from ESSENTIAL_PACKAGES import *
 from .Command_utils import *
 from Command import *
+import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
+import hashlib
+import random
+
+nonce=random.SystemRandom().randrange(0,2**36)
+hash_value=int(("0"+(hashlib.sha1(str(nonce).encode()).hexdigest()[1:])),16)
 
 async def MINE(message,message2,serverinfo,playerinfo):
-    amount_mined=1
-    if playerinfo[message.author].HAS_ITEM(1):
-        amount_mined*=2
-    if playerinfo[message.author].HAS_ITEM(2):
-        amount_mined*=4
-    if playerinfo[message.author].HAS_ITEM(3):
-        amount_mined*=8
-    if playerinfo[message.author].HAS_ITEM(4):
-        amount_mined*=16
-    playerinfo[message.author].GIVE_KIPPCOINS(amount_mined)
+    global nonce
+    global hash_value
+    guess=int(hashlib.sha1(message2.split("|")[1].encode()).hexdigest(),16)
+    if guess<=hash_value:
+        await message.channel.send("Mining successful. Recalculating has value...")
+        amount_mined=1
+        if playerinfo[message.author].HAS_ITEM(1):
+            amount_mined*=2
+        if playerinfo[message.author].HAS_ITEM(2):
+            amount_mined*=4
+        if playerinfo[message.author].HAS_ITEM(3):
+            amount_mined*=8
+        if playerinfo[message.author].HAS_ITEM(4):
+            amount_mined*=16
+        playerinfo[message.author].GIVE_KIPPCOINS(amount_mined)
+        nonce=random.SystemRandom().randrange(0,2**36)
+        hash_value=int(("0"+(hashlib.sha1(str(nonce).encode()).hexdigest()[1:])),16)
 
 async def TRANSFER(message,message2,serverinfo,playerinfo):
     try:
@@ -375,7 +390,27 @@ async def LEADERBOARD(message,message2,serverinfo,playerinfo):
     em.description=leaderboard_string
     await message.channel.send(embed=em)
 
-command["!MINE"]=KIPC("!MINE","This command stacks all of your KIPPCOIN multipliers and adds that amount of KIPPCOINS to your account. This command will not return any message\n!MINE",MINE,[])
+async def TRENDS(message,message2,serverinfo,playerinfo):
+    x_values=np.array([-9,-8,-7,-6,-5,-4,-3,-2,-1,0])
+    trends=subprocess.Popen(["sudo","cat",KIPP_DIR+"/TRENDS.txt"],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+    plt.clf()
+    plt.style.use('dark_background')
+    for key in plt.rcParams.keys():
+        if plt.rcParams[key] == "black":
+            plt.rcParams[key] = "#171a1c"
+    for trend in trends:
+        y_values=[]
+        if len(trend)>0:
+            for value in trend.split(":")[1].split(" "):
+                y_values.append(float(value))
+            plt.plot(x_values,np.array(y_values),label=trend.split(":")[0].replace("_",""))
+    plt.legend(loc=2)
+    plt.xlabel("Days")
+    plt.ylabel("KIPPCOINS per share")
+    plt.savefig("Trends_graph.png")
+    await message.channel.send(file=discord.File(KIPP_DIR+"/Trends_graph.png"))
+
+command["!MINE"]=KIPC("!MINE","This command stacks all of your KIPPCOIN multipliers and adds that amount of KIPPCOINS to your account. This command will not return any message\n!MINE|guess number",MINE,[int])
 command["!TRANSFER"]=KIPC("!TRANSFER","This command will transfer a given amount of KIPPCOINS from your account to another account\n!TRANSFER|amount|receiver",TRANSFER,[int,str])
 command["!GAMBLEGAME"]=KIPC("!GAMBLEGAME","This command will start either a solo or multiplayer gambling game involving KIPPCOINS\n!GAMBLEGAME|'SOLO' or opponent user",GAMBLEGAME,[str])
 command["!SHOP"]=KIPC("!SHOP","Opens the KIPPCOIN shop\n!SHOP",SHOP,[])
@@ -388,3 +423,4 @@ command["!SHARES"]=KIPC("!SHARES","Displays information about the stock shares y
 command["!BUYSHARES"]=KIPC("!BUYSHARES","Buys a specified number of shares from a specified market\n!BUYSHARES|market name|number of shares",BUYSHARES,[str,int])
 command["!SELLSHARES"]=KIPC("!SELLSHARES","Sells a specified number of shares from a specified market\n!SELLSHARES|market name|number of shares",SELLSHARES,[str,int])
 command["!LEADERBOARD"]=KIPC("!LEADERBOARD","Displays a KIPPCOIN net worth leaderboard\n!LEADERBOARD",LEADERBOARD,[])
+command["!TRENDS"]=KIPC("!TRENDS","Displays an image of a graph showing the trends for the past 10 days of all stocks\n!TRENDS",TRENDS,[])

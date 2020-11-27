@@ -12,7 +12,7 @@ import hashlib
 import random
 
 nonce=random.SystemRandom().randrange(0,2**36)
-hash_value=int(("0"+(hashlib.sha1(str(nonce).encode()).hexdigest()[1:])),16)
+hash_value=int(("0a"+(hashlib.sha1(str(nonce).encode()).hexdigest()[2:])),16)
 salt=random.SystemRandom().randrange(0,2048)
 
 async def MINE(message,message2,serverinfo,playerinfo):
@@ -33,7 +33,7 @@ async def MINE(message,message2,serverinfo,playerinfo):
         playerinfo[message.author].GIVE_KIPPCOINS(amount_mined)
         while hash_value>=guess:
             nonce=random.SystemRandom().randrange(0,2**36)
-            hash_value=int(("0"+(hashlib.sha1(str(nonce).encode()).hexdigest()[1:])),16)
+            hash_value=int(("0a"+(hashlib.sha1(str(nonce).encode()).hexdigest()[2:])),16)
         salt=random.SystemRandom().randrange(0,2048)
         await message.channel.send("Hash value recalculated.")
 

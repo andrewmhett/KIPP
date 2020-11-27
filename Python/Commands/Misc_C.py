@@ -69,8 +69,10 @@ async def IMAGE(message,message2,serverinfo,playerinfo):
     if image == "":
         await message.channel.send("No results for image search **{0}**".format(str(message.content).split('|')[1]))
     else:
-        await send_image(message,image,"Image")
-
+        try:
+            await send_image(message,image,"Image")
+        except discord.errors.Forbidden:
+            await message.channel.send("Missing permissions to send an image in this channel")
 async def STATUS(message,message2,serverinfo,playerinfo):
     from subprocess import Popen, PIPE
     p=Popen(KIPP_DIR+'/Bash/DaemonStatus.sh',stdout=PIPE,stderr=PIPE)

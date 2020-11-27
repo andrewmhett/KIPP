@@ -13,7 +13,7 @@ import random
 
 nonce=random.SystemRandom().randrange(0,2**36)
 hash_value=int(("0"+(hashlib.sha1(str(nonce).encode()).hexdigest()[1:])),16)
-salt=random.SystemRandom.randrange(0,1024)
+salt=random.SystemRandom().randrange(0,1024)
 
 async def MINE(message,message2,serverinfo,playerinfo):
     global hash_value
@@ -33,7 +33,7 @@ async def MINE(message,message2,serverinfo,playerinfo):
         playerinfo[message.author].GIVE_KIPPCOINS(amount_mined)
         nonce=random.SystemRandom().randrange(0,2**36)
         hash_value=int(("0"+(hashlib.sha1(str(nonce).encode()).hexdigest()[1:])),16)
-        salt=random.SystemRandom.randrange(0,1024)
+        salt=random.SystemRandom().randrange(0,1024)
 
 async def TRANSFER(message,message2,serverinfo,playerinfo):
     try:

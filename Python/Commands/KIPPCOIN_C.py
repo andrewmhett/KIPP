@@ -18,7 +18,7 @@ salt=random.SystemRandom().randrange(0,2048)
 async def MINE(message,message2,serverinfo,playerinfo):
     global hash_value
     global salt
-    guess=int(hashlib.sha1(str(int(message2.split("|")[1])+salt).encode()).hexdigest(),16)
+    guess=int(hashlib.sha256(str(int(message2.split("|")[1])+salt).encode()).hexdigest(),16)
     if guess<=hash_value:
         await message.channel.send("Mining successful. Recalculating hash value...")
         amount_mined=30

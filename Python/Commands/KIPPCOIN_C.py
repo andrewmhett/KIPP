@@ -13,10 +13,12 @@ import random
 
 nonce=random.SystemRandom().randrange(0,2**36)
 hash_value=int(("0"+(hashlib.sha1(str(nonce).encode()).hexdigest()[1:])),16)
+salt=random.SystemRandom().randrange(0,2048)
 
 async def MINE(message,message2,serverinfo,playerinfo):
     global hash_value
-    guess=int(hashlib.sha1(message2.split("|")[1].encode()).hexdigest(),16)
+    global salt
+    guess=int(hashlib.sha1(str(int(message2.split("|")[1])+salt).encode()).hexdigest(),16)
     if guess<=hash_value:
         await message.channel.send("Mining successful. Recalculating hash value...")
         amount_mined=30
@@ -32,6 +34,7 @@ async def MINE(message,message2,serverinfo,playerinfo):
         while hash_value>=guess:
             nonce=random.SystemRandom().randrange(0,2**36)
             hash_value=int(("0"+(hashlib.sha1(str(nonce).encode()).hexdigest()[1:])),16)
+        salt=random.SystemRandom().randrange(0,2048)
         await message.channel.send("Hash value recalculated.")
 
 async def TRANSFER(message,message2,serverinfo,playerinfo):

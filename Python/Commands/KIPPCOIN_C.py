@@ -410,7 +410,7 @@ async def TRENDS(message,message2,serverinfo,playerinfo):
     plt.legend(loc=2)
     plt.xlabel("Days")
     plt.ylabel("KIPPCOINS per share")
-    plt.savefig("Trends_graph.png")
+    plt.savefig(KIPP_DIR+"/Trends_graph.png")
     await message.channel.send(file=discord.File(KIPP_DIR+"/Trends_graph.png"))
 
 command["!MINE"]=KIPC("!MINE","This command stacks all of your KIPPCOIN multipliers and adds that amount of KIPPCOINS to your account. This command will not return any message\n!MINE|guess number",MINE,[int])

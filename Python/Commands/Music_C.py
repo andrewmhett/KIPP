@@ -178,7 +178,7 @@ async def MUSIC(message,message2,serverinfo,playerinfo):
                         else:
                             await message.channel.send("Sorry, but Soundcloud playlists are not yet supported")
                             return
-                if domain == "www.youtu.be":
+                if domain == "youtu.be":
                     music4 = music4.split('youtu.be/')[1]
                     music4 = "https://www.youtube.com/watch?v="+music4
                     domain="www.youtube.com"

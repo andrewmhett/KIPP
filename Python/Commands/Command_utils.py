@@ -14,9 +14,8 @@ InterstellarQuotes = ["'Do not go gentle into that good night'\n**Professor Bran
 
 safe_domains=[
     "www.youtube.com",
-    "www.youtu.be",
-    "soundcloud.com",
-    "youtu.be"
+    "youtu.be",
+    "soundcloud.com"
 ]
 
 def sanitize_url(url):
@@ -28,7 +27,7 @@ def sanitize_url(url):
             invalid_link=True
         else:
             for domain in safe_domains:
-                if request.url.split("https://")[1].split("/")[0] == domain:
+                if url.split("https://")[1].split("/")[0] == domain:
                     url_domain=domain
         for redirect in request.history:
             if redirect.url.split("https://")[1].split("/")[0] not in safe_domains:

@@ -80,9 +80,6 @@ def update_stocks():
                     os.system('sudo -E {0}/C++/STOCKS_IO wp {1} {2}'.format(KIPP_DIR,stock.split(":")[0],str(delta+int(stock.split(" ")[2]))))
             os.system('sudo echo "LAST UPDATED:{0}" >> {1}/STOCKS.txt'.format(datetime.strftime(datetime.now(),format("%m/%d/%Y")),KIPP_DIR))
 
-for i in range(10):
-    update_stocks()
-
 async def background_loop():
     import datetime
     global current_time

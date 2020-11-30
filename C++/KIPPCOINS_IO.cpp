@@ -7,16 +7,16 @@
 
 using namespace std;
 
-map<string, unsigned int> accounts;
+map<string, long long> accounts;
 
 #pragma pack(push, 1)
 struct Account{
 	string id;
-	unsigned int balance;
+	long long balance;
 };
 struct StoredAccount{
 	char id[19];
-	unsigned int balance;
+	long long balance;
 };
 #pragma pack(pop)
 
@@ -48,23 +48,23 @@ void write_data(){
 	KIPP_PATH=getenv("KIPP_DIR");
 	ofstream output;
 	output.open(KIPP_PATH+"/C++/KIPPCOINS.bin", ios::binary);
-	for (map<string, unsigned int>::iterator it = accounts.begin(); it != accounts.end(); ++it){
+	for (map<string, long long>::iterator it = accounts.begin(); it != accounts.end(); ++it){
 		StoredAccount write_struct;
-		pair<string, unsigned int> account = *it;
+		pair<string, long long> account = *it;
 		strcpy(write_struct.id,account.first.c_str());
 		write_struct.balance = account.second;
 		output.write(reinterpret_cast<char*>(&write_struct),sizeof(StoredAccount));
 	}
 	output.close();
 }
-void edit_balance(string id, int balance){
+void edit_balance(string id, long long balance){
 	accounts[id] = balance;
 	cout << id << ": " << balance << endl;
 }
 void read_balance(string id){
 	if (id=="all"){
-		for (map<string, unsigned int>::iterator it = accounts.begin(); it != accounts.end(); ++it){
-			pair<string, unsigned int> account = *it;
+		for (map<string, long long>::iterator it = accounts.begin(); it != accounts.end(); ++it){
+			pair<string, long long> account = *it;
 			cout << account.first << ": " << flush;
 			cout << account.second << endl;
 		}

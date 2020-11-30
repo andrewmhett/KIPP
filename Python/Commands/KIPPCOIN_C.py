@@ -12,13 +12,13 @@ import hashlib
 import random
 
 nonce=random.SystemRandom().randrange(0,2**36)
-hash_value=int(("0"+(hashlib.sha256(str(nonce).encode()).hexdigest()[1:])),16)
-salt=random.SystemRandom().randrange(0,1024)
+hash_value=int(("04"+(hashlib.sha256(str(nonce).encode()).hexdigest()[2:])),16)
+salt=random.SystemRandom().randrange(0,2048)
 
 async def MINE(message,message2,serverinfo,playerinfo):
     global hash_value
     global salt
-    guess=int(hashlib.sha256(message2.split("|")[1].encode()).hexdigest(),16)+salt
+    guess=int(hashlib.sha256(str(int(message2.split("|")[1])+salt).encode()).hexdigest(),16)
     if guess<=hash_value:
         await message.channel.send("Mining successful. Recalculating hash value...")
         amount_mined=30
@@ -32,8 +32,9 @@ async def MINE(message,message2,serverinfo,playerinfo):
             amount_mined*=16
         playerinfo[message.author].GIVE_KIPPCOINS(amount_mined)
         nonce=random.SystemRandom().randrange(0,2**36)
-        hash_value=int(("0"+(hashlib.sha256(str(nonce).encode()).hexdigest()[1:])),16)
-        salt=random.SystemRandom().randrange(0,1024)
+        hash_value=int(("04"+(hashlib.sha256(str(nonce).encode()).hexdigest()[2:])),16)
+        salt=random.SystemRandom().randrange(0,2048)
+        await message.channel.send("Hash value recalculated.")
 
 async def TRANSFER(message,message2,serverinfo,playerinfo):
     try:
@@ -409,7 +410,7 @@ async def TRENDS(message,message2,serverinfo,playerinfo):
     plt.legend(loc=2)
     plt.xlabel("Days")
     plt.ylabel("KIPPCOINS per share")
-    plt.savefig("Trends_graph.png")
+    plt.savefig(KIPP_DIR+"/Trends_graph.png")
     await message.channel.send(file=discord.File(KIPP_DIR+"/Trends_graph.png"))
 
 command["!MINE"]=KIPC("!MINE","This command stacks all of your KIPPCOIN multipliers and adds that amount of KIPPCOINS to your account. This command will not return any message\n!MINE|guess number",MINE,[int])

@@ -125,7 +125,7 @@ async def INVENTORY(message,message2,serverinfo,playerinfo):
             padding="="*int((20-len(roman_numeral_row))/2)
             roman_numeral_row=padding+roman_numeral_row+padding
             roman_numeral_row+="="*(20-len(roman_numeral_row))
-            plaque_str+="\n```+--------------------+\n|========KIPP========|\n|{0}|\n|=December 1st, {1}=|\n+--------------------+```".format(roman_numeral_row,str(2017+int(plaque_num)))
+            plaque_str+="```\n+--------------------+\n|========KIPP========|\n|{0}|\n|=December 1st, {1}=|\n+--------------------+```".format(roman_numeral_row,str(2017+int(plaque_num)))
         em.add_field(name="Plaques",value=plaque_str)
     if len(em.description)==0 and len(plaques)==0:
         em.description="You don't own any items."

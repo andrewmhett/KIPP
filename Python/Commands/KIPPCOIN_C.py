@@ -168,7 +168,7 @@ async def SHOP(message,message2,serverinfo,playerinfo):
         if len(item)>0:
             item_dict[item.split(":")[0]]=int(item.split(":")[1])
     em=discord.Embed(title="Shop",color=EMBEDCOLOR)
-    em.description="Current balance: `{0} KC`\n```#  NAME                      PRICE\n".format(playerinfo[message.author].GET_KIPPCOINS())
+    em.description="Current balance: `{0} KC`\nAM stands for AUTO-MINER\n```#  NAME                      PRICE\n".format(playerinfo[message.author].GET_KIPPCOINS())
     item_index=0
     for item in items:
         if len(item)>0:
@@ -184,14 +184,20 @@ async def SHOP(message,message2,serverinfo,playerinfo):
         for item in in_budget:
             em.description+="\n{0}".format(item[1])+"  "
             em.description+="{0}".format(item[0])+(" "*(26-len(item[0])))
-            em.description+="{0}".format(item_dict[item[0]])
+            if len(str(item_dict[item[0]]))>5:
+                em.description+="10^{0}".format(len(str(item_dict[item[0]]))-1)
+            else:
+                em.description+="{0}".format(item_dict[item[0]])
         em.description+="\n"
     if len(out_of_budget)>0:
         em.description+="-----------OUT OF BUDGET----------"
         for item in out_of_budget:
             em.description+="\n{0}".format(item[1])+"  "
             em.description+="{0}".format(item[0])+(" "*(26-len(item[0])))
-            em.description+="{0}".format(item_dict[item[0]])
+            if len(str(item_dict[item[0]]))>5:
+                em.description+="10^{0}".format(len(str(item_dict[item[0]]))-1)
+            else:
+                em.description+="{0}".format(item_dict[item[0]])
         em.description+="\n"
     em.description+="```In order to buy an item, use `!BUY|item number`\n(the item number is listed in the left column)"
     if len(in_budget)==0 and len(out_of_budget)==0:

@@ -80,6 +80,20 @@ def update_stocks():
                     os.system('sudo -E {0}/C++/STOCKS_IO wp {1} {2}'.format(KIPP_DIR,stock.split(":")[0],str(delta+int(stock.split(" ")[2]))))
             os.system('sudo echo "LAST UPDATED:{0}" >> {1}/STOCKS.txt'.format(datetime.strftime(datetime.now(),format("%m/%d/%Y")),KIPP_DIR))
 
+def automine_kippcoins():
+    for server in client.guilds:
+        for member in server.members:
+            amount_mined=0
+            if playerinfo[member].HAS_ITEM(6):
+                amount_mined+=40
+            if playerinfo[member].HAS_ITEM(7):
+                amount_mined*=10
+            if playerinfo[member].HAS_ITEM(8):
+                amount_mined*=100
+            if playerinfo[member].HAS_ITEM(9):
+                amount_mined+=40000
+            playerinfo[member].GIVE_KIPPCOINS(amount_mined)
+
 async def background_loop():
     import datetime
     global current_time
@@ -87,6 +101,7 @@ async def background_loop():
         try:
             if get_clock() != current_time:
                 update_stocks()
+                automine_kippcoins()
                 try:
                     await client.change_presence(activity=discord.Game(name=get_clock()))
                     current_time=get_clock()

@@ -129,8 +129,7 @@ async def MFIX(message,message2,serverinfo,playerinfo):
     await message.channel.send("Resetting variables...")
     serverinfo[message.guild].count=0
     try:
-        serverinfo[message.guild].mHandler.is_playing=False
-        serverinfo[message.guild].mHandler.player.stop()
+        message.guild.voice_client.stop()
     except Exception as err:
         print(err)
     serverinfo[message.guild].playlist=None

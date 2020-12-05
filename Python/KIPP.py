@@ -84,7 +84,7 @@ def automine_kippcoins():
     distributed=[]
     for server in client.guilds:
         for member in server.members:
-            if member not in distributed:
+            if member not in distributed and playerinfo[member].has_autominer:
                 amount_mined=0
                 if playerinfo[member].HAS_ITEM(6):
                     amount_mined+=40
@@ -204,6 +204,8 @@ async def on_ready():
         serverinfo[server] = Server(server)
         for member in server.members:
             playerinfo[member] = Profile(member)
+            if playerinfo[member].HAS_ITEM(6) or playerinfo[member].HAS_ITEM(8):
+                playerinfo[member].has_autominer=True
         client.loop.create_task(serverinfo[server].update_loop())
 @client.event
 async def on_join(member):

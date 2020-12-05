@@ -157,6 +157,8 @@ async def BUY(message,message2,serverinfo,playerinfo):
                 if playerinfo[message.author].shop_message != None:
                     await message.channel.delete(playerinfo[message.author].shop_message)
                 return
+    if playerinfo[message.author].HAS_ITEM(6) or playerinfo[message.author].HAS_ITEM(8):
+        playerinfo[message.author].has_autominer=True;
     await message.channel.send("You cannot afford this item. Use `!MINE` in order to mine KC.")
 
 async def SHOP(message,message2,serverinfo,playerinfo):

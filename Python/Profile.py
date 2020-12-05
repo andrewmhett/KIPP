@@ -15,6 +15,7 @@ class Profile:
         self.challenger=None
         self.betting=False
         self.user = user
+        self.has_autominer=False
         self.shop_message=None
     def GET_KIPPCOINS(self):
         return int(subprocess.Popen(["sudo","-E",KIPP_DIR+"/C++/KIPPCOINS_IO","r",str(self.user.id)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0])

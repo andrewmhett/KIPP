@@ -94,7 +94,8 @@ def automine_kippcoins():
                     amount_mined*=100
                 if playerinfo[member].HAS_ITEM(9):
                     amount_mined+=40000
-                playerinfo[member].GIVE_KIPPCOINS(amount_mined)
+                if amount_mined>0:
+                    playerinfo[member].GIVE_KIPPCOINS(amount_mined)
                 distributed.append(member)
 
 async def background_loop():

@@ -9,7 +9,6 @@ KIPP_ID=386352783550447628
 if len(sys.argv)>1:
     if sys.argv[1] == "dev":
         KIPP_ID=726545013064073277
-command={}
 commands=[]
 serverinfo={}
 playerinfo={}

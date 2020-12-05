@@ -22,5 +22,5 @@ async def EXEC(message,message2,serverinfo,playerinfo):
     except Exception as err:
         await message.channel.send(err)
 
-command["!EVAL"]=CRON("!EVAL","This command can be used by LockdownDoom in order to observe what a code block returns\n!EVAL|code",EVAL,[str])
-command["!EXEC"]=CRON("!EXEC","This command can be used by LockdownDoom in order to run a code block\n!EXEC|code",EXEC,[str])
+CRON("!EVAL","This command can be used by LockdownDoom in order to observe what a code block returns\n!EVAL|code",EVAL,[str])
+CRON("!EXEC","This command can be used by LockdownDoom in order to run a code block\n!EXEC|code",EXEC,[str])

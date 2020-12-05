@@ -139,7 +139,7 @@ async def IQ(message,message2,serverinfo,playerinfo):
     em = discord.Embed(title="Interstellar Quote",description=description,colour=EMBEDCOLOR)
     em.set_footer(text=get_footer())
     await message.channel.send(embed=em)
-    
+
 async def COINFLIP(message,message2,serverinfo,playerinfo):
     rand=SystemRandom().randrange(0,2)
     if rand==0:
@@ -165,15 +165,15 @@ async def FATE(message,message2,serverinfo,playerinfo):
         msg = "You will die."
         await message.channel.send(msg)
 
-command["!IQ"]=MISC("!IQ","IQ stands for Interstellar Quote. This command will send a random Interstellar quote\n!IQ",IQ,[])
-command["!CODE"]=MISC("!CODE","This command will give information about KIPP's code\n!CODE",CODE,[])
-command["!IMAGE"]=MISC("!IMAGE","This command will return an image of the given search query\n!IMAGE|search",IMAGE,[str])
-command["!STATUS"]=MISC("!STATUS","Shows KIPP's Daemon's current status\n!STATUS",STATUS,[])
-command["!MATH"]=MISC("!MATH","This command will return the answer to any basic math problem given\n!MATH|problem",MATH,[str])
-command["!CLEAR"]=MISC("!CLEAR","This command will clear the last 100 messages sent in the channel\n!CLEAR",CLEAR,[])
-command["!ADDKIPP"]=MISC("!ADDKIPP","This command returns a link that anyone can use to add KIPP to another server\n!ADDKIPP",ADDKIPP,[])
-command["!BLOCKEDLIST"]=MISC("!BLOCKEDLIST","This command will return a list of all blocked members of the server\n!BLOCKEDLIST",BLOCKEDLIST,[])
-command["!AVATAR"]=MISC("!AVATAR","This command will return the full-size avatar picture of the given user\n!AVATAR|user",AVATAR,[str])
-command["!FACEDETECT"]=MISC("!FACEDETECT","This command utilizes an Intel Neural Compute Stick 2 in order to process an image to detect a face\n!FACEDETECT|link to image",FACEDETECT,[str])
-command["!COINFLIP"]=MISC("!COINFLIP","Flip a coin and return either Heads or Tails\n!COINFLIP",COINFLIP,[])
-command["FATE"]=MISC("!FATE","Shows your fate. A very low chance of getting Yakub.\n!FATE",FATE,[])
+MISC("!IQ","IQ stands for Interstellar Quote. This command will send a random Interstellar quote\n!IQ",IQ,[])
+MISC("!CODE","This command will give information about KIPP's code\n!CODE",CODE,[])
+MISC("!IMAGE","This command will return an image of the given search query\n!IMAGE|search",IMAGE,[str])
+MISC("!STATUS","Shows KIPP's Daemon's current status\n!STATUS",STATUS,[])
+MISC("!MATH","This command will return the answer to any basic math problem given\n!MATH|problem",MATH,[str])
+MISC("!CLEAR","This command will clear the last 100 messages sent in the channel\n!CLEAR",CLEAR,[])
+MISC("!ADDKIPP","This command returns a link that anyone can use to add KIPP to another server\n!ADDKIPP",ADDKIPP,[])
+MISC("!BLOCKEDLIST","This command will return a list of all blocked members of the server\n!BLOCKEDLIST",BLOCKEDLIST,[])
+MISC("!AVATAR","This command will return the full-size avatar picture of the given user\n!AVATAR|user",AVATAR,[str])
+MISC("!FACEDETECT","This command utilizes an Intel Neural Compute Stick 2 in order to process an image to detect a face\n!FACEDETECT|link to image",FACEDETECT,[str])
+MISC("!COINFLIP","Flip a coin and return either Heads or Tails\n!COINFLIP",COINFLIP,[])
+MISC("!FATE","Shows your fate. A very low chance of getting Yakub.\n!FATE",FATE,[])

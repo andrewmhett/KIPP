@@ -154,11 +154,11 @@ async def BUY(message,message2,serverinfo,playerinfo):
                 playerinfo[message.author].GIVE_ITEM(item_index)
                 playerinfo[message.author].GIVE_KIPPCOINS(-1*item_dict[name])
                 await message.channel.send("Successfully purchased `{0}`. Your new KC balance stands at `{1} KC`".format(name,playerinfo[message.author].GET_KIPPCOINS()))
+                if playerinfo[message.author].HAS_ITEM(6) or playerinfo[message.author].HAS_ITEM(8):
+                    playerinfo[message.author].has_autominer=True;
                 if playerinfo[message.author].shop_message != None:
                     await message.channel.delete(playerinfo[message.author].shop_message)
                 return
-    if playerinfo[message.author].HAS_ITEM(6) or playerinfo[message.author].HAS_ITEM(8):
-        playerinfo[message.author].has_autominer=True;
     await message.channel.send("You cannot afford this item. Use `!MINE` in order to mine KC.")
 
 async def SHOP(message,message2,serverinfo,playerinfo):

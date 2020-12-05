@@ -81,18 +81,21 @@ def update_stocks():
             os.system('sudo echo "LAST UPDATED:{0}" >> {1}/STOCKS.txt'.format(datetime.strftime(datetime.now(),format("%m/%d/%Y")),KIPP_DIR))
 
 def automine_kippcoins():
+    distributed=[]
     for server in client.guilds:
         for member in server.members:
-            amount_mined=0
-            if playerinfo[member].HAS_ITEM(6):
-                amount_mined+=40
-            if playerinfo[member].HAS_ITEM(7):
-                amount_mined*=10
-            if playerinfo[member].HAS_ITEM(8):
-                amount_mined*=100
-            if playerinfo[member].HAS_ITEM(9):
-                amount_mined+=40000
-            playerinfo[member].GIVE_KIPPCOINS(amount_mined)
+            if member not in distributed:
+                amount_mined=0
+                if playerinfo[member].HAS_ITEM(6):
+                    amount_mined+=40
+                if playerinfo[member].HAS_ITEM(7):
+                    amount_mined*=10
+                if playerinfo[member].HAS_ITEM(8):
+                    amount_mined*=100
+                if playerinfo[member].HAS_ITEM(9):
+                    amount_mined+=40000
+                playerinfo[member].GIVE_KIPPCOINS(amount_mined)
+                distributed.append(member)
 
 async def background_loop():
     import datetime

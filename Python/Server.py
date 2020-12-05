@@ -195,7 +195,8 @@ class Server:
                         try:
                             await self.mHandler.message.edit(embed=self.mHandler.em)
                         except discord.errors.NotFound:
-                            self.mHandler.message = await self.mHandler.channel.send(embed=self.mHandler.em)
+                            if self.mHandler != None:
+                                self.mHandler.message = await self.mHandler.channel.send(embed=self.mHandler.em)
                     else:
                         self.mHandler.message = await self.mHandler.channel.send(embed=self.mHandler.em)
             await asyncio.sleep(1)

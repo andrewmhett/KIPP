@@ -80,6 +80,20 @@ def update_stocks():
                     os.system('sudo -E {0}/C++/STOCKS_IO wp {1} {2}'.format(KIPP_DIR,stock.split(":")[0],str(delta+int(stock.split(" ")[2]))))
             os.system('sudo echo "LAST UPDATED:{0}" >> {1}/STOCKS.txt'.format(datetime.strftime(datetime.now(),format("%m/%d/%Y")),KIPP_DIR))
 
+def automine_kippcoins():
+    for server in client.guilds:
+        for member in server.members:
+            amount_mined=0
+            if playerinfo[member].HAS_ITEM(6):
+                amount_mined+=40
+            if playerinfo[member].HAS_ITEM(7):
+                amount_mined*=10
+            if playerinfo[member].HAS_ITEM(8):
+                amount_mined*=100
+            if playerinfo[member].HAS_ITEM(9):
+                amount_mined+=40000
+            playerinfo[member].GIVE_KIPPCOINS(amount_mined)
+
 async def background_loop():
     import datetime
     global current_time
@@ -87,6 +101,7 @@ async def background_loop():
         try:
             if get_clock() != current_time:
                 update_stocks()
+                automine_kippcoins()
                 try:
                     await client.change_presence(activity=discord.Game(name=get_clock()))
                     current_time=get_clock()
@@ -112,17 +127,28 @@ async def background_loop():
                             else:
                                 music=serverinfo[server].queue[0][1]
                 if serverinfo[server].mHandler == None and len(serverinfo[server].queue)==0:
-                    c=datetime.datetime.now()-serverinfo[server].end_time
-                    b=datetime.datetime.now()-serverinfo[server].jointime
-                    if c.seconds/60 >= 5 and b.seconds/60 >= 5:
+                    end_time_delta=datetime.datetime.now()-serverinfo[server].end_time
+                    join_time_delta=datetime.datetime.now()-serverinfo[server].jointime
+                    if join_time_delta.seconds/60 >= 5 and end_time_delta.seconds/60 >= 5:
                         if server.voice_client != None:
                             try:
                                 await server.voice_client.disconnect()
                             except Exception:
                                 print ("Voice client timeout, can't disconnect")
+                else:
+                    if serverinfo[server].mHandler.paused:
+                        time_delta=datetime.datetime.now()-serverinfo[server].mHandler.pausedatetime
+                        if time_delta.seconds>=60:
+                            await serverinfo[server].musictextchannel.send("Song paused for more than an hour. Ending current song and clearing queue...")
+                            await serverinfo[server].mHandler.message.delete()
+                            serverinfo[server].mHandler=None
+                            serverinfo[server].queue=[]
+                            server.voice_client.stop()
+                            await server.voice_client.disconnect()
         except Exception as e:
             os.system('sudo echo "{0} {1}" >> $KIPP_DIR/log.txt'.format(datetime.datetime.strftime(datetime.datetime.now(),"[%m/%d/%Y %H:%M:%S]"), e))
         await asyncio.sleep(1)
+
 print("KIPP starting up...")
 @client.event
 async def on_voice_state_update(member,before, after):

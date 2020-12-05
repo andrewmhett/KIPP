@@ -44,4 +44,5 @@ while True:
         os.system("sudo -E python3 {0}/Python/KIPP.py".format(KIPP_DIR))
     except Exception as e:
         os.system('sudo echo "{0} {1}" >> $KIPP_DIR/log.txt'.format(datetime.datetime.strftime(datetime.datetime.now(),"[%m/%d/%Y %H:%M:%S]"), e))
+    time.sleep(10)
     logging.log(50,"KIPP restarting...")

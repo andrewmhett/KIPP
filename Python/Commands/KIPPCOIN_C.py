@@ -20,7 +20,7 @@ async def MINE(message,message2,serverinfo,playerinfo):
     global salt
     guess=int(hashlib.sha256(str(int(message2.split("|")[1])+salt).encode()).hexdigest(),16)
     if guess<=hash_value:
-        await message.channel.send("Mining successful. Recalculating hash value...")
+        await message.channel.send("Mining successful ({0}). Recalculating hash value...".format(str(message.author)))
         amount_mined=30
         if playerinfo[message.author].HAS_ITEM(1):
             amount_mined*=2

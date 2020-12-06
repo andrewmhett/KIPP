@@ -150,26 +150,10 @@
 		$.plot($("#flot-placeholder"), [temp_dataset, cpu_dataset], options);
 		var temp_x_pos = -1;
 		var cpu_x_pos = -1;
-		var total_mem = {
-			{
-				total_mem
-			}
-		}
-		var mem_in_use = {
-			{
-				mem_in_use
-			}
-		}
-		temp_text.innerHTML = {
-			{
-				temp
-			}
-		} + "° C";
-		cpu_text.innerHTML = {
-			{
-				cpu
-			}
-		} + "%";
+		var total_mem = {{total_mem}}
+		var mem_in_use = {{mem_in_use}}
+		temp_text.innerHTML = {{temp}} + "° C";
+		cpu_text.innerHTML = {{cpu}} + "%";
 		mem_text.innerHTML = mem_in_use.toFixed(1) + " / " + total_mem.toFixed(1) + " GB";
 
 		function createBarGraph(filled_fraction) {
@@ -226,6 +210,7 @@
 			}
 			$.plot($("#flot-placeholder"), [], options);
 			$.plot($("#flot-placeholder"), [temp_dataset, cpu_dataset], options);
+			console.log(cpu_dataset);
 		}
 
 		function updateMEM(mem_in_use) {

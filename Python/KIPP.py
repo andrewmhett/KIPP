@@ -1,12 +1,13 @@
-###########################
-#                         #
-#  #  #  ###  ####  ####  #
-#  # #    #   #  #  #  #  #
-#  ##     #   ####  ####  #
-#  # #    #   #     #     #
-#  #  #  ###  #     #     #
-#                         #
-###########################
+#╔═════════════════════════╗
+#║   _  _____ ____  ____   ║
+#║  | |/ /_ _|  _ \|  _ \  ║
+#║  | ' / | || |_) | |_) | ║
+#║  | . \ | ||  __/|  __/  ║
+#║  |_|\_\___|_|   |_|     ║
+#║                         ║
+#╚═════════════════════════╝
+
+
 import random
 from Base4Clock import get_clock
 from Command import commands
@@ -21,6 +22,8 @@ import os
 import threading
 import subprocess
 import difflib
+
+
 KIPP_DIR = os.environ['KIPP_DIR']
 sys.path.append(KIPP_DIR + "/Python/Commands")
 CREATOR_ID = 289920025077219328
@@ -37,18 +40,29 @@ current_time = ""
 
 
 def fluctuate(prev_delta):
-    fluctuation = SystemRandom().choices([.1, .05, .03, .01, 0, -.01, -.03, -.05, -.1], weights=(15, 25, 30, 35, 20, 35, 30, 25, 15), k=1)[
-        0] if prev_delta > 0.01 or prev_delta < 0.01 else SystemRandom().randrange(-5, 5) / 1000
+    fluctuation = SystemRandom().choices(
+        [.1, .05, .03, .01, 0, -.01, -.03, -.05, -.1],
+        weights=(15, 25, 30, 35, 20, 35, 30, 25, 15),
+        k=1)[0] if prev_delta > 0.01 or prev_delta < 0.01 else SystemRandom(
+    ).randrange(-5, 5) / 1000
     return fluctuation + prev_delta
 
 
 def update_stocks():
-    if datetime.strftime(datetime.now(), format("%m/%d/%Y")) not in subprocess.Popen(["sudo", "cat", KIPP_DIR + "/STOCKS.txt"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()[0].decode():
+    if datetime.strftime(
+            datetime.now(), format("%m/%d/%Y")) not in subprocess.Popen(
+                ["sudo", "cat", KIPP_DIR + "/STOCKS.txt"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT).communicate()[0].decode():
         if int(datetime.strftime(datetime.now(), format("%H"))) >= 10:
-            stocks = subprocess.Popen(["sudo", "-E", KIPP_DIR + "/C++/STOCKS_IO", "r", "a"],
-                                      stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
-            prev_data = subprocess.Popen(["sudo", "cat", KIPP_DIR + "/STOCKS.txt"], stdout=subprocess.PIPE,
-                                         stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+            stocks = subprocess.Popen(
+                ["sudo", "-E", KIPP_DIR + "/C++/STOCKS_IO", "r", "a"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+            prev_data = subprocess.Popen(
+                ["sudo", "cat", KIPP_DIR + "/STOCKS.txt"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
             delta_dict = {}
             for datum in prev_data:
                 if len(datum) > 0:
@@ -56,8 +70,10 @@ def update_stocks():
                         delta_dict[datum.split(":")[0]] = int(
                             datum.split(":")[1])
             os.system("sudo truncate -s 0 {0}/STOCKS.txt".format(KIPP_DIR))
-            prev_trends = subprocess.Popen(["sudo", "cat", KIPP_DIR + "/TRENDS.txt"], stdout=subprocess.PIPE,
-                                           stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
+            prev_trends = subprocess.Popen(
+                ["sudo", "cat", KIPP_DIR + "/TRENDS.txt"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
             os.system("sudo truncate -s 0 {0}/TRENDS.txt".format(KIPP_DIR))
             trend_dict = {}
             for trend in prev_trends:
@@ -67,8 +83,8 @@ def update_stocks():
                         trend_dict[trend.split(":")[0]].append(prev)
             for stock in stocks:
                 if len(stock) > 0:
-                    last_percent = delta_dict[stock.split(
-                        ":")[0]] / int(stock.split(" ")[2])
+                    last_percent = delta_dict[stock.split(":")[0]] / int(
+                        stock.split(" ")[2])
                     new_percent = fluctuate(last_percent)
                     random_perc = random.SystemRandom().randint(0, 50) / 1000
                     if new_percent > 0:
@@ -83,18 +99,22 @@ def update_stocks():
                     if int(stock.split(" ")[2]) > 150000:
                         delta -= int(int(stock.split(" ")[2]) * .08)
                     for i in range(9):
-                        trend_dict[stock.split(":")[0]][i] = trend_dict[stock.split(":")[
-                            0]][i + 1]
+                        trend_dict[stock.split(":")[0]][i] = trend_dict[
+                            stock.split(":")[0]][i + 1]
                     trend_dict[stock.split(":")[0]][9] = str(
                         int(stock.split(" ")[2]) + delta)
-                    os.system(
-                        'sudo echo "{0}:{1}" >> {2}/STOCKS.txt'.format(stock.split(":")[0], str(delta), KIPP_DIR))
+                    os.system('sudo echo "{0}:{1}" >> {2}/STOCKS.txt'.format(
+                        stock.split(":")[0], str(delta), KIPP_DIR))
                     os.system('sudo echo "{0}:{1}" >> {2}/TRENDS.txt'.format(
-                        stock.split(":")[0], " ".join(trend_dict[stock.split(":")[0]]), KIPP_DIR))
+                        stock.split(":")[0],
+                        " ".join(trend_dict[stock.split(":")[0]]), KIPP_DIR))
                     os.system('sudo -E {0}/C++/STOCKS_IO wp {1} {2}'.format(
-                        KIPP_DIR, stock.split(":")[0], str(delta + int(stock.split(" ")[2]))))
+                        KIPP_DIR,
+                        stock.split(":")[0],
+                        str(delta + int(stock.split(" ")[2]))))
             os.system('sudo echo "LAST UPDATED:{0}" >> {1}/STOCKS.txt'.format(
-                datetime.strftime(datetime.now(), format("%m/%d/%Y")), KIPP_DIR))
+                datetime.strftime(datetime.now(), format("%m/%d/%Y")),
+                KIPP_DIR))
 
 
 def automine_kippcoins():
@@ -125,33 +145,39 @@ async def background_loop():
                 update_stocks()
                 automine_kippcoins()
                 try:
-                    await client.change_presence(activity=discord.Game(name=get_clock()))
+                    await client.change_presence(activity=discord.Game(
+                        name=get_clock()))
                     current_time = get_clock()
                 except discord.DiscordException:
                     print("Binary clock rate limited...")
             for server in client.guilds:
-                if serverinfo[server].mHandler == None and len(serverinfo[server].queue) >= 1:
+                if serverinfo[server].mHandler == None and len(
+                        serverinfo[server].queue) >= 1:
                     music = serverinfo[server].queue[0][1]
                     if len(serverinfo[server].queue[0]) > 2:
-                        serverinfo[server].playlist = serverinfo[server].queue[0].split("PLAYLIST:")[
-                            1][1:]
+                        serverinfo[server].playlist = serverinfo[server].queue[
+                            0].split("PLAYLIST:")[1][1:]
                         music = serverinfo[server].pick_playlist_song()
                         if serverinfo[server].playlist != None:
                             serverinfo[server].queue.append(
                                 serverinfo[server].queue[0])
                     while len(serverinfo[server].queue) > 0:
                         try:
-                            player = await YTDLSource.from_url(music, loop=client.loop)
+                            player = await YTDLSource.from_url(
+                                music, loop=client.loop)
                             serverinfo[server].mHandler = music_handler(
-                                server, player, serverinfo[server].musicchannel)
+                                server, player,
+                                serverinfo[server].musicchannel)
                             break
                         except youtube_dl.utils.DownloadError:
-                            serverinfo[server].queue = serverinfo[server].queue[1:]
+                            serverinfo[server].queue = serverinfo[
+                                server].queue[1:]
                             if serverinfo[server].playlist != None:
                                 music = serverinfo[server].pick_playlist_song()
                             else:
                                 music = serverinfo[server].queue[0][1]
-                if serverinfo[server].mHandler == None and len(serverinfo[server].queue) == 0:
+                if serverinfo[server].mHandler == None and len(
+                        serverinfo[server].queue) == 0:
                     end_time_delta = datetime.datetime.now() - \
                         serverinfo[server].end_time
                     join_time_delta = datetime.datetime.now() - \
@@ -167,7 +193,9 @@ async def background_loop():
                         time_delta = datetime.datetime.now(
                         ) - serverinfo[server].mHandler.pausedatetime
                         if time_delta.seconds >= 60:
-                            await serverinfo[server].musictextchannel.send("Song paused for more than an hour. Ending current song and clearing queue...")
+                            await serverinfo[server].musictextchannel.send(
+                                "Song paused for more than an hour. Ending current song and clearing queue..."
+                            )
                             await serverinfo[server].mHandler.message.delete()
                             serverinfo[server].mHandler = None
                             serverinfo[server].queue = []
@@ -175,8 +203,10 @@ async def background_loop():
                             await server.voice_client.disconnect()
         except Exception as e:
             os.system('sudo echo "{0} {1}" >> $KIPP_DIR/log.txt'.format(
-                datetime.datetime.strftime(datetime.datetime.now(), "[%m/%d/%Y %H:%M:%S]"), e))
+                datetime.datetime.strftime(datetime.datetime.now(),
+                                           "[%m/%d/%Y %H:%M:%S]"), e))
         await asyncio.sleep(1)
+
 
 print("KIPP starting up...")
 
@@ -202,7 +232,8 @@ async def on_voice_state_update(member, before, after):
                 currentlyplaying = serverinfo[server].mHandler.is_playing
             if currentlyplaying:
                 if serverinfo[server].mHandler.paused == False:
-                    await serverinfo[server].musictextchannel.send("Nobody is listening to KIPP. Pausing music...")
+                    await serverinfo[server].musictextchannel.send(
+                        "Nobody is listening to KIPP. Pausing music...")
                     server.voice_client.pause()
                     serverinfo[server].mHandler.paused = True
                     serverinfo[server].mHandler.pausedatetime = datetime.now()
@@ -238,7 +269,8 @@ async def on_ready():
         serverinfo[server] = Server(server)
         for member in server.members:
             playerinfo[member] = Profile(member)
-            if playerinfo[member].HAS_ITEM(6) or playerinfo[member].HAS_ITEM(8):
+            if playerinfo[member].HAS_ITEM(6) or playerinfo[member].HAS_ITEM(
+                    8):
                 playerinfo[member].has_autominer = True
         client.loop.create_task(serverinfo[server].update_loop())
 
@@ -250,9 +282,13 @@ async def on_join(member):
         playerinfo[member] = Profile(member)
     if serverinfo[server].search_server_configs("WELCOME_CHANNEL") != None:
         try:
-            await client.get_channel(serverinfo[server].search_server_configs("WELCOME_CHANNEL")[1]).send("Welcome to **{0}**, {1}".format(server, member.mention))
+            await client.get_channel(
+                serverinfo[server].search_server_configs("WELCOME_CHANNEL")[1]
+            ).send("Welcome to **{0}**, {1}".format(server, member.mention))
         except discord.DiscordException:
-            print("Welcome channel was deleted, couldn't send message to welcome channel")
+            print(
+                "Welcome channel was deleted, couldn't send message to welcome channel"
+            )
 
 
 @client.event
@@ -274,11 +310,11 @@ async def on_message(message):
             c = message2
         for command in commands:
             if command.Name == c:
-                client.loop.create_task(command.Execute(
-                    message, message2, serverinfo, playerinfo))
+                client.loop.create_task(
+                    command.Execute(message, message2, serverinfo, playerinfo))
                 return
-        recommendations = difflib.get_close_matches(
-            c[1:], (c.Name[1:] for c in commands))
+        recommendations = difflib.get_close_matches(c[1:], (c.Name[1:]
+                                                            for c in commands))
         rec_msg = "Unable to find and execute `{0}`.".format(c)
         rec = False
         if len(recommendations) == 1:
@@ -290,5 +326,6 @@ async def on_message(message):
                 '\n!'.join(recommendations))
         if rec:
             await message.channel.send(rec_msg)
+
 
 client.run(TOKEN)

@@ -22,21 +22,21 @@ import logging
 import youtube_dl
 import subprocess
 import audioop
-EMBEDCOLOR=0x36393E
+EMBEDCOLOR = 0x36393E
 logging.getLogger().setLevel(logging.INFO)
 try:
-	from Token import TOKEN
+    from Token import TOKEN
 except ModuleNotFoundError:
-	print("TOKEN FILE NOT FOUND")
-	try:
-		TOKEN=os.environ['TOKEN']
-	except KeyError:
-		print("TOKEN NOT FOUND IN ENVIRONMENT")
+    print("TOKEN FILE NOT FOUND")
+    try:
+        TOKEN = os.environ['TOKEN']
+    except KeyError:
+        print("TOKEN NOT FOUND IN ENVIRONMENT")
 try:
-	from YOUTUBE_DATA_API import YOUTUBE_API_KEY
+    from YOUTUBE_DATA_API import YOUTUBE_API_KEY
 except ModuleNotFoundError:
-	print("YOUTUBE API FILE NOT FOUND")
-	try:
-		YOUTUBE_API_KEY=os.environ['YOUTUBE_API_KEY']
-	except KeyError:
-		print("YOUTUBE API KEY NOT FOUND IN ENVIRONMENT")
+    print("YOUTUBE API FILE NOT FOUND")
+    try:
+        YOUTUBE_API_KEY = os.environ['YOUTUBE_API_KEY']
+    except KeyError:
+        print("YOUTUBE API KEY NOT FOUND IN ENVIRONMENT")

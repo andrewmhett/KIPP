@@ -1,27 +1,33 @@
 <!DOCTYPE html>
 <html lang='en'>
+
 <head>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="/static/styles.css" media="screen"/>	
+	<link rel="stylesheet" type="text/css" href="/static/styles.css" media="screen" />
 	<style>
-		html, body {
+		html,
+		body {
 			margin: 0;
 			height: 100%;
 		}
+
 		.td {
-			display:inline-block;
+			display: inline-block;
 		}
-		#flot-placeholder{
-		    width:500px;
-		    height:35vw;
+
+		#flot-placeholder {
+			width: 500px;
+			height: 35vw;
 		}
-		.flot-tick-label{
-		    font-family:arial;
-		    font-size:20px;
+
+		.flot-tick-label {
+			font-family: arial;
+			font-size: 20px;
 		}
 	</style>
 </head>
+
 <body bgcolor="000000#" style="display:table;">
 	<div style="vertical-align:middle;text-align:center;display:table-cell">
 		<img src="/static/KIPP_1.png" style="margin-top:-30px" alt="KIPP" width=100%></img><br>
@@ -85,127 +91,152 @@
 	</div>
 	<script src="/static/dataPolling.js"></script>
 	<script>
-		var options={
-		    series:{
-			lines: {show: true,fill:true},
-			points: {show: true}
-		    },
-		    xaxis:
-		    {
-			show:false,
-			min: 1,
-			max: 20
-		    },
-		    yaxes:[
-		    {
-			labelFormatter: function (label, series) {
-			return "<font style=\"color:white;font-size:25px;font-family:arial\">" + label + "</font>";
+		var options = {
+			series: {
+				lines: {
+					show: true,
+					fill: true
+				},
+				points: {
+					show: true
+				}
 			},
-			position:"left",
-			axisLabel:"Temperature",
-			axisLabelUseCanvas:true,
-			min:20,
-			max:50
-		    },
-		    {
-			position:"right",
-			axisLabel:"CPU Usage",
-			axisLabelUseCanvas:true,
-			min:0,
-			max:100
-		    }
-		    ],
-		    legend: {
-			noColumns: 0,
-			labelFormatter: function (label, series) {
-			return "<font style=\"color:white;font-size:25px;font-family:arial\">" + label + "</font>";
+			xaxis: {
+				show: false,
+				min: 1,
+				max: 20
 			},
-			backgroundColor: "#000",
-			backgroundOpacity: 0,
-			labelBoxBorderColor: "#000000",
-			position: "nw"
-		    }
+			yaxes: [{
+					labelFormatter: function(label, series) {
+						return "<font style=\"color:white;font-size:25px;font-family:arial\">" + label + "</font>";
+					},
+					position: "left",
+					axisLabel: "Temperature",
+					axisLabelUseCanvas: true,
+					min: 20,
+					max: 50
+				},
+				{
+					position: "right",
+					axisLabel: "CPU Usage",
+					axisLabelUseCanvas: true,
+					min: 0,
+					max: 100
+				}
+			],
+			legend: {
+				noColumns: 0,
+				labelFormatter: function(label, series) {
+					return "<font style=\"color:white;font-size:25px;font-family:arial\">" + label + "</font>";
+				},
+				backgroundColor: "#000",
+				backgroundOpacity: 0,
+				labelBoxBorderColor: "#000000",
+				position: "nw"
+			}
 		};
-		var temp_arr=[];
-		var cpu_arr=[];
-		var temp_dataset={
+		var temp_arr = [];
+		var cpu_arr = [];
+		var temp_dataset = {
 			label: "CPU Temperature",
-			data:temp_arr,
-			yaxis:1
-		    }
-		var cpu_dataset={
+			data: temp_arr,
+			yaxis: 1
+		}
+		var cpu_dataset = {
 			label: "CPU Usage",
-			data:cpu_arr,
-			yaxis:2
-		    }
-		$.plot($("#flot-placeholder"),[temp_dataset,cpu_dataset],options);
-		var temp_x_pos=-1;
-		var cpu_x_pos=-1;
-		var total_mem = {{total_mem}}
-		var mem_in_use = {{mem_in_use}}
-		temp_text.innerHTML={{temp}}+"° C";
-		cpu_text.innerHTML={{cpu}}+"%";
-		mem_text.innerHTML=mem_in_use.toFixed(1)+" / "+total_mem.toFixed(1)+" GB";
+			data: cpu_arr,
+			yaxis: 2
+		}
+		$.plot($("#flot-placeholder"), [temp_dataset, cpu_dataset], options);
+		var temp_x_pos = -1;
+		var cpu_x_pos = -1;
+		var total_mem = {
+			{
+				total_mem
+			}
+		}
+		var mem_in_use = {
+			{
+				mem_in_use
+			}
+		}
+		temp_text.innerHTML = {
+			{
+				temp
+			}
+		} + "° C";
+		cpu_text.innerHTML = {
+			{
+				cpu
+			}
+		} + "%";
+		mem_text.innerHTML = mem_in_use.toFixed(1) + " / " + total_mem.toFixed(1) + " GB";
+
 		function createBarGraph(filled_fraction) {
-			var graph_string="";
-			for (var i=0;i<20;i++){
-				if (i<(20*filled_fraction)){
-					graph_string+="|";
-				}else{
-					graph_string+="-";
+			var graph_string = "";
+			for (var i = 0; i < 20; i++) {
+				if (i < (20 * filled_fraction)) {
+					graph_string += "|";
+				} else {
+					graph_string += "-";
 				}
 			}
 			return graph_string;
 		}
-		function updateTemperature(temperature){
-			temp_text.innerHTML=parseFloat(temperature).toFixed(1)+"° C";
-			var graph=createBarGraph((temperature-20)/50);
-			temp_graph_text_0.innerHTML=graph.substring(0,5);
-			temp_graph_text_1.innerHTML=graph.substring(5,10);
-			temp_graph_text_2.innerHTML=graph.substring(10,15);
-			temp_graph_text_3.innerHTML=graph.substring(15,20);
-			if (temp_x_pos != 19){
+
+		function updateTemperature(temperature) {
+			temp_text.innerHTML = parseFloat(temperature).toFixed(1) + "° C";
+			var graph = createBarGraph((temperature - 20) / 50);
+			temp_graph_text_0.innerHTML = graph.substring(0, 5);
+			temp_graph_text_1.innerHTML = graph.substring(5, 10);
+			temp_graph_text_2.innerHTML = graph.substring(10, 15);
+			temp_graph_text_3.innerHTML = graph.substring(15, 20);
+			if (temp_x_pos != 19) {
 				temp_x_pos++;
 			}
-			if (temp_arr.length==20){
-				 for (var i=1;i<20;i++){
-					 temp_arr[i-1]=[temp_arr[i][0]-1,temp_arr[i][1]];
-				 }
-				 temp_arr[19]=[20,temperature];
-			}else{
-				 temp_arr.push([temp_x_pos+1,temperature]);
+			if (temp_arr.length == 20) {
+				for (var i = 1; i < 20; i++) {
+					temp_arr[i - 1] = [temp_arr[i][0] - 1, temp_arr[i][1]];
+				}
+				temp_arr[19] = [20, temperature];
+			} else {
+				temp_arr.push([temp_x_pos + 1, temperature]);
 			}
-			$.plot($("#flot-placeholder"),[],options);
-			$.plot($("#flot-placeholder"),[temp_dataset,cpu_dataset],options);
+			$.plot($("#flot-placeholder"), [], options);
+			$.plot($("#flot-placeholder"), [temp_dataset, cpu_dataset], options);
 		}
-		function updateCPU(usage){
-			cpu_text.innerHTML=usage+"%";
-			var graph=createBarGraph(usage/100);
-			cpu_graph_text_0.innerHTML=graph.substring(0,5);
-			cpu_graph_text_1.innerHTML=graph.substring(5,10);
-			cpu_graph_text_2.innerHTML=graph.substring(10,15);
-			cpu_graph_text_3.innerHTML=graph.substring(15,20);
-			if (cpu_x_pos != 19){
+
+		function updateCPU(usage) {
+			cpu_text.innerHTML = usage + "%";
+			var graph = createBarGraph(usage / 100);
+			cpu_graph_text_0.innerHTML = graph.substring(0, 5);
+			cpu_graph_text_1.innerHTML = graph.substring(5, 10);
+			cpu_graph_text_2.innerHTML = graph.substring(10, 15);
+			cpu_graph_text_3.innerHTML = graph.substring(15, 20);
+			if (cpu_x_pos != 19) {
 				cpu_x_pos++;
 			}
-			if (cpu_arr.length==20){
-				 for (var i=1;i<20;i++){ cpu_arr[i-1]=[cpu_arr[i][0]-1,cpu_arr[i][1]];
-				 }
-				 cpu_arr[19]=[20,usage];
-			}else{
-				cpu_arr.push([cpu_x_pos+1,usage]);
+			if (cpu_arr.length == 20) {
+				for (var i = 1; i < 20; i++) {
+					cpu_arr[i - 1] = [cpu_arr[i][0] - 1, cpu_arr[i][1]];
+				}
+				cpu_arr[19] = [20, usage];
+			} else {
+				cpu_arr.push([cpu_x_pos + 1, usage]);
 			}
-			$.plot($("#flot-placeholder"),[],options);
-			$.plot($("#flot-placeholder"),[temp_dataset,cpu_dataset],options);
+			$.plot($("#flot-placeholder"), [], options);
+			$.plot($("#flot-placeholder"), [temp_dataset, cpu_dataset], options);
 		}
-		function updateMEM(mem_in_use){
-			mem_text.innerHTML=parseFloat(mem_in_use).toFixed(1)+" / "+total_mem.toFixed(1)+" GB";
-			var graph=createBarGraph(mem_in_use/total_mem);
-			mem_graph_text_0.innerHTML=graph.substring(0,5);
-			mem_graph_text_1.innerHTML=graph.substring(5,10);
-			mem_graph_text_2.innerHTML=graph.substring(10,15);
-			mem_graph_text_3.innerHTML=graph.substring(15,20);
+
+		function updateMEM(mem_in_use) {
+			mem_text.innerHTML = parseFloat(mem_in_use).toFixed(1) + " / " + total_mem.toFixed(1) + " GB";
+			var graph = createBarGraph(mem_in_use / total_mem);
+			mem_graph_text_0.innerHTML = graph.substring(0, 5);
+			mem_graph_text_1.innerHTML = graph.substring(5, 10);
+			mem_graph_text_2.innerHTML = graph.substring(10, 15);
+			mem_graph_text_3.innerHTML = graph.substring(15, 20);
 		}
 	</script>
 </body>
+
 </html>

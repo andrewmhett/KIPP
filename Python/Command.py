@@ -2,6 +2,7 @@ from Commands.Command_utils import VerifyOwner
 from ESSENTIAL_PACKAGES import *
 import sys
 import os
+commands = []
 KIPP_DIR = os.environ["KIPP_DIR"]
 sys.path.append(KIPP_DIR + "/Python/Commands")
 CREATOR_ID = 289920025077219328
@@ -9,7 +10,6 @@ KIPP_ID = 386352783550447628
 if len(sys.argv) > 1:
     if sys.argv[1] == "dev":
         KIPP_ID = 726545013064073277
-commands = []
 serverinfo = {}
 playerinfo = {}
 

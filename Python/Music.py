@@ -3,9 +3,8 @@ from Footer import get_footer
 from subprocess import check_output
 EMBEDCOLOR = 0x36393E
 
-ytdl_format_options = {
-    'format': 'bestaudio/best',
-}
+ytdl_format_options = {'format': 'bestaudio/best', 'noplaylist': True, 'continuedl': True,
+                       'verbose': True, 'skip_download': True, 'youtube_include_dash_manifest': False}
 
 ffmpeg_options = {
     'options': '-vn'

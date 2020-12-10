@@ -26,7 +26,7 @@ import difflib
 
 KIPP_DIR = os.environ['KIPP_DIR']
 if len(KIPP_DIR)==0:
-    os.environ['KIPP_DIR']="./'
+    os.environ['KIPP_DIR']="./"
 sys.path.append(KIPP_DIR + "/Python/Commands")
 CREATOR_ID = 289920025077219328
 KIPP_ID = 386352783550447628

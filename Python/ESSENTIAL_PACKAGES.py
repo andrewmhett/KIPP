@@ -32,6 +32,7 @@ except ModuleNotFoundError:
         TOKEN = os.environ['TOKEN']
     except KeyError:
         print("TOKEN NOT FOUND IN ENVIRONMENT")
+        TOKEN=""
 try:
     from YOUTUBE_DATA_API import YOUTUBE_API_KEY
 except ModuleNotFoundError:
@@ -40,3 +41,4 @@ except ModuleNotFoundError:
         YOUTUBE_API_KEY = os.environ['YOUTUBE_API_KEY']
     except KeyError:
         print("YOUTUBE API KEY NOT FOUND IN ENVIRONMENT")
+        YOUTUBE_API_KEY=""

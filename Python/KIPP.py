@@ -11,8 +11,9 @@
 import random
 from Base4Clock import get_clock
 import os
-KIPP_DIR = os.environ['KIPP_DIR']
-if len(KIPP_DIR)==0:
+try:
+    KIPP_DIR = os.environ['KIPP_DIR']
+except KeyError:
     os.environ['KIPP_DIR']="./"
 import Commands
 from Command import commands

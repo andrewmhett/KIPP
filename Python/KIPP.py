@@ -330,5 +330,5 @@ async def on_message(message):
         if rec:
             await message.channel.send(rec_msg)
 
-
-client.run(TOKEN)
+if len(TOKEN)>0:
+    client.run(TOKEN)

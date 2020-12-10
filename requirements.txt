@@ -8,3 +8,4 @@ websockets
 pynacl
 python-youtube
 baseconvert
+PIL

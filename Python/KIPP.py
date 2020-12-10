@@ -195,7 +195,7 @@ async def background_loop():
                     if serverinfo[server].mHandler.paused:
                         time_delta = datetime.datetime.now(
                         ) - serverinfo[server].mHandler.pausedatetime
-                        if time_delta.seconds >= 60:
+                        if time_delta.seconds >= 3600:
                             await serverinfo[server].musictextchannel.send(
                                 "Song paused for more than an hour. Ending current song and clearing queue..."
                             )

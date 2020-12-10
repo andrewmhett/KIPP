@@ -9,3 +9,4 @@ pynacl
 python-youtube
 baseconvert
 pillow
+matplotlib

@@ -9,4 +9,3 @@ python-youtube
 baseconvert
 pillow
 matplotlib
-pytest-asyncio

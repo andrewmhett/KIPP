@@ -10,6 +10,10 @@
 
 import random
 from Base4Clock import get_clock
+import os
+KIPP_DIR = os.environ['KIPP_DIR']
+if len(KIPP_DIR)==0:
+    os.environ['KIPP_DIR']="./"
 import Commands
 from Command import commands
 from Profile import Profile
@@ -18,15 +22,10 @@ from Server import Server
 from ESSENTIAL_PACKAGES import *
 import sys
 import logging
-import os
 import threading
 import subprocess
 import difflib
 
-
-KIPP_DIR = os.environ['KIPP_DIR']
-if len(KIPP_DIR)==0:
-    os.environ['KIPP_DIR']="./"
 sys.path.append(KIPP_DIR + "/Python/Commands")
 CREATOR_ID = 289920025077219328
 KIPP_ID = 386352783550447628

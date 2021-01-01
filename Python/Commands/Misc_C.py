@@ -3,7 +3,6 @@ from .Command_utils import *
 from Command import *
 import multiprocessing
 
-
 async def FACEDETECT(message, message2, serverinfo, playerinfo):
     import subprocess
     os.system("sudo rm out_0.bmp; sudo rm img.jpg")
@@ -74,8 +73,10 @@ async def IMAGE(message, message2, serverinfo, playerinfo):
     queue = multiprocessing.Queue()
     proc = multiprocessing.Process(target=locate_image, args=(message2, queue))
     proc.start()
-    proc.join()
-    image = queue.get()
+    try:
+        image = queue.get(timeout=5)
+    except Exception:
+        image=""
     if image == "":
         await message.channel.send("No results for image search **{0}**".format(str(message.content).split('|')[1]))
     else:

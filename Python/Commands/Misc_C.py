@@ -74,7 +74,7 @@ async def IMAGE(message, message2, serverinfo, playerinfo):
     proc = multiprocessing.Process(target=locate_image, args=(message2, queue))
     proc.start()
     try:
-        image = queue.get(timeout=5)
+        image = queue.get(timeout=10)
     except Exception:
         image=""
     if image == "":

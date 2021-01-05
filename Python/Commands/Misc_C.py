@@ -81,8 +81,8 @@ async def IMAGE(message, message2, serverinfo, playerinfo):
             await message.channel.send("Missing permissions to send an image in this channel")
 
 def locate_gif(message2, queue):
-    url = "https://www.giphy.com/search/{0}".format(
-        message2.split('|')[1])
+    url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(
+        message2.split('|')[1].replace(' ', '+').replace("'", "%27"), message2.split('|')[1].replace(' ', '+').replace("'", "%27"))
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
     req = requests.get(url, headers=headers)
@@ -92,9 +92,9 @@ def locate_gif(message2, queue):
         i = i + 1
         if i>600:
             break
-        link="https://"+str(req).split('https://')[i].split('"')[0]
-        if ".webp" in link or ".gif" in link:
-            image=link
+        if ".GIF" in ("https://" + str(req).split('https://')[i].split('"')[0]).upper() and "File:" not in "https://" + str(req).split('https://')[i].split('"')[0]:
+            image = "https://" + \
+                str(req).split('https://')[i].split('"')[0]
             if requests.get(image).status_code == 200:
                 queue.put(image)
                 break

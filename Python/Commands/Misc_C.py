@@ -51,21 +51,16 @@ def locate_image(message2, queue):
     req = requests.get(url, headers=headers)
     req = req.content
     i = 0
-    cont = 0
     while True:
-        try:
-            i = i + 1
-            if cont > 300:
-                queue.put("")
+        i = i + 1
+        if i>600:
+            break
+        if ".JPEG" in ("https://" + str(req).split('https://')[i].split('"')[0]).upper() or ".JPG" in ("https://" + str(req).split('https://')[i].split('"')[0]).upper() and "File:" not in "https://" + str(req).split('https://')[i].split('"')[0]:
+            image = "https://" + \
+                str(req).split('https://')[i].split('"')[0]
+            if requests.get(image).status_code == 200:
+                queue.put(image)
                 break
-            if ".JPEG" in ("https://" + str(req).split('https://')[i].split('"')[0]).upper() or ".JPG" in ("https://" + str(req).split('https://')[i].split('"')[0]).upper() and "File:" not in "https://" + str(req).split('https://')[i].split('"')[0]:
-                image = "https://" + \
-                    str(req).split('https://')[i].split('"')[0]
-                if requests.get(image).status_code == 200:
-                    queue.put(image)
-                    break
-        except Exception:
-            cont += 1
 
 
 async def IMAGE(message, message2, serverinfo, playerinfo):
@@ -85,6 +80,42 @@ async def IMAGE(message, message2, serverinfo, playerinfo):
         except discord.errors.Forbidden:
             await message.channel.send("Missing permissions to send an image in this channel")
 
+def locate_gif(message2, queue):
+    url = "https://www.giphy.com/search/{0}".format(
+        message2.split('|')[1])
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+    req = requests.get(url, headers=headers)
+    req = req.content
+    i = 0
+    while True:
+        i = i + 1
+        if i>600:
+            break
+        link="https://"+str(req).split('https://')[i].split('"')[0]
+        if ".webp" in link or ".gif" in link:
+            image=link
+            if requests.get(image).status_code == 200:
+                queue.put(image)
+                break
+
+
+async def GIF(message, message2, serverinfo, playerinfo):
+    await message.channel.send("Processing GIF request...")
+    queue = multiprocessing.Queue()
+    proc = multiprocessing.Process(target=locate_gif, args=(message2, queue))
+    proc.start()
+    try:
+        image = queue.get(timeout=10)
+    except Exception:
+        image=""
+    if image == "":
+        await message.channel.send("No results for GIF search **{0}**".format(str(message.content).split('|')[1]))
+    else:
+        try:
+            await send_image(message, image, "GIF")
+        except discord.errors.Forbidden:
+            await message.channel.send("Missing permissions to send an image in this channel")
 
 async def STATUS(message, message2, serverinfo, playerinfo):
     from subprocess import Popen, PIPE
@@ -194,6 +225,8 @@ MISC("!IQ", "IQ stands for Interstellar Quote. This command will send a random I
 MISC("!CODE", "This command will give information about KIPP's code\n!CODE", CODE, [])
 MISC("!IMAGE", "This command will return an image of the given search query\n!IMAGE|search",
      IMAGE, [str])
+MISC("!GIF", "This command will return gif of the given search query\n!GIF|search",
+     GIF, [str])
 MISC("!STATUS", "Shows KIPP's Daemon's current status\n!STATUS", STATUS, [])
 MISC("!MATH", "This command will return the answer to any basic math problem given\n!MATH|problem",
      MATH, [str])

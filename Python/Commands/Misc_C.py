@@ -43,7 +43,7 @@ async def CODE(message, message2, serverinfo, playerinfo):
     await message.channel.send(embed=emb)
 
 
-def locate_image(message2, queue):
+def locate_image(message2, queue, num):
     extensions=["jpeg","jpg"]
     url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={0}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(
         message2.split('|')[1].replace(' ', '+').replace("'", "%27"))
@@ -51,18 +51,21 @@ def locate_image(message2, queue):
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
     req = requests.get(url, headers=headers)
     html = str(req.content).split('["')
+    i=0
     for slice in html:
         if slice.startswith('https') and slice.split('"')[0].split('.')[-1] in extensions:
             image=slice.split('"')[0]
             if requests.get(image).status_code == 200:
                 queue.put(image)
-                break
+                i+=1
+                if i==num:
+                    break
 
 
 async def IMAGE(message, message2, serverinfo, playerinfo):
     await message.channel.send("Processing image request...")
     queue = multiprocessing.Queue()
-    proc = multiprocessing.Process(target=locate_image, args=(message2, queue))
+    proc = multiprocessing.Process(target=locate_image, args=(message2, queue, 1))
     proc.start()
     try:
         image = queue.get(timeout=10)
@@ -76,7 +79,28 @@ async def IMAGE(message, message2, serverinfo, playerinfo):
         except discord.errors.Forbidden:
             await message.channel.send("Missing permissions to send an image in this channel")
 
-def locate_gif(message2, queue):
+
+async def MULTIIMAGE(message, message2, serverinfo, playerinfo):
+    await message.channel.send("Processing image request...")
+    queue = multiprocessing.Queue()
+    proc = multiprocessing.Process(target=locate_image, args=(message2, queue, 5))
+    proc.start()
+    images=[]
+    try:
+        images.append(queue.get(timeout=10))
+    except Exception:
+        pass
+    if len(images)==0:
+        await message.channel.send("No results for image search **{0}**".format(str(message.content).split('|')[1]))
+    else:
+        try:
+            for i in range(5):
+                await send_image(message, images[i], "Image {0}".format(i+1))
+        except discord.errors.Forbidden:
+            await message.channel.send("Missing permissions to send an image in this channel")
+
+
+def locate_gif(message2, queue, num):
     extensions=["gif"]
     url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={0}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(
         message2.split('|')[1].replace(' ', '+').replace("'", "%27"))
@@ -84,18 +108,21 @@ def locate_gif(message2, queue):
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
     req = requests.get(url, headers=headers)
     html = str(req.content).split('["')
+    i=0
     for slice in html:
         if slice.startswith('https') and slice.split('"')[0].split('.')[-1] in extensions:
             image=slice.split('"')[0]
             if requests.get(image).status_code == 200:
                 queue.put(image)
-                break
+                i+=1
+                if i==num:
+                    break
 
 
 async def GIF(message, message2, serverinfo, playerinfo):
     await message.channel.send("Processing GIF request...")
     queue = multiprocessing.Queue()
-    proc = multiprocessing.Process(target=locate_gif, args=(message2, queue))
+    proc = multiprocessing.Process(target=locate_gif, args=(message2, queue, 1))
     proc.start()
     try:
         image = queue.get(timeout=10)
@@ -108,6 +135,28 @@ async def GIF(message, message2, serverinfo, playerinfo):
             await send_image(message, image, "GIF")
         except discord.errors.Forbidden:
             await message.channel.send("Missing permissions to send an image in this channel")
+
+
+async def MULTIGIF(message, message2, serverinfo, playerinfo):
+    await message.channel.send("Processing GIF request...")
+    queue = multiprocessing.Queue()
+    proc = multiprocessing.Process(target=locate_gif, args=(message2, queue, 5))
+    proc.start()
+    images=[]
+    try:
+        for i in range(5):
+            images.append(queue.get(timeout=10))
+    except Exception:
+        pass
+    if len(images)==0:
+        await message.channel.send("No results for GIF search **{0}**".format(str(message.content).split('|')[1]))
+    else:
+        try:
+            for i in range(5):
+                await send_image(message, images[i], "GIF {0}".format(i+1))
+        except discord.errors.Forbidden:
+            await message.channel.send("Missing permissions to send an image in this channel")
+
 
 async def STATUS(message, message2, serverinfo, playerinfo):
     from subprocess import Popen, PIPE
@@ -217,8 +266,12 @@ MISC("!IQ", "IQ stands for Interstellar Quote. This command will send a random I
 MISC("!CODE", "This command will give information about KIPP's code\n!CODE", CODE, [])
 MISC("!IMAGE", "This command will return an image of the given search query\n!IMAGE|search",
      IMAGE, [str])
-MISC("!GIF", "This command will return gif of the given search query\n!GIF|search",
+MISC("!GIF", "This command will return a GIF of the given search query\n!GIF|search",
      GIF, [str])
+MISC("!MULTIIMAGE", "This command will return five images of the given search query\n!MULTIIMAGE|search",
+     MULTIIMAGE, [str])
+MISC("!MULTIGIF", "This command will return five GIFs of the given search query\n!MULTIGIF|search",
+     MULTIGIF, [str])
 MISC("!STATUS", "Shows KIPP's Daemon's current status\n!STATUS", STATUS, [])
 MISC("!MATH", "This command will return the answer to any basic math problem given\n!MATH|problem",
      MATH, [str])

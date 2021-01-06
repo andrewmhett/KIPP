@@ -1,5 +1,5 @@
 from ESSENTIAL_PACKAGES import *
-
+import hashlib
 
 def READ_DATA_IN(path, condition=lambda x: True, attr_condition=lambda x: True):
     try:
@@ -21,13 +21,13 @@ def READ_DATA_IN(path, condition=lambda x: True, attr_condition=lambda x: True):
         arr = None
     return arr
 
-
 KIPP_DIR = os.environ["KIPP_DIR"]
-
 
 class Server:
     def __init__(self, server):
+        self.id_hash=hashlib.sha1(str(server.id).encode("utf-8")).hexdigest()
         self.task = None
+        self.old_queue=[]
         self.server = server
         self.mHandler = None
         self.everyoneleft = False
@@ -88,6 +88,16 @@ class Server:
         data = READ_DATA_IN(KIPP_DIR + '/ServerConfigs/{0}'.format(
             str(self.server.id)), condition=lambda x: True if query in str(x) else False)
         return data
+
+    def post_data(self,endpoint,data):
+        from private_key import n, d
+        hash=int.from_bytes(hashlib.sha512((datetime.strftime(datetime.utcnow(),"%H:%M")+data).encode('utf-8')).digest(),byteorder='big')
+        signature=pow(hash,d,n)
+        try:
+            requests.post(HEROKU_URL+"/{0}?id_hash={1}&signature={2}".format(endpoint,self.id_hash,signature),data)
+        except Exception as e:
+            print(e)
+            pass
 
     async def update_loop(self):
         while True:

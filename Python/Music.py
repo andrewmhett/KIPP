@@ -1,7 +1,7 @@
 from ESSENTIAL_PACKAGES import *
 from Footer import get_footer
 from subprocess import check_output
-EMBEDCOLOR = 0x36393E
+import hashlib
 
 ytdl_format_options = {'format': 'bestaudio/best', 'noplaylist': True, 'continuedl': True,
                        'verbose': True, 'skip_download': True, 'youtube_include_dash_manifest': False}
@@ -53,6 +53,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 class music_handler:
     def __init__(self, server, player, channel):
         self.server = server
+        self.id_hash=hashlib.sha1(str(server.id).encode("utf-8")).hexdigest()
         self.resend_timer = 0
         self.channel = channel
         self.player = player
@@ -93,12 +94,11 @@ class music_handler:
             self.length = "Live"
         self.desc = ("`0:00 / " + self.length)
         self.em = discord.Embed(colour=EMBEDCOLOR)
-        self.em.description = "[{0}]({1})".format(self.title, self.link)
+        self.em.description = "[{0}]({1})\n[{2}]({3})".format(self.title, self.link, "Web Dashboard", HEROKU_URL+"?id_hash="+self.id_hash)
         self.em.set_author(
             name="Music", icon_url="http://www.charbase.com/images/glyph/9835")
         self.em.add_field(name="", value=self.desc, inline=True)
         self.em.set_footer(text=self.footer)
-        self.is_playing = True
         self.pausedatetime = None
         self.pausetime = None
 

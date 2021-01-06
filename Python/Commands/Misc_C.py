@@ -54,8 +54,9 @@ def locate_image(message2, queue):
     for slice in html:
         if slice.startswith('https') and slice.split('"')[0].split('.')[-1] in extensions:
             image=slice.split('"')[0]
-            queue.put(image)
-            break
+            if requests.get(image).status_code == 200:
+                queue.put(image)
+                break
 
 
 async def IMAGE(message, message2, serverinfo, playerinfo):
@@ -86,8 +87,9 @@ def locate_gif(message2, queue):
     for slice in html:
         if slice.startswith('https') and slice.split('"')[0].split('.')[-1] in extensions:
             image=slice.split('"')[0]
-            queue.put(image)
-            break
+            if requests.get(image).status_code == 200:
+                queue.put(image)
+                break
 
 
 async def GIF(message, message2, serverinfo, playerinfo):

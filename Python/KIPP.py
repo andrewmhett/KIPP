@@ -198,7 +198,7 @@ async def background_loop():
                                 await server.voice_client.disconnect()
                             except Exception:
                                 print("Voice client timeout, can't disconnect")
-                else:
+                elif serverinfo[server].mHandler != None:
                     if serverinfo[server].mHandler.paused:
                         time_delta = datetime.datetime.now(
                         ) - serverinfo[server].mHandler.pausedatetime

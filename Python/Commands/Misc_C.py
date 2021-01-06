@@ -50,7 +50,7 @@ def locate_image(message2, queue):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
     req = requests.get(url, headers=headers)
-    html = req.content.split('["')
+    html = str(req.content).split('["')
     for slice in html:
         if slice.startswith('https') and slice.split('"')[0].split('.')[-1] in extensions:
             image=slice.split('"')[0]
@@ -82,7 +82,7 @@ def locate_gif(message2, queue):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
     req = requests.get(url, headers=headers)
-    html = req.content.split('["')
+    html = str(req.content).split('["')
     for slice in html:
         if slice.startswith('https') and slice.split('"')[0].split('.')[-1] in extensions:
             image=slice.split('"')[0]

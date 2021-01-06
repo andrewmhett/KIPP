@@ -81,6 +81,7 @@ async def IMAGE(message, message2, serverinfo, playerinfo):
             await message.channel.send("Missing permissions to send an image in this channel")
 
 def locate_gif(message2, queue):
+    messge2+=" gif"
     url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(
         message2.split('|')[1].replace(' ', '+').replace("'", "%27"), message2.split('|')[1].replace(' ', '+').replace("'", "%27"))
     headers = {

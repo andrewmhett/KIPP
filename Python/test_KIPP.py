@@ -5,5 +5,6 @@ except KeyError:
     os.environ['KIPP_DIR']=os.environ['PWD']
     KIPP_DIR=os.environ['PWD']
 from ESSENTIAL_PACKAGES import *
-import Commands
-from Command import commands
+def test_requirements():
+    import Commands
+    from Command import commands

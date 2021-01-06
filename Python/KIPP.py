@@ -191,7 +191,7 @@ async def background_loop():
                                 await server.voice_client.disconnect()
                             except Exception:
                                 print("Voice client timeout, can't disconnect")
-                else:
+                elif serverinfo[server].mHandler != None:
                     if serverinfo[server].mHandler.paused:
                         time_delta = datetime.datetime.now(
                         ) - serverinfo[server].mHandler.pausedatetime
@@ -199,6 +199,7 @@ async def background_loop():
                             await serverinfo[server].musictextchannel.send(
                                 "Song paused for more than an hour. Ending current song and clearing queue..."
                             )
+                            serverinfo[server].mHandler.paused=False
                             await serverinfo[server].mHandler.message.delete()
                             serverinfo[server].mHandler = None
                             serverinfo[server].queue = []

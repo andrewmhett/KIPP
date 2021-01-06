@@ -154,6 +154,13 @@ async def background_loop():
                 except discord.DiscordException:
                     print("Binary clock rate limited...")
             for server in client.guilds:
+                if serverinfo[server].old_queue != serverinfo[server].queue[1:]:
+                    #update the queue on the web dashboard
+                    serverinfo[server].old_queue=serverinfo[server].queue[1:]
+                    queue_str=""
+                    for song_pair in serverinfo[server].queue[1:]:
+                        queue_str+=song_pair[0]+",->"+song_pair[1]+",\n"
+                    serverinfo[server].post_data("song_queue",queue_str)
                 if serverinfo[server].mHandler == None and len(
                         serverinfo[server].queue) >= 1:
                     music = serverinfo[server].queue[0][1]
@@ -172,7 +179,7 @@ async def background_loop():
                                 server, player,
                                 serverinfo[server].musicchannel)
                             break
-                        except youtube_dl.utils.DownloadError:
+                        except youtube_dl.utils.DownloadError as e:
                             serverinfo[server].queue = serverinfo[
                                 server].queue[1:]
                             if serverinfo[server].playlist != None:
@@ -199,6 +206,7 @@ async def background_loop():
                             await serverinfo[server].musictextchannel.send(
                                 "Song paused for more than an hour. Ending current song and clearing queue..."
                             )
+                            serverinfo[server].post_data("song_queue","")
                             await serverinfo[server].mHandler.message.delete()
                             serverinfo[server].mHandler = None
                             serverinfo[server].queue = []
@@ -241,7 +249,7 @@ async def on_voice_state_update(member, before, after):
                     serverinfo[server].mHandler.paused = True
                     serverinfo[server].mHandler.pausedatetime = datetime.now()
     except AttributeError:
-        print(e)
+        pass
 
 
 @client.event

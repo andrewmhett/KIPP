@@ -78,7 +78,7 @@ async def IMAGE(message, message2, serverinfo, playerinfo):
 
 def locate_gif(message2, queue):
     messge2+=" gif"
-    url = "https://www.google.com/search?q=google+gifs&tbm=isch&chips=q:{0},g_1:animated:kSQtCbhP3k8%3D&hl=en&sa=X&ved=2ahUKEwiL9sr1g4buAhUjIH0KHaj2C-kQ4lYoAHoECAEQGQ&biw=1191&bih=656".format(
+    url = "https://www.google.com/search?q={0}&tbm=isch&chips=q:{0},g_1:animated:GFF0PMle5Z8%3D&hl=en&sa=X&ved=2ahUKEwjQuOWohYbuAhVFk54KHTkrAloQ4lYoAHoECAEQGQ&biw=1191&bih=656".format(
         message2.split('|')[1].replace(' ', '+').replace("'", "%27"))
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}

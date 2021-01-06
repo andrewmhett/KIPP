@@ -44,19 +44,18 @@ async def CODE(message, message2, serverinfo, playerinfo):
 
 
 def locate_image(message2, queue):
-    url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={1}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(
-        message2.split('|')[1].replace(' ', '+').replace("'", "%27"), message2.split('|')[1].replace(' ', '+').replace("'", "%27"))
+    extensions=["jpeg","jpg"]
+    url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={0}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(
+        message2.split('|')[1].replace(' ', '+').replace("'", "%27"))
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
     req = requests.get(url, headers=headers)
-    req = req.content
-    for i in range(600):
-        if ".JPEG" in ("https://" + str(req).split('https://')[i].split('"')[0]).upper() or ".JPG" in ("https://" + str(req).split('https://')[i].split('"')[0]).upper() and "File:" not in "https://" + str(req).split('https://')[i].split('"')[0]:
-            image = "https://" + \
-                str(req).split('https://')[i].split('"')[0]
-            if requests.get(image).status_code == 200:
-                queue.put(image)
-                break
+    html = req.content.split('["')
+    for slice in html:
+        if slice.startswith('https') and slice.split('"')[0].split('.')[-1] in extensions:
+            image=slice.split('"')[0]
+            queue.put(image)
+            break
 
 
 async def IMAGE(message, message2, serverinfo, playerinfo):
@@ -77,20 +76,18 @@ async def IMAGE(message, message2, serverinfo, playerinfo):
             await message.channel.send("Missing permissions to send an image in this channel")
 
 def locate_gif(message2, queue):
-    messge2+=" gif"
-    url = "https://www.google.com/search?q=google+gifs&tbm=isch&chips=q:{0},g_1:animated:kSQtCbhP3k8%3D&hl=en&sa=X&ved=2ahUKEwiL9sr1g4buAhUjIH0KHaj2C-kQ4lYoAHoECAEQGQ&biw=1191&bih=656".format(
+    extensions=["gif"]
+    url = "https://www.google.com/search?tbm=isch&source=hp&biw=2560&bih=1309&ei=eCYOW5bML6Oi0gK774NY&q={0}&oq={0}&gs_l=img.3..0l10.3693.4072.0.4294.7.6.0.1.1.0.59.152.3.3.0....0...1ac.1.64.img..3.4.156.0...0.OLvQBmMFRWY".format(
         message2.split('|')[1].replace(' ', '+').replace("'", "%27"))
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
     req = requests.get(url, headers=headers)
-    req = req.content
-    for i in range(600):
-        if ".GIF" in ("https://" + str(req).split('https://')[i].split('"')[0]).upper() and "File:" not in "https://" + str(req).split('https://')[i].split('"')[0]:
-            image = "https://" + \
-                str(req).split('https://')[i].split('"')[0]
-            if requests.get(image).status_code == 200:
-                queue.put(image)
-                break
+    html = req.content.split('["')
+    for slice in html:
+        if slice.startswith('https') and slice.split('"')[0].split('.')[-1] in extensions:
+            image=slice.split('"')[0]
+            queue.put(image)
+            break
 
 
 async def GIF(message, message2, serverinfo, playerinfo):

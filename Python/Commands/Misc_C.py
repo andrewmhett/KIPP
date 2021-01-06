@@ -87,7 +87,8 @@ async def MULTIIMAGE(message, message2, serverinfo, playerinfo):
     proc.start()
     images=[]
     try:
-        images.append(queue.get(timeout=10))
+        for i in range(5):
+            images.append(queue.get(timeout=10))
     except Exception:
         pass
     if len(images)==0:

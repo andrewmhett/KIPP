@@ -21,8 +21,7 @@ import youtube_dl
 import subprocess
 import audioop
 EMBEDCOLOR = 0x36393E
-#HEROKU_URL="https://kipp-web-dashboard.herokuapp.com"
-HEROKU_URL="http://192.168.112.177:12345"
+HEROKU_URL="https://kipp-web-dashboard.herokuapp.com"
 logging.getLogger().setLevel(logging.INFO)
 try:
     from Token import TOKEN

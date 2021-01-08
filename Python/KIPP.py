@@ -154,13 +154,6 @@ async def background_loop():
                 except discord.DiscordException:
                     print("Binary clock rate limited...")
             for server in client.guilds:
-                if serverinfo[server].old_queue != serverinfo[server].queue[1:]:
-                    #update the queue on the web dashboard
-                    serverinfo[server].old_queue=serverinfo[server].queue[1:]
-                    queue_str=""
-                    for song_pair in serverinfo[server].queue[1:]:
-                        queue_str+=song_pair[0]+",->"+song_pair[1]+",\n"
-                    serverinfo[server].post_data("song_queue",queue_str)
                 if serverinfo[server].mHandler == None and len(
                         serverinfo[server].queue) >= 1:
                     music = serverinfo[server].queue[0][1]

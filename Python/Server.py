@@ -1,5 +1,6 @@
 from ESSENTIAL_PACKAGES import *
 import hashlib
+import time
 
 def READ_DATA_IN(path, condition=lambda x: True, attr_condition=lambda x: True):
     try:
@@ -26,6 +27,7 @@ KIPP_DIR = os.environ["KIPP_DIR"]
 class Server:
     def __init__(self, server):
         self.id_hash=hashlib.sha1(str(server.id).encode("utf-8")).hexdigest()
+        self.action_queue=[]
         self.task = None
         self.old_queue=[]
         self.server = server
@@ -43,6 +45,79 @@ class Server:
         self.playlist = None
         self.playlistindex = 0
         self.music_task = None
+        self.current_timestamp = ""
+        self.action_lookup={
+            "REMOVE_SONG":self.remove_song,
+            "SHUFFLE_QUEUE":self.shuffle_queue,
+            "CLEAR_QUEUE":self.clear_queue,
+            "MOVE_SONG":self.move_song,
+            "INITIALIZE":self.initialize_dashboard,
+            "TOGGLE_PAUSE":self.toggle_pause,
+            "SKIP":self.skip
+        }
+        threading.Thread(target=self.update_web_dashboard).start()
+        threading.Thread(target=self.track_time).start()
+        self.post_data("song_queue","")
+        self.post_data("current_song","")
+
+    def toggle_pause(self):
+        if self.mHandler.paused:
+            self.server.voice_client.resume()
+            self.mHandler.paused = False
+        else:
+            self.mHandler.pausedatetime = datetime.now()
+            self.mHandler.paused = True
+            self.server.voice_client.pause()
+
+    def skip(self):
+        if self.mHandler.paused == True:
+            self.server.voice_client.resume()
+            self.mHandler.paused = False
+        self.mHandler.skip()
+
+    def initialize_dashboard(self):
+        queue_str=""
+        for song_pair in self.queue[1:]:
+            queue_str+=song_pair[0]+",->"+song_pair[1]+",\n"
+        self.post_data("song_queue",queue_str)
+        c = datetime.datetime.now() - self.mHandler.starttime
+        current_song_json="{"+'"{0}":"{1}","{2}":"{3}","{4}":{5},"{6}":{7},"{8}":"{9}","{10}":"{11}"'.format(
+        "current_name",self.mHandler.title,"current_link",self.mHandler.link,
+        "total_length",self.mHandler.duration,"seconds_elapsed",c.seconds,
+        "current_timestamp",self.current_timestamp, "total_timestamp",self.mHandler.length)+"}"
+        self.post_data("current_song",current_song_json)
+
+    def remove_song(self, index):
+        index=int(index)+1
+        if index<len(self.queue):
+            self.queue.pop(index)
+
+    def shuffle_queue(self):
+        import random
+        end = None
+        new_queue = self.queue[1:]
+        if self.queue[len(self.queue) - 1][0].startswith("PLAYLIST: "):
+            end = self.queue[len(
+                self.queue) - 1]
+            new_queue = self.queue[1:-1]
+        random.shuffle(new_queue)
+        i = 1
+        for song in new_queue:
+            self.queue[i] = song
+            i += 1
+        if end != None:
+            self.queue[i] = end
+
+    def clear_queue(self):
+        self.queue=[]
+
+    def move_song(self,index1,index2):
+        index1=int(index1)+1
+        index2=int(index2)+1
+        if index2>0 and index2<len(self.queue):
+            prev=self.queue[index1]
+            self.queue[index1]=self.queue[index2]
+            self.queue[index2]=prev
 
     def pick_playlist_song(self):
         i = self.playlistindex
@@ -91,25 +166,99 @@ class Server:
 
     def post_data(self,endpoint,data):
         from private_key import n, d
-        hash=int.from_bytes(hashlib.sha512((datetime.strftime(datetime.utcnow(),"%H:%M")+data).encode('utf-8')).digest(),byteorder='big')
+        hash=int.from_bytes(hashlib.sha512((datetime.strftime(datetime.utcnow(),"%H:%M")+data).encode('latin1')).digest(),byteorder='big')
         signature=pow(hash,d,n)
         try:
             requests.post(HEROKU_URL+"/{0}?id_hash={1}&signature={2}".format(endpoint,self.id_hash,signature),data)
-        except Exception as e:
-            print(e)
+        except Exception:
             pass
+
+    def update_web_dashboard(self):
+        old_queue=[]
+        old_song_json=""
+        import datetime
+        while True:
+            if self.mHandler != None:
+                try:
+                    if old_queue != self.queue[1:]:
+                        #update the queue on the web dashboard
+                        old_queue=self.queue[1:]
+                        queue_str=""
+                        for song_pair in self.queue[1:]:
+                            queue_str+=song_pair[0]+",->"+song_pair[1]+",\n"
+                        self.post_data("song_queue",queue_str)
+                    c = datetime.datetime.now() - self.mHandler.starttime
+                    current_song_json="{"+'"{0}":"{1}","{2}":"{3}","{4}":{5},"{6}":{7},"{8}":"{9}","{10}":"{11}"'.format(
+                    "current_name",self.mHandler.title,"current_link",self.mHandler.link,
+                    "total_length",self.mHandler.duration,"seconds_elapsed",c.seconds,
+                    "current_timestamp",self.current_timestamp, "total_timestamp",self.mHandler.length)+"}"
+                    if current_song_json != old_song_json:
+                        old_song_json=current_song_json
+                        self.post_data("current_song",current_song_json)
+                    actions_str = requests.get(HEROKU_URL+"/action_queue?id_hash="+self.id_hash).content.decode()
+                    counter=0
+                    for action in actions_str.split("<br>"):
+                        if len(action)>0:
+                            counter+=1
+                            self.action_queue.append(action)
+                    if counter>0:
+                        self.post_data("action_queue","")
+                    for i in range(len(self.action_queue)-1):
+                        o=1
+                        while self.action_queue[i]==self.action_queue[i+o]:
+                            self.action_queue.pop(i+o)
+                            if o<len(self.action_queue)-1:
+                                o+=1
+                            else:
+                                break
+                    for action_set in self.action_queue:
+                        action=action_set.split(",->")[0]
+                        args=[]
+                        if ",->" in action_set:
+                            args=action_set.split(",->")[1:]
+                        self.action_lookup[action](*args)
+                        self.action_queue.pop(0)
+                except Exception:
+                    pass
+                time.sleep(0.2)
+            else:
+                if old_song_json != {}:
+                    old_song_json={}
+                time.sleep(1)
+
+    def track_time(self):
+        import datetime
+        previous_time=datetime.datetime.now()
+        while True:
+            if self.mHandler != None:
+                c = datetime.datetime.now() - self.mHandler.starttime
+                if self.server.voice_client.is_playing():
+                    self.mHandler.is_playing = True
+                elif self.mHandler.paused:
+                    self.mHandler.is_playing = True
+                else:
+                    self.mHandler.is_playing = False
+                self.mHandler.resend_timer += (datetime.datetime.now()-previous_time).microseconds/1000000
+                if self.mHandler.paused:
+                    pausetime = datetime.datetime.now() - previous_time
+                    self.mHandler.starttime+=datetime.timedelta(microseconds=pausetime.microseconds)
+                else:
+                    if (self.mHandler.is_playing == False or c.seconds >= self.mHandler.duration) and self.mHandler.player.is_live == False:
+                        self.server.voice_client.stop()
+                        self.queue.remove(self.queue[0])
+                        self.mHandler.is_playing = False
+                        self.mHandler = None
+                        self.post_data("current_song","")
+                        self.end_time = datetime.datetime.now()
+                previous_time=datetime.datetime.now()
+                time.sleep(0.25)
+            else:
+                time.sleep(1)
 
     async def update_loop(self):
         while True:
             try:
                 if self.mHandler != None:
-                    if self.server.voice_client.is_playing():
-                        self.mHandler.is_playing = True
-                    elif self.mHandler.paused:
-                        self.mHandler.is_playing = True
-                    else:
-                        self.mHandler.is_playing = False
-                    self.mHandler.resend_timer += 1
                     import datetime
                     queuelist = "\nNo songs in queue"
                     if len(self.queue) > 1:
@@ -127,13 +276,8 @@ class Server:
                         if len(self.queue) - 3 > 0:
                             queuelist += ("\n`...and {0} more songs`".format(len(self.queue) - 3) if len(
                                 self.queue) - 3 > 1 else "\n`...and 1 more song`")
-                    if self.mHandler.paused:
-                        self.mHandler.pausetime = datetime.datetime.now() - self.mHandler.pausedatetime
-                    if self.mHandler.pausetime == None:
-                        c = datetime.datetime.now() - self.mHandler.starttime
-                    else:
-                        c = datetime.datetime.now() - (self.mHandler.starttime +
-                                                       datetime.timedelta(seconds=self.mHandler.pausetime.seconds))
+
+                    c = datetime.datetime.now() - self.mHandler.starttime
                     if self.mHandler.paused == False:
                         progress = divmod(c.days * 86400 + c.seconds, 60)
                         self.mHandler.minutedelta = progress[0]
@@ -211,11 +355,13 @@ class Server:
                         else:
                             self.mHandler.minutedelta = str(
                                 self.mHandler.minutedelta)
-                        self.mHandler.desc = self.mHandler.desc + "\n`" + str(self.mHandler.hours) + ":" + str(
-                            self.mHandler.minutedelta) + ':' + str(self.mHandler.seconddelta) + ' / ' + self.mHandler.length + '`' + pauseStr
+                        self.current_timestamp= + str(self.mHandler.hours) + ":" + str(
+                            self.mHandler.minutedelta) + ':' + str(self.mHandler.seconddelta)
+                        self.mHandler.desc =  self.mHandler.desc+"\n`" +self.current_timestamp + ' / ' + self.mHandler.length + '`' + pauseStr
                     else:
-                        self.mHandler.desc = self.mHandler.desc + "\n`" + str(self.mHandler.minutedelta) + ':' + str(
-                            self.mHandler.seconddelta) + ' / ' + self.mHandler.length + '`' + pauseStr
+                        self.current_timestamp= str(self.mHandler.minutedelta) + ':' + str(
+                            self.mHandler.seconddelta)
+                        self.mHandler.desc =  self.mHandler.desc + "\n`" +self.current_timestamp + ' / ' + self.mHandler.length + '`' + pauseStr
                     self.mHandler.em.clear_fields()
                     self.mHandler.em.add_field(
                         name="Progress", value=self.mHandler.desc, inline=True)
@@ -235,10 +381,6 @@ class Server:
                             await self.mHandler.message.delete()
                         except discord.DiscordException:
                             pass
-                        self.queue.remove(self.queue[0])
-                        self.mHandler.is_playing = False
-                        self.mHandler = None
-                        self.end_time = datetime.datetime.now()
                     else:
                         if self.mHandler.message != None:
                             try:

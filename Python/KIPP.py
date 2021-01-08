@@ -166,6 +166,7 @@ async def background_loop():
                                 serverinfo[server].queue[0])
                     while len(serverinfo[server].queue) > 0:
                         try:
+                            serverinfo[server].action_queue=[]
                             player = await YTDLSource.from_url(
                                 music, loop=client.loop)
                             serverinfo[server].mHandler = music_handler(

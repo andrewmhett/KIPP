@@ -8,25 +8,28 @@
 # ╚═════════════════════════╝
 
 
-import random
-from Base4Clock import get_clock
 import os
+import random
+
+from Base4Clock import get_clock
+
 try:
     KIPP_DIR = os.environ['KIPP_DIR']
 except KeyError:
     os.environ['KIPP_DIR']=os.environ['PWD']
     KIPP_DIR=os.environ['PWD']
+import difflib
+import logging
+import subprocess
+import sys
+import threading
+
 import Commands
 from Command import commands
-from Profile import Profile
-from Music import search_music, music_handler, YTDLSource
-from Server import Server
 from ESSENTIAL_PACKAGES import *
-import sys
-import logging
-import threading
-import subprocess
-import difflib
+from Music import YTDLSource, music_handler, search_music
+from Profile import Profile
+from Server import Server
 
 sys.path.append(KIPP_DIR + "/Python/Commands")
 CREATOR_ID = 289920025077219328
@@ -281,8 +284,10 @@ async def on_ready():
 
 
 @client.event
-async def on_join(member):
+async def on_member_join(member):
+    global serverinfo
     server = member.server
+    serverinfo[server].post_data("members", "<br>".join("{0},->{1}".format(str(member).upper(),member.id) for member in server.members))
     if member not in playerinfo.keys():
         playerinfo[member] = Profile(member)
     if serverinfo[server].search_server_configs("WELCOME_CHANNEL") != None:
@@ -295,6 +300,11 @@ async def on_join(member):
                 "Welcome channel was deleted, couldn't send message to welcome channel"
             )
 
+@client.event
+async def on_member_leave(member):
+    global serverinfo
+    server = member.server
+    serverinfo[server].post_data("members", "<br>".join("{0},->{1}".format(str(member).upper(),member.id) for member in server.members))
 
 @client.event
 async def on_message(message):

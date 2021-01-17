@@ -287,7 +287,7 @@ async def on_ready():
 
 
 @client.event
-async def on_join(member):
+async def on_member_join(member):
     server = member.server
     if member not in playerinfo.keys():
         playerinfo[member] = Profile(member)

@@ -427,7 +427,7 @@ async def LEADERBOARD(message, message2, serverinfo, playerinfo):
             market_value_map[market.split(":")[0]] = int(
                 market.split(":")[1].split(" ")[2])
     await message.channel.send("Calculating values...")
-    for member in message.guild.members:
+    for member in playerinfo.keys():
         if not member.bot:
             shares = subprocess.Popen(["sudo", "-E", KIPP_DIR + "/C++/SHARES_IO", "r", str(member.id), "a"],
                                       stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()[0].decode().split("\n")
